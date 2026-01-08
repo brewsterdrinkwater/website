@@ -10,7 +10,10 @@ const AltTabWebsite = () => {
   const [totalScore, setTotalScore] = useState(0);
   const [gamesCompleted, setGamesCompleted] = useState(0);
   const [showHighScore, setShowHighScore] = useState(false);
-  const [currentGameType, setCurrentGameType] = useState('chess');
+  const [currentGameType, setCurrentGameType] = useState(() => {
+    const games = ['math', 'tictactoe', 'pattern', 'simon'];
+    return games[Math.floor(Math.random() * games.length)];
+  });
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -127,7 +130,7 @@ const AltTabWebsite = () => {
   };
 
   const getRandomGame = () => {
-    const games = ['chess', 'tictactoe', 'pattern', 'simon'];
+    const games = ['math', 'tictactoe', 'pattern', 'simon'];
     const availableGames = games.filter(g => g !== currentGameType);
     return availableGames[Math.floor(Math.random() * availableGames.length)];
   };
@@ -151,41 +154,46 @@ const AltTabWebsite = () => {
     </div>
   );
 
-  const ChessGame = () => {
-    const [board, setBoard] = useState([
-      ['♜', '', '', '', '♚', '', '', '♜'],
-      ['', '', '', '', '', '', '', ''],
-      ['', '', '', '', '', '', '', ''],
-      ['', '', '', '', '', '', '', ''],
-      ['', '', '', '', '', '', '', ''],
-      ['', '', '', '', '', '', '', ''],
-      ['', '', '', '', '', '', '♟', ''],
-      ['', '', '', '', '♔', '', '', '♕']
-    ]);
-    const [selected, setSelected] = useState(null);
-    const [won, setWon] = useState(false);
-    const [message, setMessage] = useState('Move the Queen to checkmate!');
-
-    const handleSquareClick = (row, col) => {
-      if (won) return;
-
-      if (selected) {
-        if (row === 0 && col === 4 && selected.piece === '♕') {
-          const newBoard = board.map(r => [...r]);
-          newBoard[selected.row][selected.col] = '';
-          newBoard[row][col] = '♕';
-          setBoard(newBoard);
-          setWon(true);
-          setMessage('Checkmate! +2 points');
-          completeGame(2);
-          setSelected(null);
-        } else {
-          setMessage('Not quite! Try moving the Queen to e8');
-          setSelected(null);
+  const MathGame = () => {
+    const [problem] = useState(() => {
+      const operations = [
+        { a: Math.floor(Math.random() * 10) + 5, b: Math.floor(Math.random() * 10) + 1, op: '+' },
+        { a: Math.floor(Math.random() * 10) + 10, b: Math.floor(Math.random() * 8) + 1, op: '-' },
+        { a: Math.floor(Math.random() * 8) + 2, b: Math.floor(Math.random() * 8) + 2, op: '×' },
+      ];
+      const selected = operations[Math.floor(Math.random() * operations.length)];
+      let answer;
+      if (selected.op === '+') answer = selected.a + selected.b;
+      else if (selected.op === '-') answer = selected.a - selected.b;
+      else answer = selected.a * selected.b;
+      return { ...selected, answer };
+    });
+    const [options] = useState(() => {
+      const opts = [problem.answer];
+      while (opts.length < 4) {
+        const offset = Math.floor(Math.random() * 10) - 5;
+        const wrong = problem.answer + offset;
+        if (wrong !== problem.answer && wrong > 0 && !opts.includes(wrong)) {
+          opts.push(wrong);
         }
-      } else if (board[row][col] === '♕') {
-        setSelected({ row, col, piece: '♕' });
-        setMessage('Now click where to move!');
+      }
+      return opts.sort(() => Math.random() - 0.5);
+    });
+    const [won, setWon] = useState(false);
+    const [message, setMessage] = useState('Tap the correct answer!');
+    const [selectedAnswer, setSelectedAnswer] = useState(null);
+
+    const handleClick = (answer) => {
+      if (won) return;
+      setSelectedAnswer(answer);
+
+      if (answer === problem.answer) {
+        setWon(true);
+        setMessage('Correct! +2 points');
+        completeGame(2);
+      } else {
+        setMessage('Wrong! Try again');
+        setTimeout(() => setSelectedAnswer(null), 500);
       }
     };
 
@@ -193,24 +201,32 @@ const AltTabWebsite = () => {
       <div className="p-6 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/40">
         <div className="flex justify-between items-center mb-4">
           <div>
-            <h3 className="text-xl font-bold text-white">Checkmate in 1</h3>
-            <p className="text-sm text-white/70">Medium • 2 points</p>
+            <h3 className="text-xl font-bold text-white">Quick Math</h3>
+            <p className="text-sm text-white/70">Easy • 2 points</p>
           </div>
         </div>
-        <div className="grid grid-cols-8 gap-0.5 mb-4 max-w-md mx-auto">
-          {board.map((row, rowIdx) => row.map((piece, colIdx) => (
+        <div className="text-center mb-6">
+          <p className="text-5xl font-bold text-white mb-2">
+            {problem.a} {problem.op} {problem.b} = ?
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto mb-4">
+          {options.map((opt, idx) => (
             <button
-              key={`${rowIdx}-${colIdx}`}
-              onClick={() => handleSquareClick(rowIdx, colIdx)}
-              className={`aspect-square flex items-center justify-center text-2xl transition-all ${
-                (rowIdx + colIdx) % 2 === 0 ? 'bg-cyan-200/90' : 'bg-purple-800/90'
-              } ${selected?.row === rowIdx && selected?.col === colIdx ? 'ring-4 ring-yellow-400' : ''} ${
-                won ? 'cursor-not-allowed' : 'hover:opacity-80 cursor-pointer'
-              }`}
+              key={idx}
+              onClick={() => handleClick(opt)}
+              disabled={won}
+              className={`py-4 text-2xl font-bold rounded-xl transition-all ${
+                won && opt === problem.answer
+                  ? 'bg-green-500 text-white'
+                  : selectedAnswer === opt && opt !== problem.answer
+                  ? 'bg-red-500 text-white'
+                  : 'bg-white/20 text-white hover:bg-white/30'
+              } ${won ? 'cursor-not-allowed' : 'cursor-pointer hover:scale-105'}`}
             >
-              {piece}
+              {opt}
             </button>
-          )))}
+          ))}
         </div>
         <p className={`text-center text-lg font-medium ${won ? 'text-yellow-300' : 'text-white'}`}>
           {message}
@@ -505,7 +521,7 @@ const AltTabWebsite = () => {
 
   const GameSection = () => (
     <div className="max-w-2xl mx-auto">
-      {currentGameType === 'chess' && <ChessGame />}
+      {currentGameType === 'math' && <MathGame />}
       {currentGameType === 'tictactoe' && <TicTacToeGame />}
       {currentGameType === 'pattern' && <PatternGame />}
       {currentGameType === 'simon' && <SimonGame />}
