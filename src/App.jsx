@@ -53,66 +53,60 @@ const AltTabWebsite = () => {
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      drawMap();
+    };
+
+    const drawMap = () => {
+      // Draw gradient background first
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      gradient.addColorStop(0, '#0a0a1a');
+      gradient.addColorStop(1, '#1a1a2e');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Load map tiles from OpenStreetMap (free, no API key required)
+      const zoom = 14;
+      const tileSize = 256;
+
+      // Convert lat/lng to tile coordinates
+      const latRad = currentCity.lat * Math.PI / 180;
+      const n = Math.pow(2, zoom);
+      const xTile = Math.floor((currentCity.lng + 180) / 360 * n);
+      const yTile = Math.floor((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n);
+
+      // Calculate how many tiles we need to cover the screen
+      const tilesX = Math.ceil(canvas.width / tileSize) + 2;
+      const tilesY = Math.ceil(canvas.height / tileSize) + 2;
+
+      // Load and draw map tiles
+      const startX = xTile - Math.floor(tilesX / 2);
+      const startY = yTile - Math.floor(tilesY / 2);
+
+      for (let i = 0; i < tilesX; i++) {
+        for (let j = 0; j < tilesY; j++) {
+          const img = new window.Image();
+          img.crossOrigin = 'anonymous';
+
+          const tileX = startX + i;
+          const tileY = startY + j;
+
+          // Use CartoDB dark tiles (free, no API key, CORS-enabled)
+          img.src = `https://cartodb-basemaps-a.global.ssl.fastly.net/dark_all/${zoom}/${tileX}/${tileY}.png`;
+
+          img.onload = () => {
+            const posX = i * tileSize - (tilesX * tileSize - canvas.width) / 2;
+            const posY = j * tileSize - (tilesY * tileSize - canvas.height) / 2;
+
+            ctx.globalAlpha = 0.4;
+            ctx.drawImage(img, posX, posY, tileSize, tileSize);
+            ctx.globalAlpha = 1;
+          };
+        }
+      }
     };
 
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
-
-    // Load map tiles from OpenStreetMap
-    const zoom = 13;
-    const tileSize = 256;
-
-    // Convert lat/lng to tile coordinates
-    const latRad = currentCity.lat * Math.PI / 180;
-    const n = Math.pow(2, zoom);
-    const xTile = Math.floor((currentCity.lng + 180) / 360 * n);
-    const yTile = Math.floor((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n);
-
-    // Calculate how many tiles we need to cover the screen
-    const tilesX = Math.ceil(canvas.width / tileSize) + 2;
-    const tilesY = Math.ceil(canvas.height / tileSize) + 2;
-
-    // Draw gradient background first
-    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, '#0a0a1a');
-    gradient.addColorStop(1, '#1a1a2e');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Load and draw map tiles
-    const startX = xTile - Math.floor(tilesX / 2);
-    const startY = yTile - Math.floor(tilesY / 2);
-
-    let loadedTiles = 0;
-    const totalTiles = tilesX * tilesY;
-
-    for (let i = 0; i < tilesX; i++) {
-      for (let j = 0; j < tilesY; j++) {
-        const img = new window.Image();
-        img.crossOrigin = 'anonymous';
-
-        const tileX = startX + i;
-        const tileY = startY + j;
-
-        // Use Stamen Toner for stylized look (now hosted by Stadia Maps)
-        img.src = `https://tiles.stadiamaps.com/tiles/stamen_toner/${zoom}/${tileX}/${tileY}.png`;
-
-        img.onload = () => {
-          const posX = i * tileSize - (tilesX * tileSize - canvas.width) / 2;
-          const posY = j * tileSize - (tilesY * tileSize - canvas.height) / 2;
-
-          ctx.globalAlpha = 0.3;
-          ctx.drawImage(img, posX, posY, tileSize, tileSize);
-          ctx.globalAlpha = 1;
-
-          loadedTiles++;
-        };
-
-        img.onerror = () => {
-          loadedTiles++;
-        };
-      }
-    }
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
