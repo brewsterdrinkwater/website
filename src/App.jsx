@@ -1,6 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, X, Sparkles, Zap, Grid3x3, Image, BookOpen, ShoppingBag, Trophy, RefreshCw, Award } from 'lucide-react';
-import * as THREE from 'three';
+import { Menu, X, Sparkles, Zap, Grid3x3, Image, BookOpen, ShoppingBag, Trophy, RefreshCw, Award, MapPin } from 'lucide-react';
+
+// City data with coordinates for map background
+const CITIES = [
+  { name: 'Nashville, TN', lat: 36.1627, lng: -86.7816, country: 'USA' },
+  { name: 'Tokyo', lat: 35.6762, lng: 139.6503, country: 'Japan' },
+  { name: 'London', lat: 51.5074, lng: -0.1278, country: 'UK' },
+  { name: 'New York, NY', lat: 40.7128, lng: -74.0060, country: 'USA' },
+  { name: 'Paris', lat: 48.8566, lng: 2.3522, country: 'France' },
+  { name: 'Sydney', lat: -33.8688, lng: 151.2093, country: 'Australia' },
+  { name: 'Berlin', lat: 52.5200, lng: 13.4050, country: 'Germany' },
+  { name: 'São Paulo', lat: -23.5505, lng: -46.6333, country: 'Brazil' },
+  { name: 'Seoul', lat: 37.5665, lng: 126.9780, country: 'South Korea' },
+  { name: 'Amsterdam', lat: 52.3676, lng: 4.9041, country: 'Netherlands' },
+  { name: 'Los Angeles, CA', lat: 34.0522, lng: -118.2437, country: 'USA' },
+  { name: 'Copenhagen', lat: 55.6761, lng: 12.5683, country: 'Denmark' },
+];
 
 const AltTabWebsite = () => {
   const [currentPage, setCurrentPage] = useState('home');
@@ -14,6 +29,7 @@ const AltTabWebsite = () => {
     const games = ['math', 'tictactoe', 'pattern', 'simon'];
     return games[Math.floor(Math.random() * games.length)];
   });
+  const [currentCity] = useState(() => CITIES[Math.floor(Math.random() * CITIES.length)]);
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -27,96 +43,81 @@ const AltTabWebsite = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // Three.js Earth
+  // Canvas map background
   useEffect(() => {
     if (!canvasRef.current) return;
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas: canvasRef.current, alpha: true, antialias: true });
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-
-    // Create Earth sphere
-    const geometry = new THREE.SphereGeometry(2, 32, 32);
-
-    // Create Earth material with colors
-    const material = new THREE.MeshPhongMaterial({
-      color: 0x2194ce,
-      emissive: 0x112244,
-      specular: 0x333333,
-      shininess: 25,
-      wireframe: false
-    });
-
-    const earth = new THREE.Mesh(geometry, material);
-    scene.add(earth);
-
-    // Add clouds layer
-    const cloudGeometry = new THREE.SphereGeometry(2.05, 32, 32);
-    const cloudMaterial = new THREE.MeshPhongMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.2,
-      wireframe: true
-    });
-    const clouds = new THREE.Mesh(cloudGeometry, cloudMaterial);
-    scene.add(clouds);
-
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0x404040, 1);
-    scene.add(ambientLight);
-
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(5, 3, 5);
-    scene.add(directionalLight);
-
-    camera.position.z = 5;
-
-    let mouseX = 0;
-    let mouseY = 0;
-
-    const onMouseMove = (event) => {
-      mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-      mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     };
 
-    window.addEventListener('mousemove', onMouseMove);
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
-    const animate = () => {
-      requestAnimationFrame(animate);
+    // Load map tiles from OpenStreetMap
+    const zoom = 13;
+    const tileSize = 256;
 
-      earth.rotation.y += 0.001;
-      earth.rotation.x = mouseY * 0.3;
-      earth.rotation.y += mouseX * 0.01;
+    // Convert lat/lng to tile coordinates
+    const latRad = currentCity.lat * Math.PI / 180;
+    const n = Math.pow(2, zoom);
+    const xTile = Math.floor((currentCity.lng + 180) / 360 * n);
+    const yTile = Math.floor((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n);
 
-      clouds.rotation.y += 0.0015;
-      clouds.rotation.x = mouseY * 0.2;
+    // Calculate how many tiles we need to cover the screen
+    const tilesX = Math.ceil(canvas.width / tileSize) + 2;
+    const tilesY = Math.ceil(canvas.height / tileSize) + 2;
 
-      renderer.render(scene, camera);
-    };
+    // Draw gradient background first
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, '#0a0a1a');
+    gradient.addColorStop(1, '#1a1a2e');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    animate();
+    // Load and draw map tiles
+    const startX = xTile - Math.floor(tilesX / 2);
+    const startY = yTile - Math.floor(tilesY / 2);
 
-    const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    };
+    let loadedTiles = 0;
+    const totalTiles = tilesX * tilesY;
 
-    window.addEventListener('resize', handleResize);
+    for (let i = 0; i < tilesX; i++) {
+      for (let j = 0; j < tilesY; j++) {
+        const img = new window.Image();
+        img.crossOrigin = 'anonymous';
+
+        const tileX = startX + i;
+        const tileY = startY + j;
+
+        // Use Stamen Toner for stylized look (now hosted by Stadia Maps)
+        img.src = `https://tiles.stadiamaps.com/tiles/stamen_toner/${zoom}/${tileX}/${tileY}.png`;
+
+        img.onload = () => {
+          const posX = i * tileSize - (tilesX * tileSize - canvas.width) / 2;
+          const posY = j * tileSize - (tilesY * tileSize - canvas.height) / 2;
+
+          ctx.globalAlpha = 0.3;
+          ctx.drawImage(img, posX, posY, tileSize, tileSize);
+          ctx.globalAlpha = 1;
+
+          loadedTiles++;
+        };
+
+        img.onerror = () => {
+          loadedTiles++;
+        };
+      }
+    }
 
     return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('resize', handleResize);
-      renderer.dispose();
-      geometry.dispose();
-      material.dispose();
-      cloudGeometry.dispose();
-      cloudMaterial.dispose();
+      window.removeEventListener('resize', resizeCanvas);
     };
-  }, []);
+  }, [currentCity]);
 
   const completeGame = (points) => {
     setTotalScore(prev => prev + points);
@@ -666,15 +667,15 @@ const AltTabWebsite = () => {
     };
 
     const projects = [
-      { title: 'Digital Archive Platform', category: 'Digital Goods', size: 'large' },
-      { title: 'Community Library Space', category: 'Physical Goods', size: 'medium' },
-      { title: 'Youth Literacy Initiative', category: 'Policy', size: 'medium' },
-      { title: 'Interactive Reading Experience', category: 'Experiences', size: 'large' },
-      { title: 'Sustainable Product Line', category: 'Physical Goods', size: 'small' },
-      { title: 'Data Visualization Tool', category: 'Digital Goods', size: 'medium' },
-      { title: 'Public Art Installation', category: 'Experiences', size: 'small' },
-      { title: 'Education Policy Framework', category: 'Policy', size: 'medium' },
-      { title: 'Adaptive Furniture Collection', category: 'Physical Goods', size: 'large' },
+      { title: 'Digital Archive Platform', category: 'Digital Goods', size: 'large', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop' },
+      { title: 'Modular Office System', category: 'Furniture', size: 'medium', image: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=600&h=400&fit=crop' },
+      { title: 'Athletic Apparel Line', category: 'Sportswear', size: 'medium', image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&h=400&fit=crop' },
+      { title: 'E-Commerce Experience', category: 'Web Design', size: 'large', image: 'https://images.unsplash.com/photo-1522542550221-31fd8575f4a7?w=800&h=600&fit=crop' },
+      { title: 'Minimalist Shelving', category: 'Furniture', size: 'small', image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=400&fit=crop' },
+      { title: 'Team Kit Design', category: 'Sportswear', size: 'medium', image: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600&h=400&fit=crop' },
+      { title: 'Portfolio Website', category: 'Web Design', size: 'small', image: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=400&h=400&fit=crop' },
+      { title: 'Training Gear Collection', category: 'Sportswear', size: 'medium', image: 'https://images.unsplash.com/photo-1556906781-9a412961c28c?w=600&h=400&fit=crop' },
+      { title: 'Workspace Furniture Suite', category: 'Furniture', size: 'large', image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop' },
     ];
 
     return (
@@ -699,24 +700,18 @@ const AltTabWebsite = () => {
                 key={i}
                 className={`group relative ${sizeClasses[project.size]} rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 overflow-hidden hover:border-white/60 transition-all duration-300 cursor-pointer hover:scale-[1.02]`}
               >
-                <div className={`absolute inset-0 bg-gradient-to-br ${
-                  i % 4 === 0 ? 'from-cyan-400 to-blue-600' :
-                  i % 4 === 1 ? 'from-purple-400 to-pink-600' :
-                  i % 4 === 2 ? 'from-yellow-400 to-orange-600' :
-                  'from-green-400 to-teal-600'
-                } opacity-60`} />
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
 
-                <div className="absolute inset-0 flex items-center justify-center opacity-20">
-                  <Grid3x3 size={project.size === 'large' ? 80 : project.size === 'medium' ? 60 : 40} className="text-white" />
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                <div className="absolute inset-0 flex flex-col justify-end p-4">
                   <span className="text-xs text-white/70 uppercase tracking-wider mb-1">{project.category}</span>
                   <h3 className="text-lg md:text-xl font-bold text-white">{project.title}</h3>
-                </div>
-
-                <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-sm px-2 py-1 rounded text-xs text-white/70">
-                  Image {i + 1}
                 </div>
               </div>
             );
@@ -805,66 +800,122 @@ const AltTabWebsite = () => {
   };
 
   const MoodboardsPage = () => {
+    const moodboardImages = [
+      { src: 'https://images.unsplash.com/photo-1547447134-cd3f5c716030?w=600&h=600&fit=crop', alt: 'Skateboard deck art', category: 'Skate Culture' },
+      { src: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?w=600&h=600&fit=crop', alt: 'Basketball sneakers', category: 'Footwear' },
+      { src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=600&fit=crop', alt: 'Skateboard wheels closeup', category: 'Skate Culture' },
+      { src: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=600&h=600&fit=crop', alt: 'Nike running shoes', category: 'Footwear' },
+      { src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=600&fit=crop', alt: 'Abstract geometric art', category: 'Design' },
+      { src: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&h=600&fit=crop', alt: 'Art supplies and paint', category: 'Art' },
+      { src: 'https://images.unsplash.com/photo-1564866657315-5dcfd5ebf529?w=600&h=600&fit=crop', alt: 'Colorful sneaker collection', category: 'Footwear' },
+      { src: 'https://images.unsplash.com/photo-1555445091-5a8b655e8a4a?w=600&h=600&fit=crop', alt: 'Skatepark architecture', category: 'Skate Culture' },
+      { src: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=600&h=600&fit=crop', alt: 'Abstract fluid art', category: 'Art' },
+      { src: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=600&h=600&fit=crop', alt: 'Air Jordan sneakers', category: 'Footwear' },
+      { src: 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=600&h=600&fit=crop', alt: 'Typography design', category: 'Design' },
+      { src: 'https://images.unsplash.com/photo-1569091791842-7cfb64e04797?w=600&h=600&fit=crop', alt: 'Skateboard in motion', category: 'Skate Culture' },
+    ];
+
     return (
       <div className="space-y-8">
-        <h2 className="text-5xl font-black text-white drop-shadow-lg">Moodboards</h2>
+        <div className="text-center space-y-4">
+          <h2 className="text-5xl md:text-6xl font-black text-white drop-shadow-lg">Moodboards</h2>
+          <p className="text-xl text-white/80 max-w-2xl mx-auto">
+            Visual inspiration from skate culture, footwear design, and contemporary art
+          </p>
+        </div>
 
-        <p className="text-white/80">Scroll horizontally, click to zoom. Images coming soon.</p>
-        <div className="overflow-x-auto overflow-y-hidden whitespace-nowrap py-4">
+        <div className="overflow-x-auto overflow-y-hidden whitespace-nowrap py-4 -mx-4 px-4">
           <div className="inline-flex gap-4">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div key={i} className="inline-block w-64 h-64 md:w-80 md:h-80 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/30 hover:border-white/60 transition-all duration-300 cursor-zoom-in hover:scale-105">
-                <div className="w-full h-full flex items-center justify-center">
-                  <Image size={48} className="text-white/50" />
+            {moodboardImages.map((image, i) => (
+              <div
+                key={i}
+                className="inline-block w-64 h-64 md:w-80 md:h-80 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/30 hover:border-white/60 transition-all duration-300 cursor-zoom-in hover:scale-105 overflow-hidden relative group flex-shrink-0"
+              >
+                <img
+                  src={image.src}
+                  alt={image.alt}
+                  loading="lazy"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                  <span className="text-xs text-white/70 uppercase tracking-wider">{image.category}</span>
+                  <span className="text-sm text-white font-medium">{image.alt}</span>
                 </div>
               </div>
             ))}
           </div>
         </div>
+
+        <p className="text-white/60 text-sm text-center">Scroll horizontally to explore • Click to zoom</p>
       </div>
     );
   };
 
   const AboutPage = () => {
-    const [ripples, setRipples] = useState([]);
-    const handleClick = (e) => {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      setRipples([...ripples, { x, y, id: Date.now() }]);
-      setTimeout(() => setRipples(r => r.slice(1)), 1000);
-    };
-
     return (
-      <div className="space-y-8">
-        <h2 className="text-5xl font-black text-white drop-shadow-lg">Philosophy</h2>
-
-        <GameSection />
-
-        <div
-          onClick={handleClick}
-          className="relative p-8 md:p-12 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/30 overflow-hidden cursor-pointer"
-        >
-          {ripples.map(ripple => (
-            <div
-              key={ripple.id}
-              className="absolute rounded-full border-2 border-white pointer-events-none animate-ping"
-              style={{
-                left: ripple.x,
-                top: ripple.y,
-                width: '20px',
-                height: '20px',
-                transform: 'translate(-50%, -50%)'
-              }}
-            />
-          ))}
-          <p className="text-xl text-white/90 leading-relaxed mb-4">
-            [Your philosophy text will go here]
-          </p>
-          <p className="text-white/70">
-            Click anywhere to create ripples while you read. Image placeholder coming soon.
+      <div className="space-y-12">
+        <div className="text-center space-y-4">
+          <h2 className="text-5xl md:text-6xl font-black text-white drop-shadow-lg">Philosophy</h2>
+          <p className="text-xl text-white/80 max-w-2xl mx-auto">
+            Where research meets creativity, and ideas become reality
           </p>
         </div>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="p-8 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/30">
+            <h3 className="text-2xl font-bold text-white mb-4">Human-Centric Design</h3>
+            <p className="text-white/90 leading-relaxed mb-4">
+              At Alt-Tab, we believe that exceptional design begins with deep understanding. Our human-centric approach places people at the center of every project, ensuring that the products and experiences we create genuinely improve lives.
+            </p>
+            <p className="text-white/80 leading-relaxed">
+              Through rigorous user research and empathy-driven methodologies, we uncover insights that inform meaningful solutions. We don't design for users—we design with them.
+            </p>
+          </div>
+
+          <div className="p-8 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/30">
+            <h3 className="text-2xl font-bold text-white mb-4">Research-Driven Process</h3>
+            <p className="text-white/90 leading-relaxed mb-4">
+              Our process is grounded in systematic research and evidence-based decision making. We combine qualitative and quantitative methods to build a comprehensive understanding of complex challenges.
+            </p>
+            <p className="text-white/80 leading-relaxed">
+              From ethnographic studies to data analysis, our research practice ensures that every design decision is informed by real-world insights rather than assumptions.
+            </p>
+          </div>
+
+          <div className="p-8 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/30">
+            <h3 className="text-2xl font-bold text-white mb-4">Rapid Prototyping</h3>
+            <p className="text-white/90 leading-relaxed mb-4">
+              We believe in learning by making. Our rapid prototyping approach allows us to quickly test ideas, gather feedback, and iterate toward optimal solutions.
+            </p>
+            <p className="text-white/80 leading-relaxed">
+              By creating tangible artifacts early in the process, we reduce risk and accelerate innovation. Fail fast, learn faster—that's the Alt-Tab way.
+            </p>
+          </div>
+
+          <div className="p-8 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/30">
+            <h3 className="text-2xl font-bold text-white mb-4">Multi-Disciplinary Collaboration</h3>
+            <p className="text-white/90 leading-relaxed mb-4">
+              Complex problems require diverse perspectives. Our team brings together expertise from industrial design, library science, technology, and strategic consulting.
+            </p>
+            <p className="text-white/80 leading-relaxed">
+              This cross-pollination of disciplines enables us to approach challenges from multiple angles and deliver holistic solutions that address both immediate needs and long-term impact.
+            </p>
+          </div>
+        </div>
+
+        <div className="p-8 md:p-12 rounded-2xl bg-gradient-to-br from-cyan-500/30 to-purple-500/30 backdrop-blur-md border-2 border-white/30">
+          <div className="max-w-3xl mx-auto text-center">
+            <h3 className="text-3xl font-bold text-white mb-6">Our Mission</h3>
+            <p className="text-xl text-white/90 leading-relaxed mb-6">
+              Alt-Tab exists to bridge the gap between human needs and technological possibility. We are a think tank dedicated to designing experiences and products that enhance the quality of human life.
+            </p>
+            <p className="text-lg text-white/80 leading-relaxed">
+              Whether developing digital platforms, physical products, policy frameworks, or immersive experiences, we maintain an unwavering commitment to thoughtful, intentional design that serves people first.
+            </p>
+          </div>
+        </div>
+
+        <GameSection />
       </div>
     );
   };
@@ -893,12 +944,18 @@ const AltTabWebsite = () => {
 
   return (
     <div className="min-h-screen text-white overflow-x-hidden">
-      {/* 3D Earth Background */}
+      {/* Map Background */}
       <canvas
         ref={canvasRef}
         className="fixed inset-0 w-full h-full"
-        style={{ background: 'linear-gradient(to bottom, #000000, #1a1a2e)' }}
+        style={{ background: 'linear-gradient(to bottom, #0a0a1a, #1a1a2e)' }}
       />
+
+      {/* Location Badge */}
+      <div className="fixed bottom-4 left-4 z-40 flex items-center gap-2 px-3 py-2 rounded-full bg-black/50 backdrop-blur-md border border-white/20">
+        <MapPin size={16} className="text-cyan-400" />
+        <span className="text-sm text-white/80">{currentCity.name}</span>
+      </div>
 
       {showHighScore && <HighScorePopup />}
 
