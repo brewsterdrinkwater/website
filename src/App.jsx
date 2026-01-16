@@ -1,27 +1,28 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Menu, X, Sparkles, Zap, Grid3x3, Image, BookOpen, ShoppingBag, Trophy, RefreshCw, Award, MapPin } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Menu, X, Sparkles, Grid3x3, Image, BookOpen, ShoppingBag, Trophy, RefreshCw, Award, ExternalLink, Construction } from 'lucide-react';
 
-// City data with coordinates for map background
-const CITIES = [
-  { name: 'Nashville, TN', lat: 36.1627, lng: -86.7816, country: 'USA' },
-  { name: 'Tokyo', lat: 35.6762, lng: 139.6503, country: 'Japan' },
-  { name: 'London', lat: 51.5074, lng: -0.1278, country: 'UK' },
-  { name: 'New York, NY', lat: 40.7128, lng: -74.0060, country: 'USA' },
-  { name: 'Paris', lat: 48.8566, lng: 2.3522, country: 'France' },
-  { name: 'Sydney', lat: -33.8688, lng: 151.2093, country: 'Australia' },
-  { name: 'Berlin', lat: 52.5200, lng: 13.4050, country: 'Germany' },
-  { name: 'São Paulo', lat: -23.5505, lng: -46.6333, country: 'Brazil' },
-  { name: 'Seoul', lat: 37.5665, lng: 126.9780, country: 'South Korea' },
-  { name: 'Amsterdam', lat: 52.3676, lng: 4.9041, country: 'Netherlands' },
-  { name: 'Los Angeles, CA', lat: 34.0522, lng: -118.2437, country: 'USA' },
-  { name: 'Copenhagen', lat: 55.6761, lng: 12.5683, country: 'Denmark' },
+// Cumberland River background image (optimized for web/mobile)
+const BACKGROUND_IMAGE = 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920&q=80';
+
+// Drudge-style news links
+const NEWS_LINKS = [
+  { title: 'DESIGN MILK', url: 'https://design-milk.com', category: 'Design' },
+  { title: 'DEZEEN', url: 'https://dezeen.com', category: 'Architecture' },
+  { title: 'IT\'S NICE THAT', url: 'https://itsnicethat.com', category: 'Creative' },
+  { title: 'CORE77', url: 'https://core77.com', category: 'Industrial' },
+  { title: 'FAST COMPANY', url: 'https://fastcompany.com', category: 'Business' },
+  { title: 'WIRED', url: 'https://wired.com', category: 'Tech' },
+  { title: 'AIGA EYE ON DESIGN', url: 'https://eyeondesign.aiga.org', category: 'Design' },
+  { title: 'THE VERGE', url: 'https://theverge.com', category: 'Tech' },
+  { title: 'HYPEBEAST', url: 'https://hypebeast.com', category: 'Culture' },
+  { title: 'COOL HUNTING', url: 'https://coolhunting.com', category: 'Culture' },
+  { title: 'CREATIVE REVIEW', url: 'https://creativereview.co.uk', category: 'Creative' },
+  { title: 'INHABITAT', url: 'https://inhabitat.com', category: 'Sustainability' },
 ];
 
 const AltTabWebsite = () => {
   const [currentPage, setCurrentPage] = useState('home');
   const [menuOpen, setMenuOpen] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
-  const [cursorTrail, setCursorTrail] = useState([]);
   const [totalScore, setTotalScore] = useState(0);
   const [gamesCompleted, setGamesCompleted] = useState(0);
   const [showHighScore, setShowHighScore] = useState(false);
@@ -29,89 +30,6 @@ const AltTabWebsite = () => {
     const games = ['math', 'tictactoe', 'pattern', 'simon'];
     return games[Math.floor(Math.random() * games.length)];
   });
-  const [currentCity] = useState(() => CITIES[Math.floor(Math.random() * CITIES.length)]);
-  const canvasRef = useRef(null);
-
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      const x = (e.clientX / window.innerWidth) * 100;
-      const y = (e.clientY / window.innerHeight) * 100;
-      setMousePos({ x, y });
-      setCursorTrail(prev => [...prev.slice(-20), { x: e.clientX, y: e.clientY, id: Date.now() }]);
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  // Canvas map background
-  useEffect(() => {
-    if (!canvasRef.current) return;
-
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      drawMap();
-    };
-
-    const drawMap = () => {
-      // Draw gradient background first
-      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      gradient.addColorStop(0, '#0a0a1a');
-      gradient.addColorStop(1, '#1a1a2e');
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Load map tiles from OpenStreetMap (free, no API key required)
-      const zoom = 14;
-      const tileSize = 256;
-
-      // Convert lat/lng to tile coordinates
-      const latRad = currentCity.lat * Math.PI / 180;
-      const n = Math.pow(2, zoom);
-      const xTile = Math.floor((currentCity.lng + 180) / 360 * n);
-      const yTile = Math.floor((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n);
-
-      // Calculate how many tiles we need to cover the screen
-      const tilesX = Math.ceil(canvas.width / tileSize) + 2;
-      const tilesY = Math.ceil(canvas.height / tileSize) + 2;
-
-      // Load and draw map tiles
-      const startX = xTile - Math.floor(tilesX / 2);
-      const startY = yTile - Math.floor(tilesY / 2);
-
-      for (let i = 0; i < tilesX; i++) {
-        for (let j = 0; j < tilesY; j++) {
-          const img = new window.Image();
-          img.crossOrigin = 'anonymous';
-
-          const tileX = startX + i;
-          const tileY = startY + j;
-
-          // Use CartoDB dark tiles (free, no API key, CORS-enabled)
-          img.src = `https://cartodb-basemaps-a.global.ssl.fastly.net/dark_all/${zoom}/${tileX}/${tileY}.png`;
-
-          img.onload = () => {
-            const posX = i * tileSize - (tilesX * tileSize - canvas.width) / 2;
-            const posY = j * tileSize - (tilesY * tileSize - canvas.height) / 2;
-
-            ctx.globalAlpha = 0.4;
-            ctx.drawImage(img, posX, posY, tileSize, tileSize);
-            ctx.globalAlpha = 1;
-          };
-        }
-      }
-    };
-
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    return () => {
-      window.removeEventListener('resize', resizeCanvas);
-    };
-  }, [currentCity]);
 
   const completeGame = (points) => {
     setTotalScore(prev => prev + points);
@@ -128,6 +46,12 @@ const AltTabWebsite = () => {
     const games = ['math', 'tictactoe', 'pattern', 'simon'];
     const availableGames = games.filter(g => g !== currentGameType);
     return availableGames[Math.floor(Math.random() * availableGames.length)];
+  };
+
+  const navigateTo = (page) => {
+    setCurrentPage(page);
+    setMenuOpen(false);
+    window.scrollTo(0, 0);
   };
 
   const HighScorePopup = () => (
@@ -480,7 +404,7 @@ const AltTabWebsite = () => {
 
   const NavItem = ({ icon: Icon, label, page }) => (
     <button
-      onClick={() => { setCurrentPage(page); setMenuOpen(false); }}
+      onClick={() => navigateTo(page)}
       className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
         currentPage === page
           ? 'bg-white/30 text-white shadow-lg scale-105 backdrop-blur-md'
@@ -492,30 +416,8 @@ const AltTabWebsite = () => {
     </button>
   );
 
-  const InteractiveCard = ({ title, children, delay = 0 }) => {
-    const [isHovered, setIsHovered] = useState(false);
-    return (
-      <div
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        className={`relative p-6 rounded-2xl border-2 backdrop-blur-md transition-all duration-500 cursor-pointer ${
-          isHovered
-            ? 'border-white/60 bg-white/30 shadow-2xl scale-105 -translate-y-2'
-            : 'border-white/30 bg-white/10'
-        }`}
-        style={{ transitionDelay: `${delay}ms` }}
-      >
-        {isHovered && (
-          <div className="absolute inset-0 rounded-2xl bg-white/20 blur-xl -z-10" />
-        )}
-        <h3 className="text-xl font-bold mb-2 text-white">{title}</h3>
-        {children}
-      </div>
-    );
-  };
-
   const GameSection = () => (
-    <div className="max-w-2xl mx-auto">
+    <div className="w-full">
       {currentGameType === 'math' && <MathGame />}
       {currentGameType === 'tictactoe' && <TicTacToeGame />}
       {currentGameType === 'pattern' && <PatternGame />}
@@ -523,9 +425,32 @@ const AltTabWebsite = () => {
     </div>
   );
 
+  // Drudge-style links component
+  const NewsLinks = () => (
+    <div className="p-4 rounded-2xl bg-black/80 border-2 border-white/20">
+      <h3 className="text-center font-bold text-red-500 text-lg mb-4 border-b border-white/20 pb-2">
+        ★ HEADLINES ★
+      </h3>
+      <div className="space-y-2">
+        {NEWS_LINKS.map((link, i) => (
+          <a
+            key={i}
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-sm text-white hover:text-cyan-400 transition-colors group"
+          >
+            <ExternalLink size={12} className="opacity-50 group-hover:opacity-100" />
+            <span className="font-bold uppercase">{link.title}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+
   const HomePage = () => (
     <div className="space-y-8">
-      {/* Retro 90s header with marquee feel */}
+      {/* Retro 90s header */}
       <div className="text-center space-y-3 py-8 border-4 border-black bg-yellow-300">
         <div className="flex items-center justify-center gap-2">
           <span className="text-xl">★</span>
@@ -542,7 +467,7 @@ const AltTabWebsite = () => {
           </span>
         </h1>
         <p className="text-base md:text-lg text-black font-bold uppercase px-4">
-          ★★ Multi-Disciplinary Think Tank ★★ Based on Earth ★★
+          ★★ Multi-Disciplinary Think Tank ★★ Nashville, TN ★★
         </p>
         <div className="flex gap-3 justify-center items-center text-black text-sm font-bold">
           <span className="animate-pulse text-lg">►</span>
@@ -551,7 +476,7 @@ const AltTabWebsite = () => {
         </div>
       </div>
 
-      {/* Visitor counter style */}
+      {/* Visitor counter */}
       <div className="flex flex-wrap justify-center gap-4 text-xs">
         <div className="bg-black text-lime-400 px-4 py-2 border-2 border-lime-400 font-mono">
           VISITORS: {Math.floor(Math.random() * 99999)}
@@ -561,59 +486,63 @@ const AltTabWebsite = () => {
         </div>
       </div>
 
-      {/* Game section with retro frame */}
+      {/* Game + News Links section */}
       <div className="border-4 border-black bg-gradient-to-b from-gray-200 to-gray-300 p-4">
         <div className="bg-blue-600 text-white px-3 py-2 mb-4 border-2 border-white" style={{ boxShadow: 'inset -2px -2px 0px rgba(0,0,0,0.5)' }}>
-          <h3 className="font-bold text-sm">🎮 QUICK GAMES - Test Your Skills!</h3>
+          <h3 className="font-bold text-sm">🎮 QUICK GAMES + DESIGN NEWS</h3>
         </div>
-        <GameSection />
+        <div className="grid md:grid-cols-2 gap-4">
+          <GameSection />
+          <NewsLinks />
+        </div>
       </div>
 
-      {/* Table-based layout sections */}
+      {/* About sections */}
       <div className="border-4 border-black bg-white">
         <div className="bg-red-600 text-white px-4 py-3 border-b-4 border-black">
           <h2 className="font-bold text-xl uppercase text-center">★★★ About Alt-Tab ★★★</h2>
         </div>
         <div className="grid md:grid-cols-3">
-          <div className="border-2 border-black p-6 bg-yellow-100">
+          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-yellow-100 hover:bg-yellow-200 transition-colors text-left">
             <h3 className="font-bold text-black mb-3 underline text-lg">Human-Centric Design</h3>
             <p className="text-sm text-black mb-3">Founded by a library scientist and industrial designer, we blend research with creativity.</p>
-            <p className="text-xs text-blue-600 underline cursor-pointer hover:text-blue-800">[Read more...]</p>
-          </div>
-          <div className="border-2 border-black p-6 bg-cyan-100">
+            <p className="text-xs text-blue-600 underline">[Read more...]</p>
+          </button>
+          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-cyan-100 hover:bg-cyan-200 transition-colors text-left">
             <h3 className="font-bold text-black mb-3 underline text-lg">Multi-Disciplinary</h3>
             <p className="text-sm text-black mb-3">From digital goods to policy, we create experiences that matter.</p>
-            <p className="text-xs text-blue-600 underline cursor-pointer hover:text-blue-800">[Read more...]</p>
-          </div>
-          <div className="border-2 border-black p-6 bg-pink-100">
+            <p className="text-xs text-blue-600 underline">[Read more...]</p>
+          </button>
+          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-pink-100 hover:bg-pink-200 transition-colors text-left">
             <h3 className="font-bold text-black mb-3 underline text-lg">Future-Forward</h3>
             <p className="text-sm text-black mb-3">Bridging nostalgia with innovation, one project at a time.</p>
-            <p className="text-xs text-blue-600 underline cursor-pointer hover:text-blue-800">[Read more...]</p>
-          </div>
+            <p className="text-xs text-blue-600 underline">[Read more...]</p>
+          </button>
         </div>
       </div>
 
-      {/* Under construction style banner */}
+      {/* Under construction banner */}
       <div className="border-4 border-yellow-400 bg-black p-6 text-center">
         <div className="flex items-center justify-center gap-4 mb-3 flex-wrap">
           <span className="text-3xl">⚠️</span>
           <span className="text-yellow-400 font-bold uppercase text-base md:text-lg">Site Under Active Development</span>
           <span className="text-3xl">⚠️</span>
         </div>
-        <p className="text-white text-xs md:text-sm">Last Updated: January 6, 2026 | Best Viewed in 800x600 Resolution</p>
+        <p className="text-white text-xs md:text-sm">Last Updated: January 2026 | Nashville, TN</p>
       </div>
 
-      {/* Web ring style links */}
+      {/* Navigation buttons - now functional */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { text: 'VIEW PROJECTS', color: 'bg-blue-500' },
-          { text: 'MOODBOARDS', color: 'bg-green-500' },
-          { text: 'PHILOSOPHY', color: 'bg-purple-500' },
-          { text: 'SHOP NOW', color: 'bg-red-500' }
+          { text: 'VIEW PROJECTS', color: 'bg-blue-500', page: 'projects' },
+          { text: 'MOODBOARDS', color: 'bg-green-500', page: 'moodboards' },
+          { text: 'PHILOSOPHY', color: 'bg-purple-500', page: 'about' },
+          { text: 'SHOP', color: 'bg-red-500', page: 'shop' }
         ].map((link, i) => (
           <button
             key={i}
-            className={`${link.color} text-white font-bold py-4 px-3 border-4 border-black hover:brightness-110 transition-all text-sm md:text-base`}
+            onClick={() => navigateTo(link.page)}
+            className={`${link.color} text-white font-bold py-4 px-3 border-4 border-black hover:brightness-110 transition-all text-sm md:text-base active:scale-95`}
             style={{ boxShadow: '5px 5px 0px black' }}
           >
             ► {link.text} ◄
@@ -621,21 +550,17 @@ const AltTabWebsite = () => {
         ))}
       </div>
 
-      {/* Blinking text and badges section */}
+      {/* Badges section */}
       <div className="text-center space-y-3 bg-white border-4 border-black p-6">
-        <p className="text-black text-sm md:text-base">
-          <span className="font-bold bg-yellow-300 px-2 py-1">NEW!</span> Join our mailing list for updates!
-          <span className="ml-2 text-red-600 font-bold animate-pulse">→ CLICK HERE ←</span>
-        </p>
         <div className="flex justify-center gap-3 items-center flex-wrap">
           <div className="bg-gradient-to-r from-red-500 to-blue-500 text-white px-3 py-1 text-xs font-bold border-2 border-black">
-            HTML 4.01
+            REACT 18
           </div>
           <div className="bg-gradient-to-r from-green-500 to-yellow-500 text-black px-3 py-1 text-xs font-bold border-2 border-black">
-            CSS ENABLED
+            TAILWIND CSS
           </div>
           <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 text-xs font-bold border-2 border-black">
-            JAVASCRIPT
+            VITE
           </div>
         </div>
       </div>
@@ -684,7 +609,7 @@ const AltTabWebsite = () => {
         <div className="grid grid-cols-6 gap-3 md:gap-4">
           {projects.map((project, i) => {
             const sizeClasses = {
-              small: 'col-span-2 row-span-2',
+              small: 'col-span-3 md:col-span-2 row-span-2',
               medium: 'col-span-3 row-span-2',
               large: 'col-span-6 md:col-span-3 row-span-3'
             };
@@ -700,9 +625,7 @@ const AltTabWebsite = () => {
                   loading="lazy"
                   className="absolute inset-0 w-full h-full object-cover"
                 />
-
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
                 <div className="absolute inset-0 flex flex-col justify-end p-4">
                   <span className="text-xs text-white/70 uppercase tracking-wider mb-1">{project.category}</span>
                   <h3 className="text-lg md:text-xl font-bold text-white">{project.title}</h3>
@@ -840,7 +763,7 @@ const AltTabWebsite = () => {
           </div>
         </div>
 
-        <p className="text-white/60 text-sm text-center">Scroll horizontally to explore • Click to zoom</p>
+        <p className="text-white/60 text-sm text-center">Scroll horizontally to explore</p>
       </div>
     );
   };
@@ -916,61 +839,50 @@ const AltTabWebsite = () => {
 
   const ShopPage = () => (
     <div className="space-y-8">
-      <h2 className="text-5xl font-black text-white drop-shadow-lg">Shop</h2>
+      <div className="text-center space-y-4">
+        <h2 className="text-5xl md:text-6xl font-black text-white drop-shadow-lg">Shop</h2>
+        <p className="text-xl text-white/80 max-w-2xl mx-auto">
+          Curated goods from Alt-Tab
+        </p>
+      </div>
+
+      {/* Under Construction Notice */}
+      <div className="max-w-2xl mx-auto">
+        <div className="p-8 md:p-12 rounded-2xl bg-yellow-400/90 border-4 border-black text-center">
+          <Construction size={64} className="mx-auto text-black mb-4" />
+          <h3 className="text-3xl font-black text-black mb-4">Under Construction</h3>
+          <p className="text-lg text-black/80 mb-6">
+            We're working on something special. Our shop will feature limited edition goods,
+            digital zines, and exclusive Alt-Tab merchandise.
+          </p>
+          <p className="text-sm text-black/60 font-mono">
+            Check back soon for updates.
+          </p>
+        </div>
+      </div>
 
       <GameSection />
-
-      <div className="grid md:grid-cols-3 gap-6">
-        {['Limited Edition Tote', 'Digital Zine Vol. 1', 'Exploration Kit', 'Future Archive Print', 'Membership Pass', 'Mystery Box'].map((item, i) => (
-          <div key={i} className="group p-6 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/30 hover:border-white/60 transition-all duration-300 cursor-pointer hover:scale-105">
-            <div className="aspect-square rounded-lg bg-white/10 mb-4 flex items-center justify-center group-hover:bg-white/20 transition-colors">
-              <ShoppingBag size={48} className="text-white/50" />
-            </div>
-            <h3 className="text-lg font-bold text-white mb-2">{item}</h3>
-            <p className="text-white/80 font-mono">$XX.XX</p>
-          </div>
-        ))}
-      </div>
     </div>
   );
 
-  const bgGradient = `radial-gradient(at ${mousePos.x}% ${mousePos.y}%, rgb(34, 211, 238) 0%, rgb(168, 85, 247) 30%, rgb(236, 72, 153) 60%, rgb(251, 191, 36) 100%)`;
-
   return (
     <div className="min-h-screen text-white overflow-x-hidden">
-      {/* Map Background */}
-      <canvas
-        ref={canvasRef}
-        className="fixed inset-0 w-full h-full"
-        style={{ background: 'linear-gradient(to bottom, #0a0a1a, #1a1a2e)' }}
+      {/* Static Background Image */}
+      <div
+        className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url(${BACKGROUND_IMAGE})`,
+        }}
       />
-
-      {/* Location Badge */}
-      <div className="fixed bottom-4 left-4 z-40 flex items-center gap-2 px-3 py-2 rounded-full bg-black/50 backdrop-blur-md border border-white/20">
-        <MapPin size={16} className="text-cyan-400" />
-        <span className="text-sm text-white/80">{currentCity.name}</span>
-      </div>
+      {/* Dark overlay for readability */}
+      <div className="fixed inset-0 bg-black/60" />
 
       {showHighScore && <HighScorePopup />}
-
-      {cursorTrail.map((pos, i) => (
-        <div
-          key={pos.id}
-          className="fixed w-2 h-2 bg-white rounded-full pointer-events-none z-50"
-          style={{
-            left: pos.x,
-            top: pos.y,
-            opacity: (i / cursorTrail.length) * 0.7,
-            transform: 'translate(-50%, -50%)',
-            transition: 'opacity 0.3s'
-          }}
-        />
-      ))}
 
       <nav className="relative z-50 p-4 md:p-6 bg-white/10 backdrop-blur-md border-b border-white/20">
         <div className="flex justify-between items-center max-w-7xl mx-auto">
           <button
-            onClick={() => setCurrentPage('home')}
+            onClick={() => navigateTo('home')}
             className="text-2xl md:text-3xl font-black text-white hover:scale-110 transition-transform drop-shadow-lg"
           >
             ALT-TAB
@@ -1021,7 +933,7 @@ const AltTabWebsite = () => {
       </main>
 
       <footer className="relative z-10 text-center py-8 text-white/80 text-sm">
-        <p>© 2024 Alt-Tab Think Tank · Based on Earth · Multi-Disciplinary</p>
+        <p>© 2024 Alt-Tab Think Tank · Nashville, TN · Multi-Disciplinary</p>
       </footer>
     </div>
   );
