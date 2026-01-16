@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Menu, X, Sparkles, Grid3x3, Image, BookOpen, ShoppingBag, Trophy, RefreshCw, Award, ExternalLink, Construction } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Menu, X, Sparkles, Grid3x3, Image, BookOpen, ShoppingBag, Trophy, RefreshCw, Award, ExternalLink, Construction, Instagram, Sun, Moon } from 'lucide-react';
 
 // Cumberland River background image (optimized for web/mobile)
 const BACKGROUND_IMAGE = 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920&q=80';
@@ -26,8 +26,10 @@ const AltTabWebsite = () => {
   const [totalScore, setTotalScore] = useState(0);
   const [gamesCompleted, setGamesCompleted] = useState(0);
   const [showHighScore, setShowHighScore] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [golfBall, setGolfBall] = useState({ x: 0, y: 0, vx: 0, vy: 0, visible: false });
   const [currentGameType, setCurrentGameType] = useState(() => {
-    const games = ['math', 'tictactoe', 'pattern', 'simon'];
+    const games = ['math', 'tictactoe', 'pattern', 'simon', 'reaction', 'wordscramble'];
     return games[Math.floor(Math.random() * games.length)];
   });
 
@@ -43,7 +45,7 @@ const AltTabWebsite = () => {
   };
 
   const getRandomGame = () => {
-    const games = ['math', 'tictactoe', 'pattern', 'simon'];
+    const games = ['math', 'tictactoe', 'pattern', 'simon', 'reaction', 'wordscramble'];
     const availableGames = games.filter(g => g !== currentGameType);
     return availableGames[Math.floor(Math.random() * availableGames.length)];
   };
@@ -53,6 +55,47 @@ const AltTabWebsite = () => {
     setMenuOpen(false);
     window.scrollTo(0, 0);
   };
+
+  // Golf ball cursor effect
+  const handleMouseMove = useCallback((e) => {
+    setGolfBall(prev => ({
+      x: e.clientX,
+      y: e.clientY,
+      vx: (e.clientX - prev.x) * 0.5,
+      vy: (e.clientY - prev.y) * 0.5,
+      visible: true
+    }));
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [handleMouseMove]);
+
+  // Golf ball bounce animation
+  useEffect(() => {
+    if (!golfBall.visible) return;
+
+    const animate = () => {
+      setGolfBall(prev => {
+        let newVy = prev.vy + 0.5; // gravity
+        let newY = prev.y + newVy;
+        let newVx = prev.vx * 0.98; // friction
+        let newX = prev.x + newVx;
+
+        // Bounce off bottom
+        if (newY > window.innerHeight - 20) {
+          newY = window.innerHeight - 20;
+          newVy = -newVy * 0.6;
+        }
+
+        return { ...prev, x: newX, y: newY, vx: newVx, vy: newVy };
+      });
+    };
+
+    const interval = setInterval(animate, 16);
+    return () => clearInterval(interval);
+  }, [golfBall.visible]);
 
   const HighScorePopup = () => (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -402,13 +445,161 @@ const AltTabWebsite = () => {
     );
   };
 
+  // Reaction Time Game
+  const ReactionGame = () => {
+    const [gameState, setGameState] = useState('waiting'); // waiting, ready, click, done
+    const [startTime, setStartTime] = useState(0);
+    const [reactionTime, setReactionTime] = useState(0);
+    const [won, setWon] = useState(false);
+
+    useEffect(() => {
+      if (gameState === 'waiting') {
+        const delay = Math.random() * 3000 + 2000;
+        const timer = setTimeout(() => setGameState('ready'), delay);
+        return () => clearTimeout(timer);
+      }
+    }, [gameState]);
+
+    const handleClick = () => {
+      if (gameState === 'waiting') {
+        setGameState('waiting');
+      } else if (gameState === 'ready') {
+        setStartTime(Date.now());
+        setGameState('click');
+      } else if (gameState === 'click') {
+        const time = Date.now() - startTime;
+        setReactionTime(time);
+        setGameState('done');
+        if (time < 400) {
+          setWon(true);
+          completeGame(3);
+        }
+      }
+    };
+
+    return (
+      <div className={`p-6 rounded-2xl backdrop-blur-md border-2 border-white/40 ${darkMode ? 'bg-gray-800/40' : 'bg-white/20'}`}>
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <h3 className={`text-xl font-bold ${darkMode ? 'text-gray-100' : 'text-white'}`}>Reaction Test</h3>
+            <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-white/70'}`}>Medium • 3 points</p>
+          </div>
+        </div>
+        <button
+          onClick={handleClick}
+          className={`w-full h-40 rounded-xl text-2xl font-bold transition-all ${
+            gameState === 'waiting' ? 'bg-red-500 text-white' :
+            gameState === 'ready' ? 'bg-green-500 text-white animate-pulse' :
+            gameState === 'click' ? 'bg-yellow-500 text-black' :
+            won ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+          }`}
+        >
+          {gameState === 'waiting' && 'Wait for green...'}
+          {gameState === 'ready' && 'CLICK NOW!'}
+          {gameState === 'click' && 'CLICK!'}
+          {gameState === 'done' && (won ? `${reactionTime}ms - Great! +3` : `${reactionTime}ms - Too slow!`)}
+        </button>
+        {gameState === 'done' && (
+          <div className="flex gap-2 mt-4">
+            <button
+              onClick={() => setCurrentGameType(getRandomGame())}
+              className="flex-1 px-4 py-2 bg-cyan-500 text-white rounded-lg font-bold hover:bg-cyan-400 transition-colors"
+            >
+              Next Game
+            </button>
+            <button
+              onClick={() => window.location.reload()}
+              className={`px-4 py-2 rounded-lg hover:bg-white/30 transition-colors ${darkMode ? 'bg-gray-700 text-white' : 'bg-white/20 text-white'}`}
+            >
+              <RefreshCw size={20} />
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Word Scramble Game
+  const WordScrambleGame = () => {
+    const words = ['DESIGN', 'CREATE', 'BUILD', 'THINK', 'DREAM', 'CRAFT'];
+    const [word] = useState(() => words[Math.floor(Math.random() * words.length)]);
+    const [scrambled] = useState(() => word.split('').sort(() => Math.random() - 0.5).join(''));
+    const [guess, setGuess] = useState('');
+    const [won, setWon] = useState(false);
+    const [message, setMessage] = useState('Unscramble the word!');
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      if (guess.toUpperCase() === word) {
+        setWon(true);
+        setMessage('Correct! +2 points');
+        completeGame(2);
+      } else {
+        setMessage('Try again!');
+        setGuess('');
+      }
+    };
+
+    return (
+      <div className={`p-6 rounded-2xl backdrop-blur-md border-2 border-white/40 ${darkMode ? 'bg-gray-800/40' : 'bg-white/20'}`}>
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <h3 className={`text-xl font-bold ${darkMode ? 'text-gray-100' : 'text-white'}`}>Word Scramble</h3>
+            <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-white/70'}`}>Easy • 2 points</p>
+          </div>
+        </div>
+        <div className="text-center mb-6">
+          <p className={`text-5xl font-bold mb-2 tracking-widest ${darkMode ? 'text-gray-100' : 'text-white'}`}>
+            {scrambled}
+          </p>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            value={guess}
+            onChange={(e) => setGuess(e.target.value)}
+            disabled={won}
+            placeholder="Your answer..."
+            className={`w-full px-4 py-3 rounded-lg border-2 text-center text-xl font-bold uppercase ${
+              darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white/20 border-white/30 text-white placeholder-white/50'
+            }`}
+          />
+          {!won && (
+            <button type="submit" className="w-full py-3 bg-cyan-500 text-white rounded-lg font-bold hover:bg-cyan-400 transition-colors">
+              Submit
+            </button>
+          )}
+        </form>
+        <p className={`text-center text-lg font-medium mt-4 ${won ? 'text-yellow-300' : darkMode ? 'text-gray-200' : 'text-white'}`}>
+          {message}
+        </p>
+        {won && (
+          <div className="flex gap-2 mt-4">
+            <button
+              onClick={() => setCurrentGameType(getRandomGame())}
+              className="flex-1 px-4 py-2 bg-cyan-500 text-white rounded-lg font-bold hover:bg-cyan-400 transition-colors"
+            >
+              Next Game
+            </button>
+            <button
+              onClick={() => window.location.reload()}
+              className={`px-4 py-2 rounded-lg hover:bg-white/30 transition-colors ${darkMode ? 'bg-gray-700 text-white' : 'bg-white/20 text-white'}`}
+            >
+              <RefreshCw size={20} />
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const NavItem = ({ icon: Icon, label, page }) => (
     <button
       onClick={() => navigateTo(page)}
       className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
         currentPage === page
-          ? 'bg-white/30 text-white shadow-lg scale-105 backdrop-blur-md'
-          : 'hover:bg-white/20 text-white/80 hover:text-white backdrop-blur-sm'
+          ? darkMode ? 'bg-gray-700/50 text-white shadow-lg scale-105' : 'bg-white/30 text-white shadow-lg scale-105 backdrop-blur-md'
+          : darkMode ? 'hover:bg-gray-700/30 text-gray-200 hover:text-white' : 'hover:bg-white/20 text-white/80 hover:text-white backdrop-blur-sm'
       }`}
     >
       <Icon size={20} />
@@ -422,6 +613,8 @@ const AltTabWebsite = () => {
       {currentGameType === 'tictactoe' && <TicTacToeGame />}
       {currentGameType === 'pattern' && <PatternGame />}
       {currentGameType === 'simon' && <SimonGame />}
+      {currentGameType === 'reaction' && <ReactionGame />}
+      {currentGameType === 'wordscramble' && <WordScrambleGame />}
     </div>
   );
 
@@ -866,31 +1059,65 @@ const AltTabWebsite = () => {
   );
 
   return (
-    <div className="min-h-screen text-white overflow-x-hidden">
-      {/* Static Background Image */}
-      <div
-        className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `url(${BACKGROUND_IMAGE})`,
-        }}
-      />
-      {/* Dark overlay for readability */}
-      <div className="fixed inset-0 bg-black/60" />
+    <div className={`min-h-screen overflow-x-hidden cursor-none ${darkMode ? 'bg-gray-100 text-gray-900' : 'text-white'}`}>
+      {/* Golf Ball Cursor */}
+      {golfBall.visible && (
+        <div
+          className="fixed w-6 h-6 rounded-full pointer-events-none z-[100] shadow-lg"
+          style={{
+            left: golfBall.x - 12,
+            top: golfBall.y - 12,
+            background: 'radial-gradient(circle at 30% 30%, #ffffff, #e0e0e0, #a0a0a0)',
+            boxShadow: 'inset -2px -2px 4px rgba(0,0,0,0.3), 2px 2px 8px rgba(0,0,0,0.4)',
+          }}
+        >
+          {/* Golf ball dimples */}
+          <div className="absolute inset-1 rounded-full opacity-30" style={{
+            background: 'repeating-radial-gradient(circle at 50% 50%, transparent 0px, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 3px)'
+          }} />
+        </div>
+      )}
+
+      {/* Background - Light or Dark mode */}
+      {darkMode ? (
+        <div className="fixed inset-0 bg-gradient-to-br from-gray-100 via-blue-50 to-gray-200" />
+      ) : (
+        <>
+          <div
+            className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${BACKGROUND_IMAGE})`,
+            }}
+          />
+          <div className="fixed inset-0 bg-black/60" />
+        </>
+      )}
 
       {showHighScore && <HighScorePopup />}
 
-      <nav className="relative z-50 p-4 md:p-6 bg-white/10 backdrop-blur-md border-b border-white/20">
+      <nav className={`relative z-50 p-4 md:p-6 backdrop-blur-md border-b ${darkMode ? 'bg-white/80 border-gray-200' : 'bg-white/10 border-white/20'}`}>
         <div className="flex justify-between items-center max-w-7xl mx-auto">
           <button
             onClick={() => navigateTo('home')}
-            className="text-2xl md:text-3xl font-black text-white hover:scale-110 transition-transform drop-shadow-lg"
+            className={`text-2xl md:text-3xl font-black hover:scale-110 transition-transform drop-shadow-lg ${darkMode ? 'text-gray-900' : 'text-white'}`}
           >
             ALT-TAB
           </button>
 
-          <div className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30">
-            <Trophy size={20} className="text-yellow-300" />
-            <span className="text-white font-bold">{totalScore}</span>
+          <div className="flex items-center gap-3">
+            {/* Theme Toggle */}
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className={`p-2 rounded-full transition-all ${darkMode ? 'bg-gray-200 hover:bg-gray-300 text-gray-800' : 'bg-white/20 hover:bg-white/30 text-white'}`}
+              title={darkMode ? 'Switch to dark mode' : 'Switch to light mode'}
+            >
+              {darkMode ? <Moon size={20} /> : <Sun size={20} />}
+            </button>
+
+            <div className={`hidden sm:flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border ${darkMode ? 'bg-gray-200/80 border-gray-300' : 'bg-white/20 border-white/30'}`}>
+              <Trophy size={20} className="text-yellow-500" />
+              <span className={`font-bold ${darkMode ? 'text-gray-900' : 'text-white'}`}>{totalScore}</span>
+            </div>
           </div>
 
           <div className="hidden md:flex gap-2">
@@ -903,7 +1130,7 @@ const AltTabWebsite = () => {
 
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden p-2 hover:bg-white/20 rounded-lg transition-colors"
+            className={`md:hidden p-2 rounded-lg transition-colors ${darkMode ? 'hover:bg-gray-200 text-gray-800' : 'hover:bg-white/20'}`}
           >
             {menuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -932,7 +1159,18 @@ const AltTabWebsite = () => {
         {currentPage === 'shop' && <ShopPage />}
       </main>
 
-      <footer className="relative z-10 text-center py-8 text-white/80 text-sm">
+      <footer className={`relative z-10 text-center py-8 text-sm ${darkMode ? 'text-gray-600' : 'text-white/80'}`}>
+        <div className="flex items-center justify-center gap-4 mb-3">
+          <a
+            href="https://instagram.com/alttab"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all hover:scale-105 ${darkMode ? 'bg-gray-200 hover:bg-gray-300 text-gray-800' : 'bg-white/20 hover:bg-white/30 text-white'}`}
+          >
+            <Instagram size={18} />
+            <span className="font-medium">@alttab</span>
+          </a>
+        </div>
         <p>© 2024 Alt-Tab Think Tank · Nashville, TN · Multi-Disciplinary</p>
       </footer>
     </div>
