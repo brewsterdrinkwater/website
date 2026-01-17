@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Menu, X, Sparkles, Grid3x3, Image, BookOpen, ShoppingBag, Trophy, RefreshCw, Award, ExternalLink, Construction, Instagram, Sun, Moon } from 'lucide-react';
 
-// Cumberland River background image (optimized for web/mobile)
-const BACKGROUND_IMAGE = 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920&q=80';
+// Middle Tennessee topography map background (light, optimized for web/mobile)
+const BACKGROUND_IMAGE = 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1920&q=80';
 
 // Drudge-style news links
 const NEWS_LINKS = [
@@ -644,8 +644,8 @@ const AltTabWebsite = () => {
       onClick={() => navigateTo(page)}
       className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
         currentPage === page
-          ? darkMode ? 'bg-gray-700/50 text-white shadow-lg scale-105' : 'bg-white/30 text-white shadow-lg scale-105 backdrop-blur-md'
-          : darkMode ? 'hover:bg-gray-700/30 text-gray-200 hover:text-white' : 'hover:bg-white/20 text-white/80 hover:text-white backdrop-blur-sm'
+          ? 'bg-black/20 text-black shadow-lg scale-105'
+          : 'hover:bg-black/10 text-black/70 hover:text-black'
       }`}
     >
       <Icon size={20} />
@@ -720,6 +720,7 @@ const AltTabWebsite = () => {
           { city: 'NASHVILLE', tz: 'America/Chicago' },
           { city: 'NEW YORK', tz: 'America/New_York' },
           { city: 'LONDON', tz: 'Europe/London' },
+          { city: 'JOHANNESBURG', tz: 'Africa/Johannesburg' },
           { city: 'TOKYO', tz: 'Asia/Tokyo' },
         ].map((clock) => (
           <div key={clock.city} className="bg-black text-lime-400 px-3 py-2 border-2 border-lime-400 font-mono">
@@ -1150,11 +1151,11 @@ const AltTabWebsite = () => {
 
       {showHighScore && <HighScorePopup />}
 
-      <nav className={`relative z-50 p-4 md:p-6 backdrop-blur-md border-b ${darkMode ? 'bg-white/80 border-gray-200' : 'bg-white/10 border-white/20'}`}>
+      <nav className="relative z-50 p-4 md:p-6 border-b-4 border-black bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400">
         <div className="flex justify-between items-center max-w-7xl mx-auto">
           <button
             onClick={() => navigateTo('home')}
-            className={`text-2xl md:text-3xl font-black hover:scale-110 transition-transform drop-shadow-lg ${darkMode ? 'text-gray-900' : 'text-white'}`}
+            className="text-2xl md:text-3xl font-black hover:scale-110 transition-transform text-black drop-shadow-sm"
           >
             ALT-TAB
           </button>
@@ -1163,15 +1164,15 @@ const AltTabWebsite = () => {
             {/* Theme Toggle */}
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className={`p-2 rounded-full transition-all ${darkMode ? 'bg-gray-200 hover:bg-gray-300 text-gray-800' : 'bg-white/20 hover:bg-white/30 text-white'}`}
+              className="p-2 rounded-full transition-all bg-black/10 hover:bg-black/20 text-black"
               title={darkMode ? 'Switch to dark mode' : 'Switch to light mode'}
             >
               {darkMode ? <Moon size={20} /> : <Sun size={20} />}
             </button>
 
-            <div className={`hidden sm:flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border ${darkMode ? 'bg-gray-200/80 border-gray-300' : 'bg-white/20 border-white/30'}`}>
-              <Trophy size={20} className="text-yellow-500" />
-              <span className={`font-bold ${darkMode ? 'text-gray-900' : 'text-white'}`}>{totalScore}</span>
+            <div className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-black/10 border-2 border-black/20">
+              <Trophy size={20} className="text-black" />
+              <span className="font-bold text-black">{totalScore}</span>
             </div>
           </div>
 
@@ -1185,17 +1186,17 @@ const AltTabWebsite = () => {
 
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className={`md:hidden p-2 rounded-lg transition-colors ${darkMode ? 'hover:bg-gray-200 text-gray-800' : 'hover:bg-white/20'}`}
+            className="md:hidden p-2 rounded-lg transition-colors hover:bg-black/10 text-black"
           >
             {menuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
         {menuOpen && (
-          <div className="md:hidden absolute top-full left-0 right-0 bg-white/20 backdrop-blur-lg p-4 space-y-2 border-b border-white/20">
-            <div className="flex items-center justify-center gap-2 mb-4 px-4 py-2 rounded-full bg-white/20 border border-white/30">
-              <Trophy size={20} className="text-yellow-300" />
-              <span className="text-white font-bold">{totalScore} points</span>
+          <div className="md:hidden absolute top-full left-0 right-0 bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400 p-4 space-y-2 border-b-4 border-black">
+            <div className="flex items-center justify-center gap-2 mb-4 px-4 py-2 rounded-full bg-black/10 border-2 border-black/20">
+              <Trophy size={20} className="text-black" />
+              <span className="text-black font-bold">{totalScore} points</span>
             </div>
             <NavItem icon={Sparkles} label="Home" page="home" />
             <NavItem icon={Grid3x3} label="Projects" page="projects" />
@@ -1217,7 +1218,7 @@ const AltTabWebsite = () => {
       <footer className={`relative z-10 text-center py-8 text-sm ${darkMode ? 'text-gray-600' : 'text-white/80'}`}>
         <div className="flex items-center justify-center gap-4 mb-3">
           <a
-            href="https://instagram.com/alttab"
+            href="https://www.instagram.com/alttab.xyz/#"
             target="_blank"
             rel="noopener noreferrer"
             className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all hover:scale-105 ${darkMode ? 'bg-gray-200 hover:bg-gray-300 text-gray-800' : 'bg-white/20 hover:bg-white/30 text-white'}`}
