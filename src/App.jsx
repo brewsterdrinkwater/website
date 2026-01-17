@@ -6,18 +6,58 @@ const BACKGROUND_IMAGE = 'https://images.unsplash.com/photo-1558618666-fcd25c85c
 
 // Drudge-style news links
 const NEWS_LINKS = [
-  { title: 'DESIGN MILK', url: 'https://design-milk.com', category: 'Design' },
-  { title: 'DEZEEN', url: 'https://dezeen.com', category: 'Architecture' },
-  { title: 'IT\'S NICE THAT', url: 'https://itsnicethat.com', category: 'Creative' },
-  { title: 'CORE77', url: 'https://core77.com', category: 'Industrial' },
-  { title: 'FAST COMPANY', url: 'https://fastcompany.com', category: 'Business' },
-  { title: 'WIRED', url: 'https://wired.com', category: 'Tech' },
-  { title: 'AIGA EYE ON DESIGN', url: 'https://eyeondesign.aiga.org', category: 'Design' },
-  { title: 'THE VERGE', url: 'https://theverge.com', category: 'Tech' },
-  { title: 'HYPEBEAST', url: 'https://hypebeast.com', category: 'Culture' },
-  { title: 'COOL HUNTING', url: 'https://coolhunting.com', category: 'Culture' },
-  { title: 'CREATIVE REVIEW', url: 'https://creativereview.co.uk', category: 'Creative' },
-  { title: 'INHABITAT', url: 'https://inhabitat.com', category: 'Sustainability' },
+  { title: 'ATLANTIC', url: 'https://theatlantic.com' },
+  { title: 'AXIOS', url: 'https://axios.com' },
+  { title: 'BBC', url: 'https://bbc.com' },
+  { title: 'BILLBOARD', url: 'https://billboard.com' },
+  { title: 'BOSTON GLOBE', url: 'https://bostonglobe.com' },
+  { title: 'BOSTON HERALD', url: 'https://bostonherald.com' },
+  { title: 'BREITBART', url: 'https://breitbart.com' },
+  { title: 'BUSINESS INSIDER', url: 'https://businessinsider.com' },
+  { title: 'CBS NEWS', url: 'https://cbsnews.com' },
+  { title: 'C-SPAN', url: 'https://c-span.org' },
+  { title: 'CHICAGO SUN-TIMES', url: 'https://chicago.suntimes.com' },
+  { title: 'CHICAGO TRIB', url: 'https://chicagotribune.com' },
+  { title: 'CNBC', url: 'https://cnbc.com' },
+  { title: 'CNN', url: 'https://cnn.com' },
+  { title: 'DAILY BEAST', url: 'https://thedailybeast.com' },
+  { title: 'DAILY CALLER', url: 'https://dailycaller.com' },
+  { title: 'DEADLINE HOLLYWOOD', url: 'https://deadline.com' },
+  { title: 'ENT WEEKLY', url: 'https://ew.com' },
+  { title: 'FOXNEWS', url: 'https://foxnews.com' },
+  { title: 'H\'WOOD REPORTER', url: 'https://hollywoodreporter.com' },
+  { title: 'HUFFINGTON POST', url: 'https://huffpost.com' },
+  { title: 'INTERCEPT', url: 'https://theintercept.com' },
+  { title: 'LA TIMES', url: 'https://latimes.com' },
+  { title: 'MARKETWATCH', url: 'https://marketwatch.com' },
+  { title: 'MOTHER JONES', url: 'https://motherjones.com' },
+  { title: 'NATION', url: 'https://thenation.com' },
+  { title: 'NATIONAL REVIEW', url: 'https://nationalreview.com' },
+  { title: 'NBC NEWS', url: 'https://nbcnews.com' },
+  { title: 'NEW REPUBLIC', url: 'https://newrepublic.com' },
+  { title: 'NEW YORK TIMES', url: 'https://nytimes.com' },
+  { title: 'NY POST', url: 'https://nypost.com' },
+  { title: 'NEW YORKER', url: 'https://newyorker.com' },
+  { title: 'NEWSMAX', url: 'https://newsmax.com' },
+  { title: 'PEOPLE', url: 'https://people.com' },
+  { title: 'POLITICO', url: 'https://politico.com' },
+  { title: 'REASON', url: 'https://reason.com' },
+  { title: 'ROLL CALL', url: 'https://rollcall.com' },
+  { title: 'ROLLING STONE', url: 'https://rollingstone.com' },
+  { title: 'SALON', url: 'https://salon.com' },
+  { title: 'SAN FRAN CHRON', url: 'https://sfchronicle.com' },
+  { title: 'SEMAFOR', url: 'https://semafor.com' },
+  { title: 'SKY NEWS', url: 'https://news.sky.com' },
+  { title: 'TMZ', url: 'https://tmz.com' },
+  { title: 'US NEWS', url: 'https://usnews.com' },
+  { title: 'USA TODAY', url: 'https://usatoday.com' },
+  { title: 'VANITY FAIR', url: 'https://vanityfair.com' },
+  { title: 'VARIETY', url: 'https://variety.com' },
+  { title: 'WALL STREET JOURNAL', url: 'https://wsj.com' },
+  { title: 'WASH EXAMINER', url: 'https://washingtonexaminer.com' },
+  { title: 'WASH POST', url: 'https://washingtonpost.com' },
+  { title: 'WASH TIMES', url: 'https://washingtontimes.com' },
+  { title: 'WRAP', url: 'https://thewrap.com' },
 ];
 
 const AltTabWebsite = () => {
@@ -28,10 +68,17 @@ const AltTabWebsite = () => {
   const [showHighScore, setShowHighScore] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [golfBall, setGolfBall] = useState({ x: 0, y: 0, vx: 0, vy: 0, visible: false });
+  const [currentTime, setCurrentTime] = useState(new Date());
   const [currentGameType, setCurrentGameType] = useState(() => {
     const games = ['math', 'tictactoe', 'pattern', 'simon', 'reaction', 'wordscramble'];
     return games[Math.floor(Math.random() * games.length)];
   });
+
+  // Update time every second for world clocks
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const completeGame = (points) => {
     setTotalScore(prev => prev + points);
@@ -447,7 +494,7 @@ const AltTabWebsite = () => {
 
   // Reaction Time Game
   const ReactionGame = () => {
-    const [gameState, setGameState] = useState('waiting'); // waiting, ready, click, done
+    const [gameState, setGameState] = useState('waiting'); // waiting, ready, done
     const [startTime, setStartTime] = useState(0);
     const [reactionTime, setReactionTime] = useState(0);
     const [won, setWon] = useState(false);
@@ -455,22 +502,23 @@ const AltTabWebsite = () => {
     useEffect(() => {
       if (gameState === 'waiting') {
         const delay = Math.random() * 3000 + 2000;
-        const timer = setTimeout(() => setGameState('ready'), delay);
+        const timer = setTimeout(() => {
+          setStartTime(Date.now());
+          setGameState('ready');
+        }, delay);
         return () => clearTimeout(timer);
       }
     }, [gameState]);
 
     const handleClick = () => {
       if (gameState === 'waiting') {
+        // Too early - restart
         setGameState('waiting');
       } else if (gameState === 'ready') {
-        setStartTime(Date.now());
-        setGameState('click');
-      } else if (gameState === 'click') {
         const time = Date.now() - startTime;
         setReactionTime(time);
         setGameState('done');
-        if (time < 400) {
+        if (time < 500) {
           setWon(true);
           completeGame(3);
         }
@@ -490,14 +538,12 @@ const AltTabWebsite = () => {
           className={`w-full h-40 rounded-xl text-2xl font-bold transition-all ${
             gameState === 'waiting' ? 'bg-red-500 text-white' :
             gameState === 'ready' ? 'bg-green-500 text-white animate-pulse' :
-            gameState === 'click' ? 'bg-yellow-500 text-black' :
-            won ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+            won ? 'bg-green-500 text-white' : 'bg-orange-500 text-white'
           }`}
         >
           {gameState === 'waiting' && 'Wait for green...'}
           {gameState === 'ready' && 'CLICK NOW!'}
-          {gameState === 'click' && 'CLICK!'}
-          {gameState === 'done' && (won ? `${reactionTime}ms - Great! +3` : `${reactionTime}ms - Too slow!`)}
+          {gameState === 'done' && (won ? `${reactionTime}ms - Great! +3` : `${reactionTime}ms - Try again!`)}
         </button>
         {gameState === 'done' && (
           <div className="flex gap-2 mt-4">
@@ -620,21 +666,20 @@ const AltTabWebsite = () => {
 
   // Drudge-style links component
   const NewsLinks = () => (
-    <div className="p-4 rounded-2xl bg-black/80 border-2 border-white/20">
-      <h3 className="text-center font-bold text-red-500 text-lg mb-4 border-b border-white/20 pb-2">
+    <div className="p-4 rounded-2xl bg-black/90 border-2 border-white/20">
+      <h3 className="text-center font-bold text-red-500 text-lg mb-3 border-b border-white/20 pb-2">
         ★ HEADLINES ★
       </h3>
-      <div className="space-y-2">
+      <div className="max-h-80 overflow-y-auto space-y-1 pr-2 scrollbar-thin">
         {NEWS_LINKS.map((link, i) => (
           <a
             key={i}
             href={link.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 text-sm text-white hover:text-cyan-400 transition-colors group"
+            className="block text-xs text-white hover:text-cyan-400 hover:bg-white/10 px-2 py-1 rounded transition-colors"
           >
-            <ExternalLink size={12} className="opacity-50 group-hover:opacity-100" />
-            <span className="font-bold uppercase">{link.title}</span>
+            {link.title}
           </a>
         ))}
       </div>
@@ -669,14 +714,24 @@ const AltTabWebsite = () => {
         </div>
       </div>
 
-      {/* Visitor counter */}
-      <div className="flex flex-wrap justify-center gap-4 text-xs">
-        <div className="bg-black text-lime-400 px-4 py-2 border-2 border-lime-400 font-mono">
-          VISITORS: {Math.floor(Math.random() * 99999)}
-        </div>
-        <div className="bg-black text-cyan-400 px-4 py-2 border-2 border-cyan-400 font-mono">
-          ONLINE NOW: {Math.floor(Math.random() * 50)}
-        </div>
+      {/* World Clocks */}
+      <div className="flex flex-wrap justify-center gap-3 text-xs">
+        {[
+          { city: 'NASHVILLE', tz: 'America/Chicago' },
+          { city: 'NEW YORK', tz: 'America/New_York' },
+          { city: 'LONDON', tz: 'Europe/London' },
+          { city: 'TOKYO', tz: 'Asia/Tokyo' },
+        ].map((clock) => (
+          <div key={clock.city} className="bg-black text-lime-400 px-3 py-2 border-2 border-lime-400 font-mono">
+            <span className="text-white/60">{clock.city}:</span>{' '}
+            {currentTime.toLocaleTimeString('en-US', {
+              timeZone: clock.tz,
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: true
+            })}
+          </div>
+        ))}
       </div>
 
       {/* Game + News Links section */}
