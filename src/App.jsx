@@ -119,30 +119,6 @@ const AltTabWebsite = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [handleMouseMove]);
 
-  // Golf ball bounce animation
-  useEffect(() => {
-    if (!golfBall.visible) return;
-
-    const animate = () => {
-      setGolfBall(prev => {
-        let newVy = prev.vy + 0.5; // gravity
-        let newY = prev.y + newVy;
-        let newVx = prev.vx * 0.98; // friction
-        let newX = prev.x + newVx;
-
-        // Bounce off bottom
-        if (newY > window.innerHeight - 20) {
-          newY = window.innerHeight - 20;
-          newVy = -newVy * 0.6;
-        }
-
-        return { ...prev, x: newX, y: newY, vx: newVx, vy: newVy };
-      });
-    };
-
-    const interval = setInterval(animate, 16);
-    return () => clearInterval(interval);
-  }, [golfBall.visible]);
 
   const HighScorePopup = () => (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -749,36 +725,24 @@ const AltTabWebsite = () => {
       {/* About sections */}
       <div className="border-4 border-black bg-white">
         <div className="bg-red-600 text-white px-4 py-3 border-b-4 border-black">
-          <h2 className="font-bold text-xl uppercase text-center">★★★ About Alt-Tab ★★★</h2>
+          <h2 className="font-bold text-2xl md:text-3xl uppercase text-center">About Alt-Tab</h2>
         </div>
         <div className="grid md:grid-cols-3">
-          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-yellow-100 hover:bg-yellow-200 transition-colors text-left">
+          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-gray-100 hover:bg-gray-200 transition-colors text-left">
             <h3 className="font-bold text-black mb-3 underline text-lg">Human-Centric Design</h3>
-            <p className="text-sm text-black mb-3">Founded by a library scientist and industrial designer, we blend research with creativity.</p>
-            <p className="text-xs text-blue-600 underline">[Read more...]</p>
+            <p className="text-sm text-black">Founded by a library scientist and industrial designer, we blend research with creativity.</p>
           </button>
-          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-cyan-100 hover:bg-cyan-200 transition-colors text-left">
+          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-gray-100 hover:bg-gray-200 transition-colors text-left">
             <h3 className="font-bold text-black mb-3 underline text-lg">Multi-Disciplinary</h3>
-            <p className="text-sm text-black mb-3">From digital goods to policy, we create experiences that matter.</p>
-            <p className="text-xs text-blue-600 underline">[Read more...]</p>
+            <p className="text-sm text-black">From digital goods to policy, we create experiences that matter.</p>
           </button>
-          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-pink-100 hover:bg-pink-200 transition-colors text-left">
+          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-gray-100 hover:bg-gray-200 transition-colors text-left">
             <h3 className="font-bold text-black mb-3 underline text-lg">Future-Forward</h3>
-            <p className="text-sm text-black mb-3">Bridging nostalgia with innovation, one project at a time.</p>
-            <p className="text-xs text-blue-600 underline">[Read more...]</p>
+            <p className="text-sm text-black">Bridging nostalgia with innovation, one project at a time.</p>
           </button>
         </div>
       </div>
 
-      {/* Under construction banner */}
-      <div className="border-4 border-yellow-400 bg-black p-6 text-center">
-        <div className="flex items-center justify-center gap-4 mb-3 flex-wrap">
-          <span className="text-3xl">⚠️</span>
-          <span className="text-yellow-400 font-bold uppercase text-base md:text-lg">Site Under Active Development</span>
-          <span className="text-3xl">⚠️</span>
-        </div>
-        <p className="text-white text-xs md:text-sm">Last Updated: January 2026 | Nashville, TN</p>
-      </div>
 
       {/* Navigation buttons - now functional */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
