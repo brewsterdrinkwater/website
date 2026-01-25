@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Menu, X, Sparkles, Grid3x3, Image, BookOpen, ShoppingBag, Trophy, RefreshCw, Award, ExternalLink, Construction, Instagram, Sun, Moon } from 'lucide-react';
+import { Menu, X, Sparkles, Grid3x3, Image, BookOpen, ShoppingBag, Trophy, RefreshCw, Award, Construction, Instagram, Sun, Moon } from 'lucide-react';
 
 // Middle Tennessee topography map background (light, optimized for web/mobile)
 const BACKGROUND_IMAGE = 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1920&q=80';
@@ -67,7 +67,7 @@ const AltTabWebsite = () => {
   const [gamesCompleted, setGamesCompleted] = useState(0);
   const [showHighScore, setShowHighScore] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  const [golfBall, setGolfBall] = useState({ x: 0, y: 0, vx: 0, vy: 0, visible: false });
+  const [golfBall, setGolfBall] = useState({ x: 0, y: 0, visible: false });
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentGameType, setCurrentGameType] = useState(() => {
     const games = ['math', 'tictactoe', 'pattern', 'simon', 'reaction', 'wordscramble'];
@@ -105,13 +105,11 @@ const AltTabWebsite = () => {
 
   // Golf ball cursor effect
   const handleMouseMove = useCallback((e) => {
-    setGolfBall(prev => ({
+    setGolfBall({
       x: e.clientX,
       y: e.clientY,
-      vx: (e.clientX - prev.x) * 0.5,
-      vy: (e.clientY - prev.y) * 0.5,
       visible: true
-    }));
+    });
   }, []);
 
   useEffect(() => {
