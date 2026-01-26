@@ -679,20 +679,16 @@ const AltTabWebsite = () => {
           </span>
         </h1>
         <p className="text-base md:text-lg text-black font-bold uppercase px-4">
-          ★★ Multi-Disciplinary Think Tank ★★ Nashville, TN ★★
+          ★★ Multi-Disciplinary Think Tank ★★
         </p>
-        <div className="flex gap-3 justify-center items-center text-black text-sm font-bold">
-          <span className="animate-pulse text-lg">►</span>
-          <span>EXPLORE · CREATE · TRANSFORM</span>
-          <span className="animate-pulse text-lg">◄</span>
-        </div>
       </div>
 
       {/* World Clocks */}
       <div className="flex flex-wrap justify-center gap-3 text-xs">
         {[
-          { city: 'NASHVILLE', tz: 'America/Chicago' },
+          { city: 'LOS ANGELES', tz: 'America/Los_Angeles' },
           { city: 'NEW YORK', tz: 'America/New_York' },
+          { city: 'LISBON', tz: 'Europe/Lisbon' },
           { city: 'LONDON', tz: 'Europe/London' },
           { city: 'JOHANNESBURG', tz: 'Africa/Johannesburg' },
           { city: 'TOKYO', tz: 'Asia/Tokyo' },
@@ -710,11 +706,8 @@ const AltTabWebsite = () => {
       </div>
 
       {/* Game + News Links section */}
-      <div className="border-4 border-black bg-gradient-to-b from-gray-200 to-gray-300 p-4">
-        <div className="bg-blue-600 text-white px-3 py-2 mb-4 border-2 border-white" style={{ boxShadow: 'inset -2px -2px 0px rgba(0,0,0,0.5)' }}>
-          <h3 className="font-bold text-sm">🎮 QUICK GAMES + DESIGN NEWS</h3>
-        </div>
-        <div className="grid md:grid-cols-2 gap-4">
+      <div className="border-4 border-black bg-gradient-to-b from-gray-200 to-gray-300 p-6 md:p-8">
+        <div className="grid md:grid-cols-2 gap-6">
           <GameSection />
           <NewsLinks />
         </div>
@@ -928,19 +921,32 @@ const AltTabWebsite = () => {
   };
 
   const MoodboardsPage = () => {
-    const moodboardImages = [
-      { src: 'https://images.unsplash.com/photo-1547447134-cd3f5c716030?w=600&h=600&fit=crop', alt: 'Skateboard deck art', category: 'Skate Culture' },
-      { src: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?w=600&h=600&fit=crop', alt: 'Basketball sneakers', category: 'Footwear' },
-      { src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=600&fit=crop', alt: 'Skateboard wheels closeup', category: 'Skate Culture' },
-      { src: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=600&h=600&fit=crop', alt: 'Nike running shoes', category: 'Footwear' },
-      { src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=600&fit=crop', alt: 'Abstract geometric art', category: 'Design' },
-      { src: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&h=600&fit=crop', alt: 'Art supplies and paint', category: 'Art' },
-      { src: 'https://images.unsplash.com/photo-1564866657315-5dcfd5ebf529?w=600&h=600&fit=crop', alt: 'Colorful sneaker collection', category: 'Footwear' },
-      { src: 'https://images.unsplash.com/photo-1555445091-5a8b655e8a4a?w=600&h=600&fit=crop', alt: 'Skatepark architecture', category: 'Skate Culture' },
-      { src: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=600&h=600&fit=crop', alt: 'Abstract fluid art', category: 'Art' },
-      { src: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=600&h=600&fit=crop', alt: 'Air Jordan sneakers', category: 'Footwear' },
-      { src: 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=600&h=600&fit=crop', alt: 'Typography design', category: 'Design' },
-      { src: 'https://images.unsplash.com/photo-1569091791842-7cfb64e04797?w=600&h=600&fit=crop', alt: 'Skateboard in motion', category: 'Skate Culture' },
+    const moodboardItems = [
+      // Images
+      { type: 'image', src: 'https://images.unsplash.com/photo-1547447134-cd3f5c716030?w=600&h=600&fit=crop', alt: 'Skateboard deck art', category: 'Skate Culture' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?w=600&h=600&fit=crop', alt: 'Basketball sneakers', category: 'Footwear' },
+      { type: 'video', src: 'https://img.youtube.com/vi/cFwytlpCJ9U/maxresdefault.jpg', alt: 'Video Feature', category: 'Video', link: 'https://www.youtube.com/watch?v=cFwytlpCJ9U' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=600&fit=crop', alt: 'Skateboard wheels closeup', category: 'Skate Culture' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=600&h=600&fit=crop', alt: 'Nike running shoes', category: 'Footwear' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=600&fit=crop', alt: 'Abstract geometric art', category: 'Design' },
+      { type: 'video', src: 'https://img.youtube.com/vi/tdrRKLjztcQ/maxresdefault.jpg', alt: 'Creative Process', category: 'Video', link: 'https://www.youtube.com/watch?v=tdrRKLjztcQ' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&h=600&fit=crop', alt: 'Art supplies and paint', category: 'Art' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1564866657315-5dcfd5ebf529?w=600&h=600&fit=crop', alt: 'Colorful sneaker collection', category: 'Footwear' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1555445091-5a8b655e8a4a?w=600&h=600&fit=crop', alt: 'Skatepark architecture', category: 'Skate Culture' },
+      { type: 'video', src: 'https://img.youtube.com/vi/sKE1nLc5P_c/maxresdefault.jpg', alt: 'Design Inspiration', category: 'Video', link: 'https://www.youtube.com/watch?v=sKE1nLc5P_c' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=600&h=600&fit=crop', alt: 'Abstract fluid art', category: 'Art' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=600&h=600&fit=crop', alt: 'Air Jordan sneakers', category: 'Footwear' },
+      // Hypebeast / Artsy style images
+      { type: 'image', src: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&h=600&fit=crop', alt: 'Streetwear fashion', category: 'Hypebeast' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=600&h=600&fit=crop', alt: 'Urban architecture', category: 'Design' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=600&h=600&fit=crop', alt: 'Typography design', category: 'Design' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1569091791842-7cfb64e04797?w=600&h=600&fit=crop', alt: 'Skateboard in motion', category: 'Skate Culture' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1582582621959-48d27397dc69?w=600&h=600&fit=crop', alt: 'Graffiti art', category: 'Street Art' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1533158326339-7f3cf2404354?w=600&h=600&fit=crop', alt: 'Neon lights', category: 'Art' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&fit=crop', alt: 'Fashion editorial', category: 'Hypebeast' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&h=600&fit=crop', alt: 'Modern gallery', category: 'Artsy' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=600&h=600&fit=crop', alt: 'Abstract installation', category: 'Artsy' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=600&fit=crop', alt: 'Landscape vista', category: 'Art' },
     ];
 
     return (
@@ -954,22 +960,48 @@ const AltTabWebsite = () => {
 
         <div className="overflow-x-auto overflow-y-hidden whitespace-nowrap py-4 -mx-4 px-4">
           <div className="inline-flex gap-4">
-            {moodboardImages.map((image, i) => (
-              <div
-                key={i}
-                className="inline-block w-64 h-64 md:w-80 md:h-80 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/30 hover:border-white/60 transition-all duration-300 cursor-zoom-in hover:scale-105 overflow-hidden relative group flex-shrink-0"
-              >
-                <img
-                  src={image.src}
-                  alt={image.alt}
-                  loading="lazy"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                  <span className="text-xs text-white/70 uppercase tracking-wider">{image.category}</span>
-                  <span className="text-sm text-white font-medium">{image.alt}</span>
+            {moodboardItems.map((item, i) => (
+              item.type === 'video' ? (
+                <a
+                  key={i}
+                  href={item.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block w-64 h-64 md:w-80 md:h-80 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/30 hover:border-white/60 transition-all duration-300 hover:scale-105 overflow-hidden relative group flex-shrink-0"
+                >
+                  <img
+                    src={item.src}
+                    alt={item.alt}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <div className="w-0 h-0 border-t-8 border-t-transparent border-l-12 border-l-white border-b-8 border-b-transparent ml-1" style={{ borderLeftWidth: '16px' }} />
+                    </div>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                    <span className="text-xs text-white/70 uppercase tracking-wider">{item.category}</span>
+                    <span className="text-sm text-white font-medium">{item.alt}</span>
+                  </div>
+                </a>
+              ) : (
+                <div
+                  key={i}
+                  className="inline-block w-64 h-64 md:w-80 md:h-80 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/30 hover:border-white/60 transition-all duration-300 cursor-zoom-in hover:scale-105 overflow-hidden relative group flex-shrink-0"
+                >
+                  <img
+                    src={item.src}
+                    alt={item.alt}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                    <span className="text-xs text-white/70 uppercase tracking-wider">{item.category}</span>
+                    <span className="text-sm text-white font-medium">{item.alt}</span>
+                  </div>
                 </div>
-              </div>
+              )
             ))}
           </div>
         </div>
@@ -1189,7 +1221,7 @@ const AltTabWebsite = () => {
             <span className="font-medium">@alttab</span>
           </a>
         </div>
-        <p>© 2024 Alt-Tab Think Tank · Nashville, TN · Multi-Disciplinary</p>
+        <p>© 2024 Alt-Tab Think Tank · Multi-Disciplinary</p>
       </footer>
     </div>
   );
