@@ -713,6 +713,33 @@ const AltTabWebsite = () => {
         </div>
       </div>
 
+      {/* Featured Projects */}
+      <div className="border-4 border-black bg-white">
+        <div className="bg-blue-600 text-white px-4 py-3 border-b-4 border-black">
+          <h2 className="font-bold text-2xl md:text-3xl uppercase text-center">Featured Projects</h2>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4">
+          {[
+            { name: 'USM Furniture', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/USM_Logo.svg/512px-USM_Logo.svg.png', category: 'Product' },
+            { name: 'Nike NYC', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Logo_NIKE.svg/512px-Logo_NIKE.svg.png', category: 'Experience' },
+            { name: 'MLB Streaming', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Major_League_Baseball_logo.svg/440px-Major_League_Baseball_logo.svg.png', category: 'Digital' },
+            { name: 'Live Breathe Futbol', logo: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=200&h=200&fit=crop', category: 'Sport' },
+          ].map((project, i) => (
+            <button
+              key={i}
+              onClick={() => navigateTo('projects')}
+              className="bg-gray-50 hover:bg-gray-100 p-4 transition-all hover:scale-105 border-2 border-black"
+            >
+              <div className="h-16 flex items-center justify-center mb-2">
+                <img src={project.logo} alt={project.name} className="max-h-full max-w-full object-contain" />
+              </div>
+              <p className="text-xs font-bold text-center text-black">{project.name}</p>
+              <p className="text-xs text-gray-500 text-center uppercase">{project.category}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* About sections */}
       <div className="border-4 border-black bg-white">
         <div className="bg-red-600 text-white px-4 py-3 border-b-4 border-black">
@@ -772,6 +799,7 @@ const AltTabWebsite = () => {
   );
 
   const ProjectsPage = () => {
+    const [activeFilter, setActiveFilter] = useState('All');
     const [formData, setFormData] = useState({
       name: '',
       email: '',
@@ -789,17 +817,22 @@ const AltTabWebsite = () => {
       }, 3000);
     };
 
+    const categories = ['All', 'Product', 'Experience', 'Research', 'Digital', 'Sport', 'Education'];
+
     const projects = [
-      { title: 'Digital Archive Platform', category: 'Digital Goods', size: 'large', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop' },
-      { title: 'Modular Office System', category: 'Furniture', size: 'medium', image: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=600&h=400&fit=crop' },
-      { title: 'Athletic Apparel Line', category: 'Sportswear', size: 'medium', image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&h=400&fit=crop' },
-      { title: 'E-Commerce Experience', category: 'Web Design', size: 'large', image: 'https://images.unsplash.com/photo-1522542550221-31fd8575f4a7?w=800&h=600&fit=crop' },
-      { title: 'Minimalist Shelving', category: 'Furniture', size: 'small', image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=400&fit=crop' },
-      { title: 'Team Kit Design', category: 'Sportswear', size: 'medium', image: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600&h=400&fit=crop' },
-      { title: 'Portfolio Website', category: 'Web Design', size: 'small', image: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=400&h=400&fit=crop' },
-      { title: 'Training Gear Collection', category: 'Sportswear', size: 'medium', image: 'https://images.unsplash.com/photo-1556906781-9a412961c28c?w=600&h=400&fit=crop' },
-      { title: 'Workspace Furniture Suite', category: 'Furniture', size: 'large', image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop' },
+      { name: 'USM Furniture', category: 'Product', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/USM_Logo.svg/512px-USM_Logo.svg.png', description: 'Modular furniture system design' },
+      { name: 'Nike NYC', category: 'Experience', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Logo_NIKE.svg/512px-Logo_NIKE.svg.png', description: 'Retail experience design' },
+      { name: 'MLB Streaming', category: 'Digital', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Major_League_Baseball_logo.svg/440px-Major_League_Baseball_logo.svg.png', description: 'Digital streaming platform' },
+      { name: 'Live Breathe Futbol', category: 'Sport', logo: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=200&h=200&fit=crop', description: 'Football apparel brand' },
+      { name: 'Stanford Research Lab', category: 'Research', logo: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=200&h=200&fit=crop', description: 'Research methodology design' },
+      { name: 'EdTech Platform', category: 'Education', logo: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=200&h=200&fit=crop', description: 'Learning experience design' },
+      { name: 'Retail Analytics', category: 'Digital', logo: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=200&h=200&fit=crop', description: 'Data visualization dashboard' },
+      { name: 'Museum Interactive', category: 'Experience', logo: 'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=200&h=200&fit=crop', description: 'Interactive exhibit design' },
     ];
+
+    const filteredProjects = activeFilter === 'All'
+      ? projects
+      : projects.filter(p => p.category === activeFilter);
 
     return (
       <div className="space-y-12">
@@ -810,33 +843,45 @@ const AltTabWebsite = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-6 gap-3 md:gap-4">
-          {projects.map((project, i) => {
-            const sizeClasses = {
-              small: 'col-span-3 md:col-span-2 row-span-2',
-              medium: 'col-span-3 row-span-2',
-              large: 'col-span-6 md:col-span-3 row-span-3'
-            };
+        {/* Filter Labels */}
+        <div className="flex flex-wrap justify-center gap-2">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveFilter(cat)}
+              className={`px-4 py-2 text-sm font-bold uppercase tracking-wider transition-all ${
+                activeFilter === cat
+                  ? 'bg-white text-black'
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              } border-2 border-white/30 hover:border-white/60`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
 
-            return (
-              <div
-                key={i}
-                className={`group relative ${sizeClasses[project.size]} rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 overflow-hidden hover:border-white/60 transition-all duration-300 cursor-pointer hover:scale-[1.02]`}
-              >
+        {/* Projects Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {filteredProjects.map((project, i) => (
+            <div
+              key={i}
+              className="group bg-white rounded-xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer border-4 border-black hover:shadow-xl"
+            >
+              <div className="h-24 flex items-center justify-center mb-4">
                 <img
-                  src={project.image}
-                  alt={project.title}
+                  src={project.logo}
+                  alt={project.name}
                   loading="lazy"
-                  className="absolute inset-0 w-full h-full object-cover"
+                  className="max-h-full max-w-full object-contain"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                <div className="absolute inset-0 flex flex-col justify-end p-4">
-                  <span className="text-xs text-white/70 uppercase tracking-wider mb-1">{project.category}</span>
-                  <h3 className="text-lg md:text-xl font-bold text-white">{project.title}</h3>
-                </div>
               </div>
-            );
-          })}
+              <h3 className="font-bold text-black text-center text-lg">{project.name}</h3>
+              <p className="text-sm text-gray-600 text-center mt-2">{project.description}</p>
+              <div className="mt-3 text-center">
+                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">{project.category}</span>
+              </div>
+            </div>
+          ))}
         </div>
 
         <div className="max-w-4xl mx-auto pt-12">
@@ -922,31 +967,40 @@ const AltTabWebsite = () => {
 
   const MoodboardsPage = () => {
     const moodboardItems = [
-      // Images
-      { type: 'image', src: 'https://images.unsplash.com/photo-1547447134-cd3f5c716030?w=600&h=600&fit=crop', alt: 'Skateboard deck art', category: 'Skate Culture' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?w=600&h=600&fit=crop', alt: 'Basketball sneakers', category: 'Footwear' },
-      { type: 'video', src: 'https://img.youtube.com/vi/cFwytlpCJ9U/maxresdefault.jpg', alt: 'Video Feature', category: 'Video', link: 'https://www.youtube.com/watch?v=cFwytlpCJ9U' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=600&fit=crop', alt: 'Skateboard wheels closeup', category: 'Skate Culture' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=600&h=600&fit=crop', alt: 'Nike running shoes', category: 'Footwear' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=600&fit=crop', alt: 'Abstract geometric art', category: 'Design' },
-      { type: 'video', src: 'https://img.youtube.com/vi/tdrRKLjztcQ/maxresdefault.jpg', alt: 'Creative Process', category: 'Video', link: 'https://www.youtube.com/watch?v=tdrRKLjztcQ' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&h=600&fit=crop', alt: 'Art supplies and paint', category: 'Art' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1564866657315-5dcfd5ebf529?w=600&h=600&fit=crop', alt: 'Colorful sneaker collection', category: 'Footwear' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1555445091-5a8b655e8a4a?w=600&h=600&fit=crop', alt: 'Skatepark architecture', category: 'Skate Culture' },
-      { type: 'video', src: 'https://img.youtube.com/vi/sKE1nLc5P_c/maxresdefault.jpg', alt: 'Design Inspiration', category: 'Video', link: 'https://www.youtube.com/watch?v=sKE1nLc5P_c' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=600&h=600&fit=crop', alt: 'Abstract fluid art', category: 'Art' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=600&h=600&fit=crop', alt: 'Air Jordan sneakers', category: 'Footwear' },
-      // Hypebeast / Artsy style images
-      { type: 'image', src: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&h=600&fit=crop', alt: 'Streetwear fashion', category: 'Hypebeast' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=600&h=600&fit=crop', alt: 'Urban architecture', category: 'Design' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=600&h=600&fit=crop', alt: 'Typography design', category: 'Design' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1569091791842-7cfb64e04797?w=600&h=600&fit=crop', alt: 'Skateboard in motion', category: 'Skate Culture' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1582582621959-48d27397dc69?w=600&h=600&fit=crop', alt: 'Graffiti art', category: 'Street Art' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1533158326339-7f3cf2404354?w=600&h=600&fit=crop', alt: 'Neon lights', category: 'Art' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&fit=crop', alt: 'Fashion editorial', category: 'Hypebeast' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&h=600&fit=crop', alt: 'Modern gallery', category: 'Artsy' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=600&h=600&fit=crop', alt: 'Abstract installation', category: 'Artsy' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=600&fit=crop', alt: 'Landscape vista', category: 'Art' },
+      // Large items
+      { type: 'image', src: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&h=1000&fit=crop', alt: 'Modern Architecture', category: 'Architecture', size: 'large' },
+      { type: 'video', src: 'https://img.youtube.com/vi/cFwytlpCJ9U/maxresdefault.jpg', alt: 'Video Feature', category: 'Video', link: 'https://www.youtube.com/watch?v=cFwytlpCJ9U', size: 'large' },
+      // Medium items
+      { type: 'image', src: 'https://images.unsplash.com/photo-1547447134-cd3f5c716030?w=600&h=600&fit=crop', alt: 'Skateboard deck art', category: 'Skate Culture', size: 'medium' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1573790387438-4da905039392?w=600&h=600&fit=crop', alt: 'Impressionist Water Lilies', category: 'Fine Art', size: 'medium' },
+      // Small items
+      { type: 'image', src: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop', alt: 'Product Design Sneaker', category: 'Footwear', size: 'small' },
+      { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Prada-Logo.svg/512px-Prada-Logo.svg.png', alt: 'Prada', category: 'Brand', size: 'small' },
+      // Large
+      { type: 'image', src: 'https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=800&h=1000&fit=crop', alt: 'Brutalist Architecture', category: 'Architecture', size: 'large' },
+      { type: 'video', src: 'https://img.youtube.com/vi/tdrRKLjztcQ/maxresdefault.jpg', alt: 'Creative Process', category: 'Video', link: 'https://www.youtube.com/watch?v=tdrRKLjztcQ', size: 'medium' },
+      // Medium
+      { type: 'image', src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=600&fit=crop', alt: 'Skateboard wheels', category: 'Skate Culture', size: 'medium' },
+      { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/en/thumb/7/7b/New_York_Mets.svg/440px-New_York_Mets.svg.png', alt: 'New York Mets', category: 'Sport', size: 'small' },
+      // Small
+      { type: 'image', src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=400&fit=crop', alt: 'Geometric Art', category: 'Design', size: 'small' },
+      { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/53/Arsenal_FC.svg/440px-Arsenal_FC.svg.png', alt: 'Arsenal FC', category: 'Sport', size: 'small' },
+      // Large
+      { type: 'image', src: 'https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=800&h=1000&fit=crop', alt: 'Japanese Architecture', category: 'Architecture', size: 'large' },
+      { type: 'video', src: 'https://img.youtube.com/vi/sKE1nLc5P_c/maxresdefault.jpg', alt: 'Design Inspiration', category: 'Video', link: 'https://www.youtube.com/watch?v=sKE1nLc5P_c', size: 'medium' },
+      // Medium
+      { type: 'image', src: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=600&h=600&fit=crop', alt: 'Abstract fluid art', category: 'Art', size: 'medium' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1574182245530-967d9b3831af?w=600&h=600&fit=crop', alt: 'Impressionist Garden', category: 'Fine Art', size: 'medium' },
+      // Small
+      { type: 'image', src: 'https://images.unsplash.com/photo-1582582621959-48d27397dc69?w=400&h=400&fit=crop', alt: 'Graffiti art', category: 'Street Art', size: 'small' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1533158326339-7f3cf2404354?w=400&h=400&fit=crop', alt: 'Neon lights', category: 'Art', size: 'small' },
+      // More variety
+      { type: 'image', src: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=800&fit=crop', alt: 'Fashion editorial', category: 'Hypebeast', size: 'medium' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=800&h=600&fit=crop', alt: 'Abstract installation', category: 'Artsy', size: 'large' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1555445091-5a8b655e8a4a?w=400&h=400&fit=crop', alt: 'Skatepark', category: 'Skate Culture', size: 'small' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=800&h=1000&fit=crop', alt: 'Minimalist Architecture', category: 'Architecture', size: 'large' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=600&h=600&fit=crop', alt: 'Impressionist Sunset', category: 'Fine Art', size: 'medium' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1569091791842-7cfb64e04797?w=400&h=400&fit=crop', alt: 'Skateboard motion', category: 'Skate Culture', size: 'small' },
     ];
 
     return (
@@ -954,59 +1008,67 @@ const AltTabWebsite = () => {
         <div className="text-center space-y-4">
           <h2 className="text-5xl md:text-6xl font-black text-white drop-shadow-lg">Moodboards</h2>
           <p className="text-xl text-white/80 max-w-2xl mx-auto">
-            Visual inspiration from skate culture, footwear design, and contemporary art
+            Visual inspiration from architecture, fine art, skate culture, and contemporary design
           </p>
         </div>
 
-        <div className="overflow-x-auto overflow-y-hidden whitespace-nowrap py-4 -mx-4 px-4">
-          <div className="inline-flex gap-4">
-            {moodboardItems.map((item, i) => (
-              item.type === 'video' ? (
+        {/* Masonry Grid */}
+        <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+          {moodboardItems.map((item, i) => {
+            const heightClass = item.size === 'large' ? 'h-80 md:h-96' : item.size === 'medium' ? 'h-64 md:h-72' : 'h-48 md:h-56';
+
+            if (item.type === 'video') {
+              return (
                 <a
                   key={i}
                   href={item.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block w-64 h-64 md:w-80 md:h-80 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/30 hover:border-white/60 transition-all duration-300 hover:scale-105 overflow-hidden relative group flex-shrink-0"
+                  className={`block ${heightClass} rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4`}
                 >
-                  <img
-                    src={item.src}
-                    alt={item.alt}
-                    loading="lazy"
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={item.src} alt={item.alt} loading="lazy" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                      <div className="w-0 h-0 border-t-8 border-t-transparent border-l-12 border-l-white border-b-8 border-b-transparent ml-1" style={{ borderLeftWidth: '16px' }} />
+                    <div className="w-14 h-14 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <div className="w-0 h-0 border-t-6 border-t-transparent border-b-6 border-b-transparent ml-1" style={{ borderLeftWidth: '12px', borderLeftColor: 'white', borderLeftStyle: 'solid' }} />
                     </div>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
                     <span className="text-xs text-white/70 uppercase tracking-wider">{item.category}</span>
-                    <span className="text-sm text-white font-medium">{item.alt}</span>
+                    <p className="text-sm text-white font-medium">{item.alt}</p>
                   </div>
                 </a>
-              ) : (
+              );
+            }
+
+            if (item.type === 'logo') {
+              return (
                 <div
                   key={i}
-                  className="inline-block w-64 h-64 md:w-80 md:h-80 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/30 hover:border-white/60 transition-all duration-300 cursor-zoom-in hover:scale-105 overflow-hidden relative group flex-shrink-0"
+                  className={`${heightClass} rounded-xl bg-white border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4 flex items-center justify-center p-6`}
                 >
-                  <img
-                    src={item.src}
-                    alt={item.alt}
-                    loading="lazy"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                  <img src={item.src} alt={item.alt} loading="lazy" className="max-w-full max-h-full object-contain" />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
                     <span className="text-xs text-white/70 uppercase tracking-wider">{item.category}</span>
-                    <span className="text-sm text-white font-medium">{item.alt}</span>
+                    <p className="text-sm text-white font-medium">{item.alt}</p>
                   </div>
                 </div>
-              )
-            ))}
-          </div>
-        </div>
+              );
+            }
 
-        <p className="text-white/60 text-sm text-center">Scroll horizontally to explore</p>
+            return (
+              <div
+                key={i}
+                className={`${heightClass} rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:border-white/50 transition-all duration-300 cursor-zoom-in hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4`}
+              >
+                <img src={item.src} alt={item.alt} loading="lazy" className="w-full h-full object-cover" />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="text-xs text-white/70 uppercase tracking-wider">{item.category}</span>
+                  <p className="text-sm text-white font-medium">{item.alt}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     );
   };
