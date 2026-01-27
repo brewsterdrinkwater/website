@@ -998,40 +998,46 @@ const AltTabWebsite = () => {
 
   const MoodboardsPage = () => {
     const moodboardItems = [
-      // Large items
-      { type: 'image', src: 'https://images.unsplash.com/photo-1545419913-775e2e148963?w=800&h=1000&fit=crop', alt: 'Nashville Skyline', category: 'Architecture', size: 'large' },
-      { type: 'video', src: 'https://img.youtube.com/vi/cFwytlpCJ9U/maxresdefault.jpg', alt: 'Video Feature', category: 'Video', link: 'https://www.youtube.com/watch?v=cFwytlpCJ9U', size: 'large' },
-      // Medium items
-      { type: 'image', src: 'https://images.unsplash.com/photo-1547447134-cd3f5c716030?w=600&h=600&fit=crop', alt: 'Skateboard deck art', category: 'Skate Culture', size: 'medium' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1573790387438-4da905039392?w=600&h=600&fit=crop', alt: 'Impressionist Water Lilies', category: 'Fine Art', size: 'medium' },
-      // Small items
-      { type: 'image', src: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop', alt: 'Product Design Sneaker', category: 'Footwear', size: 'small' },
-      { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Prada-Logo.svg/512px-Prada-Logo.svg.png', alt: 'Prada', category: 'Brand', size: 'small' },
+      // XL - Hero items
+      { type: 'image', src: 'https://images.unsplash.com/photo-1545419913-775e2e148963?w=1200&q=80', alt: 'Nashville Skyline', size: 'xl' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1594322436404-5a0526db4d13?w=1200&q=80', alt: 'Minimalist Furniture', size: 'xl' },
       // Large
-      { type: 'image', src: 'https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=800&h=1000&fit=crop', alt: 'Brutalist Architecture', category: 'Architecture', size: 'large' },
-      { type: 'video', src: 'https://img.youtube.com/vi/tdrRKLjztcQ/maxresdefault.jpg', alt: 'Creative Process', category: 'Video', link: 'https://www.youtube.com/watch?v=tdrRKLjztcQ', size: 'medium' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=1000&q=80', alt: 'Muralist', size: 'large' },
+      { type: 'video', src: 'https://img.youtube.com/vi/cFwytlpCJ9U/maxresdefault.jpg', alt: 'Video', link: 'https://www.youtube.com/watch?v=cFwytlpCJ9U', size: 'large' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=1000&q=80', alt: 'Brutalist Architecture', size: 'large' },
       // Medium
-      { type: 'image', src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=600&fit=crop', alt: 'Skateboard wheels', category: 'Skate Culture', size: 'medium' },
-      { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/en/thumb/7/7b/New_York_Mets.svg/440px-New_York_Mets.svg.png', alt: 'New York Mets', category: 'Sport', size: 'small' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1577083552431-6e5fd01988ec?w=800&q=80', alt: 'Retail Interior', size: 'medium' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1573790387438-4da905039392?w=800&q=80', alt: 'Fine Art', size: 'medium' },
+      { type: 'video', src: 'https://img.youtube.com/vi/tdrRKLjztcQ/maxresdefault.jpg', alt: 'Video', link: 'https://www.youtube.com/watch?v=tdrRKLjztcQ', size: 'medium' },
       // Small
-      { type: 'image', src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=400&fit=crop', alt: 'Geometric Art', category: 'Design', size: 'small' },
-      { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/53/Arsenal_FC.svg/440px-Arsenal_FC.svg.png', alt: 'Arsenal FC', category: 'Sport', size: 'small' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80', alt: 'Sneaker', size: 'small' },
+      { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Prada-Logo.svg/512px-Prada-Logo.svg.png', alt: 'Prada', size: 'small' },
       // Large
-      { type: 'image', src: 'https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=800&h=1000&fit=crop', alt: 'Japanese Architecture', category: 'Architecture', size: 'large' },
-      { type: 'video', src: 'https://img.youtube.com/vi/sKE1nLc5P_c/maxresdefault.jpg', alt: 'Design Inspiration', category: 'Video', link: 'https://www.youtube.com/watch?v=sKE1nLc5P_c', size: 'medium' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=1000&q=80', alt: 'Street Artist', size: 'large' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=1000&q=80', alt: 'Japanese Architecture', size: 'large' },
       // Medium
-      { type: 'image', src: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=600&h=600&fit=crop', alt: 'Abstract fluid art', category: 'Art', size: 'medium' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1574182245530-967d9b3831af?w=600&h=600&fit=crop', alt: 'Impressionist Garden', category: 'Fine Art', size: 'medium' },
+      { type: 'video', src: 'https://img.youtube.com/vi/sKE1nLc5P_c/maxresdefault.jpg', alt: 'Video', link: 'https://www.youtube.com/watch?v=sKE1nLc5P_c', size: 'medium' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=800&q=80', alt: 'Abstract Art', size: 'medium' },
       // Small
-      { type: 'image', src: 'https://images.unsplash.com/photo-1582582621959-48d27397dc69?w=400&h=400&fit=crop', alt: 'Graffiti art', category: 'Street Art', size: 'small' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1533158326339-7f3cf2404354?w=400&h=400&fit=crop', alt: 'Neon lights', category: 'Art', size: 'small' },
-      // More variety
-      { type: 'image', src: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=800&fit=crop', alt: 'Fashion editorial', category: 'Hypebeast', size: 'medium' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=800&h=600&fit=crop', alt: 'Abstract installation', category: 'Artsy', size: 'large' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1555445091-5a8b655e8a4a?w=400&h=400&fit=crop', alt: 'Skatepark', category: 'Skate Culture', size: 'small' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=800&h=1000&fit=crop', alt: 'Minimalist Architecture', category: 'Architecture', size: 'large' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=600&h=600&fit=crop', alt: 'Impressionist Sunset', category: 'Fine Art', size: 'medium' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1569091791842-7cfb64e04797?w=400&h=400&fit=crop', alt: 'Skateboard motion', category: 'Skate Culture', size: 'small' },
+      { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/en/thumb/7/7b/New_York_Mets.svg/440px-New_York_Mets.svg.png', alt: 'Mets', size: 'small' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&q=80', alt: 'Geometric', size: 'small' },
+      { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/53/Arsenal_FC.svg/440px-Arsenal_FC.svg.png', alt: 'Arsenal', size: 'small' },
+      // XL
+      { type: 'image', src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80', alt: 'Urban Culture', size: 'xl' },
+      // Medium
+      { type: 'image', src: 'https://images.unsplash.com/photo-1574182245530-967d9b3831af?w=800&q=80', alt: 'Impressionist', size: 'medium' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1582582621959-48d27397dc69?w=800&q=80', alt: 'Street Art', size: 'medium' },
+      // Small
+      { type: 'image', src: 'https://images.unsplash.com/photo-1533158326339-7f3cf2404354?w=600&q=80', alt: 'Neon', size: 'small' },
+      // Large
+      { type: 'image', src: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1000&q=80', alt: 'Fashion', size: 'large' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=1000&q=80', alt: 'Installation', size: 'large' },
+      // Medium
+      { type: 'image', src: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=800&q=80', alt: 'Architecture', size: 'medium' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=800&q=80', alt: 'Sunset', size: 'medium' },
+      // Small
+      { type: 'image', src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&q=80', alt: 'Basketball', size: 'small' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=600&q=80', alt: 'Hoops', size: 'small' },
     ];
 
     return (
@@ -1039,14 +1045,14 @@ const AltTabWebsite = () => {
         <div className="text-center space-y-4">
           <h2 className="text-5xl md:text-6xl font-black text-white drop-shadow-lg">Moodboards</h2>
           <p className="text-xl text-white/80 max-w-2xl mx-auto">
-            Visual inspiration from architecture, fine art, skate culture, and contemporary design
+            Visual inspiration from architecture, fine art, and contemporary design
           </p>
         </div>
 
         {/* Masonry Grid */}
         <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
           {moodboardItems.map((item, i) => {
-            const heightClass = item.size === 'large' ? 'h-80 md:h-96' : item.size === 'medium' ? 'h-64 md:h-72' : 'h-48 md:h-56';
+            const heightClass = item.size === 'xl' ? 'h-96 md:h-[28rem]' : item.size === 'large' ? 'h-80 md:h-96' : item.size === 'medium' ? 'h-64 md:h-72' : 'h-48 md:h-56';
 
             if (item.type === 'video') {
               return (
@@ -1057,15 +1063,11 @@ const AltTabWebsite = () => {
                   rel="noopener noreferrer"
                   className={`block ${heightClass} rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4`}
                 >
-                  <img src={item.src} alt={item.alt} loading="lazy" className="w-full h-full object-cover" />
+                  <img src={item.src} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-14 h-14 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                       <div className="w-0 h-0 border-t-6 border-t-transparent border-b-6 border-b-transparent ml-1" style={{ borderLeftWidth: '12px', borderLeftColor: 'white', borderLeftStyle: 'solid' }} />
                     </div>
-                  </div>
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
-                    <span className="text-xs text-white/70 uppercase tracking-wider">{item.category}</span>
-                    <p className="text-sm text-white font-medium">{item.alt}</p>
                   </div>
                 </a>
               );
@@ -1077,11 +1079,7 @@ const AltTabWebsite = () => {
                   key={i}
                   className={`${heightClass} rounded-xl bg-white border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4 flex items-center justify-center p-6`}
                 >
-                  <img src={item.src} alt={item.alt} loading="lazy" className="max-w-full max-h-full object-contain" />
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="text-xs text-white/70 uppercase tracking-wider">{item.category}</span>
-                    <p className="text-sm text-white font-medium">{item.alt}</p>
-                  </div>
+                  <img src={item.src} alt="" loading="lazy" decoding="async" className="max-w-full max-h-full object-contain" />
                 </div>
               );
             }
@@ -1089,13 +1087,9 @@ const AltTabWebsite = () => {
             return (
               <div
                 key={i}
-                className={`${heightClass} rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:border-white/50 transition-all duration-300 cursor-zoom-in hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4`}
+                className={`${heightClass} rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4`}
               >
-                <img src={item.src} alt={item.alt} loading="lazy" className="w-full h-full object-cover" />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="text-xs text-white/70 uppercase tracking-wider">{item.category}</span>
-                  <p className="text-sm text-white font-medium">{item.alt}</p>
-                </div>
+                <img src={item.src} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
               </div>
             );
           })}
