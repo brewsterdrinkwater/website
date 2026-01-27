@@ -73,6 +73,17 @@ const AltTabWebsite = () => {
     const games = ['math', 'tictactoe', 'pattern', 'simon', 'reaction', 'wordscramble'];
     return games[Math.floor(Math.random() * games.length)];
   });
+  const [letterPositions, setLetterPositions] = useState({
+    A: { x: 0, y: 0 },
+    L: { x: 0, y: 0 },
+    T: { x: 0, y: 0 },
+    '-': { x: 0, y: 0 },
+    T2: { x: 0, y: 0 },
+    A2: { x: 0, y: 0 },
+    B: { x: 0, y: 0 },
+  });
+  const [draggingLetter, setDraggingLetter] = useState(null);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   // Update time every second for world clocks
   useEffect(() => {
@@ -110,12 +121,40 @@ const AltTabWebsite = () => {
       y: e.clientY,
       visible: true
     });
+
+    // Handle letter dragging
+    if (draggingLetter) {
+      const deltaX = e.clientX - dragStart.x;
+      const deltaY = e.clientY - dragStart.y;
+      setLetterPositions(prev => ({
+        ...prev,
+        [draggingLetter]: {
+          x: prev[draggingLetter].x + deltaX,
+          y: prev[draggingLetter].y + deltaY,
+        }
+      }));
+      setDragStart({ x: e.clientX, y: e.clientY });
+    }
+  }, [draggingLetter, dragStart]);
+
+  const handleLetterMouseDown = (letter, e) => {
+    e.preventDefault();
+    setDraggingLetter(letter);
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseUp = useCallback(() => {
+    setDraggingLetter(null);
   }, []);
 
   useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [handleMouseMove]);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [handleMouseMove, handleMouseUp]);
 
 
   const HighScorePopup = () => (
@@ -666,17 +705,36 @@ const AltTabWebsite = () => {
       <div className="text-center space-y-3 py-8 border-4 border-black bg-yellow-300">
         <div className="flex items-center justify-center gap-2">
           <span className="text-xl">★</span>
-          <span className="text-xs uppercase tracking-widest font-bold text-black">Est. 2024</span>
+          <span className="text-xs uppercase tracking-widest font-bold text-black">Established 2024</span>
           <span className="text-xl">★</span>
         </div>
-        <h1 className="text-6xl md:text-8xl font-black text-black leading-none" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
-          <span style={{
-            display: 'inline-block',
-            color: '#000000',
-            textShadow: '2px 2px 0px #ff0000, 4px 4px 0px #0000ff'
-          }}>
-            ALT-TAB
-          </span>
+        <h1 className="text-6xl md:text-8xl font-black text-black leading-none select-none" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+          {[
+            { key: 'A', char: 'A' },
+            { key: 'L', char: 'L' },
+            { key: 'T', char: 'T' },
+            { key: '-', char: '-' },
+            { key: 'T2', char: 'T' },
+            { key: 'A2', char: 'A' },
+            { key: 'B', char: 'B' },
+          ].map((letter) => (
+            <span
+              key={letter.key}
+              onMouseDown={(e) => handleLetterMouseDown(letter.key, e)}
+              style={{
+                display: 'inline-block',
+                color: '#000000',
+                textShadow: '2px 2px 0px #ff0000, 4px 4px 0px #0000ff',
+                cursor: 'grab',
+                transform: `translate(${letterPositions[letter.key].x}px, ${letterPositions[letter.key].y}px)`,
+                transition: draggingLetter === letter.key ? 'none' : 'transform 0.1s ease-out',
+                userSelect: 'none',
+              }}
+              className="hover:scale-110 active:cursor-grabbing"
+            >
+              {letter.char}
+            </span>
+          ))}
         </h1>
         <p className="text-base md:text-lg text-black font-bold uppercase px-4">
           ★★ Multi-Disciplinary Think Tank ★★
@@ -687,9 +745,9 @@ const AltTabWebsite = () => {
       <div className="flex flex-wrap justify-center gap-3 text-xs">
         {[
           { city: 'LOS ANGELES', tz: 'America/Los_Angeles' },
+          { city: 'NASHVILLE', tz: 'America/Chicago' },
           { city: 'NEW YORK', tz: 'America/New_York' },
           { city: 'LISBON', tz: 'Europe/Lisbon' },
-          { city: 'LONDON', tz: 'Europe/London' },
           { city: 'JOHANNESBURG', tz: 'Africa/Johannesburg' },
           { city: 'TOKYO', tz: 'Asia/Tokyo' },
         ].map((clock) => (
@@ -710,33 +768,6 @@ const AltTabWebsite = () => {
         <div className="grid md:grid-cols-2 gap-6">
           <GameSection />
           <NewsLinks />
-        </div>
-      </div>
-
-      {/* Featured Projects */}
-      <div className="border-4 border-black bg-white">
-        <div className="bg-blue-600 text-white px-4 py-3 border-b-4 border-black">
-          <h2 className="font-bold text-2xl md:text-3xl uppercase text-center">Featured Projects</h2>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4">
-          {[
-            { name: 'USM Furniture', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/USM_Logo.svg/512px-USM_Logo.svg.png', category: 'Product' },
-            { name: 'Nike NYC', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Logo_NIKE.svg/512px-Logo_NIKE.svg.png', category: 'Experience' },
-            { name: 'MLB Streaming', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Major_League_Baseball_logo.svg/440px-Major_League_Baseball_logo.svg.png', category: 'Digital' },
-            { name: 'Live Breathe Futbol', logo: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=200&h=200&fit=crop', category: 'Sport' },
-          ].map((project, i) => (
-            <button
-              key={i}
-              onClick={() => navigateTo('projects')}
-              className="bg-gray-50 hover:bg-gray-100 p-4 transition-all hover:scale-105 border-2 border-black"
-            >
-              <div className="h-16 flex items-center justify-center mb-2">
-                <img src={project.logo} alt={project.name} className="max-h-full max-w-full object-contain" />
-              </div>
-              <p className="text-xs font-bold text-center text-black">{project.name}</p>
-              <p className="text-xs text-gray-500 text-center uppercase">{project.category}</p>
-            </button>
-          ))}
         </div>
       </div>
 
@@ -968,7 +999,7 @@ const AltTabWebsite = () => {
   const MoodboardsPage = () => {
     const moodboardItems = [
       // Large items
-      { type: 'image', src: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&h=1000&fit=crop', alt: 'Modern Architecture', category: 'Architecture', size: 'large' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1545419913-775e2e148963?w=800&h=1000&fit=crop', alt: 'Nashville Skyline', category: 'Architecture', size: 'large' },
       { type: 'video', src: 'https://img.youtube.com/vi/cFwytlpCJ9U/maxresdefault.jpg', alt: 'Video Feature', category: 'Video', link: 'https://www.youtube.com/watch?v=cFwytlpCJ9U', size: 'large' },
       // Medium items
       { type: 'image', src: 'https://images.unsplash.com/photo-1547447134-cd3f5c716030?w=600&h=600&fit=crop', alt: 'Skateboard deck art', category: 'Skate Culture', size: 'medium' },
