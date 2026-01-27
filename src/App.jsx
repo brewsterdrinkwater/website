@@ -1038,6 +1038,12 @@ const AltTabWebsite = () => {
       // Small
       { type: 'image', src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&q=80', alt: 'Basketball', size: 'small' },
       { type: 'image', src: 'https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=600&q=80', alt: 'Hoops', size: 'small' },
+      // Frank Lloyd Wright - Fallingwater
+      { type: 'image', src: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80', alt: 'Fallingwater', size: 'xl' },
+      // BDDW style furniture
+      { type: 'image', src: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1000&q=80', alt: 'BDDW Furniture', size: 'large' },
+      // Dover Street Market
+      { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Dover_Street_Market_logo.svg/512px-Dover_Street_Market_logo.svg.png', alt: 'Dover Street Market', size: 'medium' },
     ];
 
     return (
