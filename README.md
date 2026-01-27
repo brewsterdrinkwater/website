@@ -231,5 +231,5 @@ For production, consider adding to `index.html`:
 ## Support
 
 - Instagram: [@alttab.xyz](https://www.instagram.com/alttab.xyz/)
-- Location: Nashville, TN
-- Founded: 2024
+- Location: Eartth
+- Founded: Yes
