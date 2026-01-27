@@ -73,6 +73,17 @@ const AltTabWebsite = () => {
     const games = ['math', 'tictactoe', 'pattern', 'simon', 'reaction', 'wordscramble'];
     return games[Math.floor(Math.random() * games.length)];
   });
+  const [letterPositions, setLetterPositions] = useState({
+    A: { x: 0, y: 0 },
+    L: { x: 0, y: 0 },
+    T: { x: 0, y: 0 },
+    '-': { x: 0, y: 0 },
+    T2: { x: 0, y: 0 },
+    A2: { x: 0, y: 0 },
+    B: { x: 0, y: 0 },
+  });
+  const [draggingLetter, setDraggingLetter] = useState(null);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   // Update time every second for world clocks
   useEffect(() => {
@@ -110,12 +121,40 @@ const AltTabWebsite = () => {
       y: e.clientY,
       visible: true
     });
+
+    // Handle letter dragging
+    if (draggingLetter) {
+      const deltaX = e.clientX - dragStart.x;
+      const deltaY = e.clientY - dragStart.y;
+      setLetterPositions(prev => ({
+        ...prev,
+        [draggingLetter]: {
+          x: prev[draggingLetter].x + deltaX,
+          y: prev[draggingLetter].y + deltaY,
+        }
+      }));
+      setDragStart({ x: e.clientX, y: e.clientY });
+    }
+  }, [draggingLetter, dragStart]);
+
+  const handleLetterMouseDown = (letter, e) => {
+    e.preventDefault();
+    setDraggingLetter(letter);
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseUp = useCallback(() => {
+    setDraggingLetter(null);
   }, []);
 
   useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [handleMouseMove]);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [handleMouseMove, handleMouseUp]);
 
 
   const HighScorePopup = () => (
@@ -666,17 +705,36 @@ const AltTabWebsite = () => {
       <div className="text-center space-y-3 py-8 border-4 border-black bg-yellow-300">
         <div className="flex items-center justify-center gap-2">
           <span className="text-xl">★</span>
-          <span className="text-xs uppercase tracking-widest font-bold text-black">Est. 2024</span>
+          <span className="text-xs uppercase tracking-widest font-bold text-black">Established 2024</span>
           <span className="text-xl">★</span>
         </div>
-        <h1 className="text-6xl md:text-8xl font-black text-black leading-none" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
-          <span style={{
-            display: 'inline-block',
-            color: '#000000',
-            textShadow: '2px 2px 0px #ff0000, 4px 4px 0px #0000ff'
-          }}>
-            ALT-TAB
-          </span>
+        <h1 className="text-6xl md:text-8xl font-black text-black leading-none select-none" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+          {[
+            { key: 'A', char: 'A' },
+            { key: 'L', char: 'L' },
+            { key: 'T', char: 'T' },
+            { key: '-', char: '-' },
+            { key: 'T2', char: 'T' },
+            { key: 'A2', char: 'A' },
+            { key: 'B', char: 'B' },
+          ].map((letter) => (
+            <span
+              key={letter.key}
+              onMouseDown={(e) => handleLetterMouseDown(letter.key, e)}
+              style={{
+                display: 'inline-block',
+                color: '#000000',
+                textShadow: '2px 2px 0px #ff0000, 4px 4px 0px #0000ff',
+                cursor: 'grab',
+                transform: `translate(${letterPositions[letter.key].x}px, ${letterPositions[letter.key].y}px)`,
+                transition: draggingLetter === letter.key ? 'none' : 'transform 0.1s ease-out',
+                userSelect: 'none',
+              }}
+              className="hover:scale-110 active:cursor-grabbing"
+            >
+              {letter.char}
+            </span>
+          ))}
         </h1>
         <p className="text-base md:text-lg text-black font-bold uppercase px-4">
           ★★ Multi-Disciplinary Think Tank ★★
@@ -687,9 +745,9 @@ const AltTabWebsite = () => {
       <div className="flex flex-wrap justify-center gap-3 text-xs">
         {[
           { city: 'LOS ANGELES', tz: 'America/Los_Angeles' },
+          { city: 'NASHVILLE', tz: 'America/Chicago' },
           { city: 'NEW YORK', tz: 'America/New_York' },
           { city: 'LISBON', tz: 'Europe/Lisbon' },
-          { city: 'LONDON', tz: 'Europe/London' },
           { city: 'JOHANNESBURG', tz: 'Africa/Johannesburg' },
           { city: 'TOKYO', tz: 'Asia/Tokyo' },
         ].map((clock) => (
@@ -710,33 +768,6 @@ const AltTabWebsite = () => {
         <div className="grid md:grid-cols-2 gap-6">
           <GameSection />
           <NewsLinks />
-        </div>
-      </div>
-
-      {/* Featured Projects */}
-      <div className="border-4 border-black bg-white">
-        <div className="bg-blue-600 text-white px-4 py-3 border-b-4 border-black">
-          <h2 className="font-bold text-2xl md:text-3xl uppercase text-center">Featured Projects</h2>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4">
-          {[
-            { name: 'USM Furniture', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/USM_Logo.svg/512px-USM_Logo.svg.png', category: 'Product' },
-            { name: 'Nike NYC', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Logo_NIKE.svg/512px-Logo_NIKE.svg.png', category: 'Experience' },
-            { name: 'MLB Streaming', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Major_League_Baseball_logo.svg/440px-Major_League_Baseball_logo.svg.png', category: 'Digital' },
-            { name: 'Live Breathe Futbol', logo: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=200&h=200&fit=crop', category: 'Sport' },
-          ].map((project, i) => (
-            <button
-              key={i}
-              onClick={() => navigateTo('projects')}
-              className="bg-gray-50 hover:bg-gray-100 p-4 transition-all hover:scale-105 border-2 border-black"
-            >
-              <div className="h-16 flex items-center justify-center mb-2">
-                <img src={project.logo} alt={project.name} className="max-h-full max-w-full object-contain" />
-              </div>
-              <p className="text-xs font-bold text-center text-black">{project.name}</p>
-              <p className="text-xs text-gray-500 text-center uppercase">{project.category}</p>
-            </button>
-          ))}
         </div>
       </div>
 
@@ -967,40 +998,52 @@ const AltTabWebsite = () => {
 
   const MoodboardsPage = () => {
     const moodboardItems = [
-      // Large items
-      { type: 'image', src: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&h=1000&fit=crop', alt: 'Modern Architecture', category: 'Architecture', size: 'large' },
-      { type: 'video', src: 'https://img.youtube.com/vi/cFwytlpCJ9U/maxresdefault.jpg', alt: 'Video Feature', category: 'Video', link: 'https://www.youtube.com/watch?v=cFwytlpCJ9U', size: 'large' },
-      // Medium items
-      { type: 'image', src: 'https://images.unsplash.com/photo-1547447134-cd3f5c716030?w=600&h=600&fit=crop', alt: 'Skateboard deck art', category: 'Skate Culture', size: 'medium' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1573790387438-4da905039392?w=600&h=600&fit=crop', alt: 'Impressionist Water Lilies', category: 'Fine Art', size: 'medium' },
-      // Small items
-      { type: 'image', src: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop', alt: 'Product Design Sneaker', category: 'Footwear', size: 'small' },
-      { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Prada-Logo.svg/512px-Prada-Logo.svg.png', alt: 'Prada', category: 'Brand', size: 'small' },
+      // XL - Hero items
+      { type: 'image', src: 'https://images.unsplash.com/photo-1545419913-775e2e148963?w=1200&q=80', alt: 'Nashville Skyline', size: 'xl' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1594322436404-5a0526db4d13?w=1200&q=80', alt: 'Minimalist Furniture', size: 'xl' },
       // Large
-      { type: 'image', src: 'https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=800&h=1000&fit=crop', alt: 'Brutalist Architecture', category: 'Architecture', size: 'large' },
-      { type: 'video', src: 'https://img.youtube.com/vi/tdrRKLjztcQ/maxresdefault.jpg', alt: 'Creative Process', category: 'Video', link: 'https://www.youtube.com/watch?v=tdrRKLjztcQ', size: 'medium' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=1000&q=80', alt: 'Muralist', size: 'large' },
+      { type: 'video', src: 'https://img.youtube.com/vi/cFwytlpCJ9U/maxresdefault.jpg', alt: 'Video', link: 'https://www.youtube.com/watch?v=cFwytlpCJ9U', size: 'large' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=1000&q=80', alt: 'Brutalist Architecture', size: 'large' },
       // Medium
-      { type: 'image', src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=600&fit=crop', alt: 'Skateboard wheels', category: 'Skate Culture', size: 'medium' },
-      { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/en/thumb/7/7b/New_York_Mets.svg/440px-New_York_Mets.svg.png', alt: 'New York Mets', category: 'Sport', size: 'small' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1577083552431-6e5fd01988ec?w=800&q=80', alt: 'Retail Interior', size: 'medium' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1573790387438-4da905039392?w=800&q=80', alt: 'Fine Art', size: 'medium' },
+      { type: 'video', src: 'https://img.youtube.com/vi/tdrRKLjztcQ/maxresdefault.jpg', alt: 'Video', link: 'https://www.youtube.com/watch?v=tdrRKLjztcQ', size: 'medium' },
       // Small
-      { type: 'image', src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=400&fit=crop', alt: 'Geometric Art', category: 'Design', size: 'small' },
-      { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/53/Arsenal_FC.svg/440px-Arsenal_FC.svg.png', alt: 'Arsenal FC', category: 'Sport', size: 'small' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80', alt: 'Sneaker', size: 'small' },
+      { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Prada-Logo.svg/512px-Prada-Logo.svg.png', alt: 'Prada', size: 'small' },
       // Large
-      { type: 'image', src: 'https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=800&h=1000&fit=crop', alt: 'Japanese Architecture', category: 'Architecture', size: 'large' },
-      { type: 'video', src: 'https://img.youtube.com/vi/sKE1nLc5P_c/maxresdefault.jpg', alt: 'Design Inspiration', category: 'Video', link: 'https://www.youtube.com/watch?v=sKE1nLc5P_c', size: 'medium' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=1000&q=80', alt: 'Street Artist', size: 'large' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=1000&q=80', alt: 'Japanese Architecture', size: 'large' },
       // Medium
-      { type: 'image', src: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=600&h=600&fit=crop', alt: 'Abstract fluid art', category: 'Art', size: 'medium' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1574182245530-967d9b3831af?w=600&h=600&fit=crop', alt: 'Impressionist Garden', category: 'Fine Art', size: 'medium' },
+      { type: 'video', src: 'https://img.youtube.com/vi/sKE1nLc5P_c/maxresdefault.jpg', alt: 'Video', link: 'https://www.youtube.com/watch?v=sKE1nLc5P_c', size: 'medium' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=800&q=80', alt: 'Abstract Art', size: 'medium' },
       // Small
-      { type: 'image', src: 'https://images.unsplash.com/photo-1582582621959-48d27397dc69?w=400&h=400&fit=crop', alt: 'Graffiti art', category: 'Street Art', size: 'small' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1533158326339-7f3cf2404354?w=400&h=400&fit=crop', alt: 'Neon lights', category: 'Art', size: 'small' },
-      // More variety
-      { type: 'image', src: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=800&fit=crop', alt: 'Fashion editorial', category: 'Hypebeast', size: 'medium' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=800&h=600&fit=crop', alt: 'Abstract installation', category: 'Artsy', size: 'large' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1555445091-5a8b655e8a4a?w=400&h=400&fit=crop', alt: 'Skatepark', category: 'Skate Culture', size: 'small' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=800&h=1000&fit=crop', alt: 'Minimalist Architecture', category: 'Architecture', size: 'large' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=600&h=600&fit=crop', alt: 'Impressionist Sunset', category: 'Fine Art', size: 'medium' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1569091791842-7cfb64e04797?w=400&h=400&fit=crop', alt: 'Skateboard motion', category: 'Skate Culture', size: 'small' },
+      { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/en/thumb/7/7b/New_York_Mets.svg/440px-New_York_Mets.svg.png', alt: 'Mets', size: 'small' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&q=80', alt: 'Geometric', size: 'small' },
+      { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/53/Arsenal_FC.svg/440px-Arsenal_FC.svg.png', alt: 'Arsenal', size: 'small' },
+      // XL
+      { type: 'image', src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80', alt: 'Urban Culture', size: 'xl' },
+      // Medium
+      { type: 'image', src: 'https://images.unsplash.com/photo-1574182245530-967d9b3831af?w=800&q=80', alt: 'Impressionist', size: 'medium' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1582582621959-48d27397dc69?w=800&q=80', alt: 'Street Art', size: 'medium' },
+      // Small
+      { type: 'image', src: 'https://images.unsplash.com/photo-1533158326339-7f3cf2404354?w=600&q=80', alt: 'Neon', size: 'small' },
+      // Large
+      { type: 'image', src: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1000&q=80', alt: 'Fashion', size: 'large' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=1000&q=80', alt: 'Installation', size: 'large' },
+      // Medium
+      { type: 'image', src: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=800&q=80', alt: 'Architecture', size: 'medium' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=800&q=80', alt: 'Sunset', size: 'medium' },
+      // Small
+      { type: 'image', src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&q=80', alt: 'Basketball', size: 'small' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=600&q=80', alt: 'Hoops', size: 'small' },
+      // Frank Lloyd Wright - Fallingwater
+      { type: 'image', src: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80', alt: 'Fallingwater', size: 'xl' },
+      // BDDW style furniture
+      { type: 'image', src: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1000&q=80', alt: 'BDDW Furniture', size: 'large' },
+      // Dover Street Market
+      { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Dover_Street_Market_logo.svg/512px-Dover_Street_Market_logo.svg.png', alt: 'Dover Street Market', size: 'medium' },
     ];
 
     return (
@@ -1008,14 +1051,14 @@ const AltTabWebsite = () => {
         <div className="text-center space-y-4">
           <h2 className="text-5xl md:text-6xl font-black text-white drop-shadow-lg">Moodboards</h2>
           <p className="text-xl text-white/80 max-w-2xl mx-auto">
-            Visual inspiration from architecture, fine art, skate culture, and contemporary design
+            Visual inspiration from architecture, fine art, and contemporary design
           </p>
         </div>
 
         {/* Masonry Grid */}
         <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
           {moodboardItems.map((item, i) => {
-            const heightClass = item.size === 'large' ? 'h-80 md:h-96' : item.size === 'medium' ? 'h-64 md:h-72' : 'h-48 md:h-56';
+            const heightClass = item.size === 'xl' ? 'h-96 md:h-[28rem]' : item.size === 'large' ? 'h-80 md:h-96' : item.size === 'medium' ? 'h-64 md:h-72' : 'h-48 md:h-56';
 
             if (item.type === 'video') {
               return (
@@ -1026,15 +1069,11 @@ const AltTabWebsite = () => {
                   rel="noopener noreferrer"
                   className={`block ${heightClass} rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4`}
                 >
-                  <img src={item.src} alt={item.alt} loading="lazy" className="w-full h-full object-cover" />
+                  <img src={item.src} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-14 h-14 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                       <div className="w-0 h-0 border-t-6 border-t-transparent border-b-6 border-b-transparent ml-1" style={{ borderLeftWidth: '12px', borderLeftColor: 'white', borderLeftStyle: 'solid' }} />
                     </div>
-                  </div>
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
-                    <span className="text-xs text-white/70 uppercase tracking-wider">{item.category}</span>
-                    <p className="text-sm text-white font-medium">{item.alt}</p>
                   </div>
                 </a>
               );
@@ -1046,11 +1085,7 @@ const AltTabWebsite = () => {
                   key={i}
                   className={`${heightClass} rounded-xl bg-white border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4 flex items-center justify-center p-6`}
                 >
-                  <img src={item.src} alt={item.alt} loading="lazy" className="max-w-full max-h-full object-contain" />
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="text-xs text-white/70 uppercase tracking-wider">{item.category}</span>
-                    <p className="text-sm text-white font-medium">{item.alt}</p>
-                  </div>
+                  <img src={item.src} alt="" loading="lazy" decoding="async" className="max-w-full max-h-full object-contain" />
                 </div>
               );
             }
@@ -1058,13 +1093,9 @@ const AltTabWebsite = () => {
             return (
               <div
                 key={i}
-                className={`${heightClass} rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:border-white/50 transition-all duration-300 cursor-zoom-in hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4`}
+                className={`${heightClass} rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4`}
               >
-                <img src={item.src} alt={item.alt} loading="lazy" className="w-full h-full object-cover" />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="text-xs text-white/70 uppercase tracking-wider">{item.category}</span>
-                  <p className="text-sm text-white font-medium">{item.alt}</p>
-                </div>
+                <img src={item.src} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
               </div>
             );
           })}
