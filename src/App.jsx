@@ -392,7 +392,7 @@ const AltTabWebsite = () => {
       <div className="text-center space-y-3 py-8 border-4 border-black bg-yellow-300">
         <div className="flex items-center justify-center gap-2">
           <span className="text-xl">★</span>
-          <span className="text-xs uppercase tracking-widest font-bold text-black">Established 2024</span>
+          <span className="text-xs uppercase tracking-widest font-bold text-black">Established</span>
           <span className="text-xl">★</span>
         </div>
         <h1 className="text-6xl md:text-8xl font-black text-black leading-none select-none" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
@@ -514,6 +514,9 @@ const AltTabWebsite = () => {
 
     const handleSubmit = (e) => {
       e.preventDefault();
+      const subject = `Alt-Tab Inquiry from ${formData.name}`;
+      const body = `Name: ${formData.name}\nEmail: ${formData.email}\nCompany: ${formData.company || 'Not provided'}\n\nMessage:\n${formData.message}`;
+      window.location.href = `mailto:ty@alt-tab.xyz?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
       setFormSubmitted(true);
       setTimeout(() => {
         setFormSubmitted(false);
@@ -715,8 +718,8 @@ const AltTabWebsite = () => {
       { type: 'image', src: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80', alt: 'Fallingwater', size: 'xl' },
       // BDDW style furniture
       { type: 'image', src: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1000&q=80', alt: 'BDDW Furniture', size: 'large' },
-      // Dover Street Market
-      { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Dover_Street_Market_logo.svg/512px-Dover_Street_Market_logo.svg.png', alt: 'Dover Street Market', size: 'medium' },
+      // Dover Street Market - using text placeholder since logo has access restrictions
+      { type: 'text', text: 'DOVER STREET MARKET', alt: 'Dover Street Market', size: 'medium' },
       // Skate shop interior with bowl
       { type: 'image', src: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80', alt: 'Retail Space', size: 'xl' },
       // Graffiti street art
@@ -764,6 +767,17 @@ const AltTabWebsite = () => {
                   className={`${heightClass} rounded-xl bg-white border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4 flex items-center justify-center p-6`}
                 >
                   <img src={item.src} alt="" loading="lazy" decoding="async" className="max-w-full max-h-full object-contain" />
+                </div>
+              );
+            }
+
+            if (item.type === 'text') {
+              return (
+                <div
+                  key={i}
+                  className={`${heightClass} rounded-xl bg-black border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4 flex items-center justify-center p-6`}
+                >
+                  <span className="text-white font-black text-2xl md:text-3xl text-center tracking-tight" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>{item.text}</span>
                 </div>
               );
             }
