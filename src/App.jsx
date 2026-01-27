@@ -1044,6 +1044,11 @@ const AltTabWebsite = () => {
       { type: 'image', src: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1000&q=80', alt: 'BDDW Furniture', size: 'large' },
       // Dover Street Market
       { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Dover_Street_Market_logo.svg/512px-Dover_Street_Market_logo.svg.png', alt: 'Dover Street Market', size: 'medium' },
+      // Skate shop interior with bowl
+      { type: 'image', src: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80', alt: 'Retail Space', size: 'xl' },
+      // Graffiti street art
+      { type: 'image', src: 'https://images.unsplash.com/photo-1557672172-298e090bd0f1?w=1000&q=80', alt: 'Graffiti', size: 'large' },
+      { type: 'image', src: 'https://images.unsplash.com/photo-1533158307587-828f0a76ef46?w=800&q=80', alt: 'Street Typography', size: 'medium' },
     ];
 
     return (
