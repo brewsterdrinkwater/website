@@ -82,6 +82,29 @@ const AltTabWebsite = () => {
   const [draggingLetter, setDraggingLetter] = useState(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
+  // Die-cut draggable objects
+  const dieCutItems = [
+    { id: 'basketball', emoji: '🏀', size: 50 },
+    { id: 'golfclub', emoji: '🏌️', size: 45 },
+    { id: '3dprinter', emoji: '🖨️', size: 40 },
+    { id: 'drill', emoji: '🔧', size: 35 },
+    { id: 'soccer', emoji: '⚽', size: 48 },
+    { id: 'headphones', emoji: '🎧', size: 42 },
+    { id: 'skateboard', emoji: '🛹', size: 55 },
+  ];
+
+  const [dieCutPositions, setDieCutPositions] = useState(() => {
+    const positions = {};
+    dieCutItems.forEach(item => {
+      positions[item.id] = {
+        x: Math.random() * 300 - 150,
+        y: Math.random() * 200 - 100,
+      };
+    });
+    return positions;
+  });
+  const [draggingDieCut, setDraggingDieCut] = useState(null);
+
   // Update time every second for world clocks
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -121,7 +144,21 @@ const AltTabWebsite = () => {
       }));
       setDragStart({ x: e.clientX, y: e.clientY });
     }
-  }, [draggingLetter, dragStart]);
+
+    // Handle die-cut dragging
+    if (draggingDieCut) {
+      const deltaX = e.clientX - dragStart.x;
+      const deltaY = e.clientY - dragStart.y;
+      setDieCutPositions(prev => ({
+        ...prev,
+        [draggingDieCut]: {
+          x: prev[draggingDieCut].x + deltaX,
+          y: prev[draggingDieCut].y + deltaY,
+        }
+      }));
+      setDragStart({ x: e.clientX, y: e.clientY });
+    }
+  }, [draggingLetter, draggingDieCut, dragStart]);
 
   const handleLetterMouseDown = (letter, e) => {
     e.preventDefault();
@@ -129,8 +166,15 @@ const AltTabWebsite = () => {
     setDragStart({ x: e.clientX, y: e.clientY });
   };
 
+  const handleDieCutMouseDown = (id, e) => {
+    e.preventDefault();
+    setDraggingDieCut(id);
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
   const handleMouseUp = useCallback(() => {
     setDraggingLetter(null);
+    setDraggingDieCut(null);
   }, []);
 
   useEffect(() => {
@@ -364,32 +408,58 @@ const AltTabWebsite = () => {
     </div>
   );
 
-  // Drudge-style links component
+  // Drudge-style links component - 2 row layout
   const NewsLinks = () => (
     <div className="p-4 rounded-2xl bg-black/90 border-2 border-white/20">
       <h3 className="text-center font-bold text-red-500 text-lg mb-3 border-b border-white/20 pb-2">
         ★ HEADLINES ★
       </h3>
-      <div className="max-h-80 overflow-y-auto space-y-1 pr-2 scrollbar-thin">
-        {NEWS_LINKS.map((link, i) => (
-          <a
-            key={i}
-            href={link.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block text-xs text-white hover:text-cyan-400 hover:bg-white/10 px-2 py-1 rounded transition-colors"
-          >
-            {link.title}
-          </a>
-        ))}
+      <div className="max-h-80 overflow-y-auto pr-2 scrollbar-thin">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+          {NEWS_LINKS.map((link, i) => (
+            <a
+              key={i}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-xs text-white hover:text-yellow-400 hover:bg-white/10 px-2 py-1 rounded transition-colors truncate"
+            >
+              {link.title}
+            </a>
+          ))}
+        </div>
       </div>
     </div>
   );
 
   const HomePage = () => (
     <div className="space-y-8">
+      {/* Die-cut draggable objects */}
+      <div className="relative">
+        {dieCutItems.map((item) => (
+          <div
+            key={item.id}
+            onMouseDown={(e) => handleDieCutMouseDown(item.id, e)}
+            style={{
+              position: 'absolute',
+              left: `calc(50% + ${dieCutPositions[item.id].x}px)`,
+              top: `calc(50% + ${dieCutPositions[item.id].y}px)`,
+              fontSize: item.size,
+              cursor: 'grab',
+              zIndex: 20,
+              userSelect: 'none',
+              filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))',
+              transition: draggingDieCut === item.id ? 'none' : 'transform 0.1s ease-out',
+            }}
+            className="hover:scale-110 active:cursor-grabbing"
+          >
+            {item.emoji}
+          </div>
+        ))}
+      </div>
+
       {/* Retro 90s header */}
-      <div className="text-center space-y-3 py-8 border-4 border-black bg-yellow-300">
+      <div className="text-center space-y-3 py-8 border-4 border-black bg-gradient-to-br from-yellow-300 via-yellow-400 to-orange-400">
         <div className="flex items-center justify-center gap-2">
           <span className="text-xl">★</span>
           <span className="text-xs uppercase tracking-widest font-bold text-black">Established</span>
@@ -438,8 +508,8 @@ const AltTabWebsite = () => {
           { city: 'JOHANNESBURG', tz: 'Africa/Johannesburg' },
           { city: 'TOKYO', tz: 'Asia/Tokyo' },
         ].map((clock) => (
-          <div key={clock.city} className="bg-black text-lime-400 px-3 py-2 border-2 border-lime-400 font-mono">
-            <span className="text-white/60">{clock.city}:</span>{' '}
+          <div key={clock.city} className="bg-black text-yellow-400 px-3 py-2 border-2 border-yellow-400 font-mono">
+            <span className="text-orange-300">{clock.city}:</span>{' '}
             {currentTime.toLocaleTimeString('en-US', {
               timeZone: clock.tz,
               hour: '2-digit',
@@ -450,29 +520,29 @@ const AltTabWebsite = () => {
         ))}
       </div>
 
-      {/* Game + News Links section */}
-      <div className="border-4 border-black bg-gradient-to-b from-gray-200 to-gray-300 p-6 md:p-8">
+      {/* News Links + Game section - swapped */}
+      <div className="border-4 border-black bg-gradient-to-br from-yellow-200 via-yellow-300 to-orange-300 p-6 md:p-8">
         <div className="grid md:grid-cols-2 gap-6">
-          <GameSection />
           <NewsLinks />
+          <GameSection />
         </div>
       </div>
 
       {/* About sections */}
       <div className="border-4 border-black bg-white">
-        <div className="bg-red-600 text-white px-4 py-3 border-b-4 border-black">
+        <div className="bg-gradient-to-r from-orange-500 to-yellow-500 text-black px-4 py-3 border-b-4 border-black">
           <h2 className="font-bold text-2xl md:text-3xl uppercase text-center">About Alt-Tab</h2>
         </div>
         <div className="grid md:grid-cols-3">
-          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-gray-100 hover:bg-gray-200 transition-colors text-left">
+          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-yellow-50 hover:bg-yellow-100 transition-colors text-left">
             <h3 className="font-bold text-black mb-3 underline text-lg">Human-Centric Design</h3>
             <p className="text-sm text-black">Founded by a library scientist and industrial designer, we blend research with creativity.</p>
           </button>
-          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-gray-100 hover:bg-gray-200 transition-colors text-left">
+          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-orange-50 hover:bg-orange-100 transition-colors text-left">
             <h3 className="font-bold text-black mb-3 underline text-lg">Multi-Disciplinary</h3>
             <p className="text-sm text-black">From digital goods to policy, we create experiences that matter.</p>
           </button>
-          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-gray-100 hover:bg-gray-200 transition-colors text-left">
+          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-yellow-50 hover:bg-yellow-100 transition-colors text-left">
             <h3 className="font-bold text-black mb-3 underline text-lg">Future-Forward</h3>
             <p className="text-sm text-black">Bridging nostalgia with innovation, one project at a time.</p>
           </button>
@@ -480,18 +550,18 @@ const AltTabWebsite = () => {
       </div>
 
 
-      {/* Navigation buttons - now functional */}
+      {/* Navigation buttons - now functional with neon colors */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { text: 'VIEW PROJECTS', color: 'bg-blue-500', page: 'projects' },
-          { text: 'MOODBOARDS', color: 'bg-green-500', page: 'moodboards' },
-          { text: 'ABOUT', color: 'bg-purple-500', page: 'about' },
-          { text: 'SHOP', color: 'bg-red-500', page: 'shop' }
+          { text: 'VIEW PROJECTS', color: 'bg-gradient-to-r from-yellow-400 to-orange-500', page: 'projects' },
+          { text: 'MOODBOARDS', color: 'bg-gradient-to-r from-orange-400 to-yellow-500', page: 'moodboards' },
+          { text: 'ABOUT', color: 'bg-gradient-to-r from-yellow-500 to-orange-400', page: 'about' },
+          { text: 'SHOP', color: 'bg-gradient-to-r from-orange-500 to-yellow-400', page: 'shop' }
         ].map((link, i) => (
           <button
             key={i}
             onClick={() => navigateTo(link.page)}
-            className={`${link.color} text-white font-bold py-4 px-3 border-4 border-black hover:brightness-110 transition-all text-sm md:text-base active:scale-95`}
+            className={`${link.color} text-black font-bold py-4 px-3 border-4 border-black hover:brightness-110 transition-all text-sm md:text-base active:scale-95`}
             style={{ boxShadow: '5px 5px 0px black' }}
           >
             ► {link.text} ◄
@@ -527,7 +597,9 @@ const AltTabWebsite = () => {
     const categories = ['All', 'Product', 'Experience', 'Research', 'Digital', 'Sport', 'Education'];
 
     const projects = [
-      { name: 'USM Furniture', category: 'Product', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/USM_Logo.svg/512px-USM_Logo.svg.png', description: 'Modular furniture system design' },
+      { name: 'USM Furniture', category: 'Product', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/USM_Logo.svg/512px-USM_Logo.svg.png', description: 'Modular furniture system design', link: 'https://us.usm.com/' },
+      { name: 'Wonder Universe', category: 'Education', logo: 'https://images.unsplash.com/photo-1566140967404-b8b3932483f5?w=200&h=200&fit=crop', description: "Children's museum experience", link: 'https://wonderuniverse.org/' },
+      { name: 'BKYSC', category: 'Sport', logo: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=200&h=200&fit=crop', description: 'Brooklyn Youth Sports Club', link: 'https://www.brooklynyouthsportsclub.org/' },
       { name: 'Nike NYC', category: 'Experience', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Logo_NIKE.svg/512px-Logo_NIKE.svg.png', description: 'Retail experience design' },
       { name: 'MLB Streaming', category: 'Digital', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Major_League_Baseball_logo.svg/440px-Major_League_Baseball_logo.svg.png', description: 'Digital streaming platform' },
       { name: 'Live Breathe Futbol', category: 'Sport', logo: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=200&h=200&fit=crop', description: 'Football apparel brand' },
@@ -569,26 +641,31 @@ const AltTabWebsite = () => {
 
         {/* Projects Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {filteredProjects.map((project, i) => (
-            <div
-              key={i}
-              className="group bg-white rounded-xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer border-4 border-black hover:shadow-xl"
-            >
-              <div className="h-24 flex items-center justify-center mb-4">
-                <img
-                  src={project.logo}
-                  alt={project.name}
-                  loading="lazy"
-                  className="max-h-full max-w-full object-contain"
-                />
-              </div>
-              <h3 className="font-bold text-black text-center text-lg">{project.name}</h3>
-              <p className="text-sm text-gray-600 text-center mt-2">{project.description}</p>
-              <div className="mt-3 text-center">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">{project.category}</span>
-              </div>
-            </div>
-          ))}
+          {filteredProjects.map((project, i) => {
+            const CardWrapper = project.link ? 'a' : 'div';
+            const linkProps = project.link ? { href: project.link, target: '_blank', rel: 'noopener noreferrer' } : {};
+            return (
+              <CardWrapper
+                key={i}
+                {...linkProps}
+                className="group bg-white rounded-xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer border-4 border-black hover:shadow-xl block"
+              >
+                <div className="h-24 flex items-center justify-center mb-4">
+                  <img
+                    src={project.logo}
+                    alt={project.name}
+                    loading="lazy"
+                    className="max-h-full max-w-full object-contain"
+                  />
+                </div>
+                <h3 className="font-bold text-black text-center text-lg">{project.name}</h3>
+                <p className="text-sm text-gray-600 text-center mt-2">{project.description}</p>
+                <div className="mt-3 text-center">
+                  <span className="text-xs font-bold uppercase tracking-wider text-gray-400">{project.category}</span>
+                </div>
+              </CardWrapper>
+            );
+          })}
         </div>
 
         <div className="max-w-4xl mx-auto pt-12">
@@ -673,18 +750,21 @@ const AltTabWebsite = () => {
   };
 
   const MoodboardsPage = () => {
-    const moodboardItems = [
+    const [moodboardOrder, setMoodboardOrder] = useState(null);
+    const [draggedMoodboardItem, setDraggedMoodboardItem] = useState(null);
+
+    const baseMoodboardItems = [
       // XL - Hero items
       { type: 'image', src: 'https://images.unsplash.com/photo-1545419913-775e2e148963?w=1200&q=80', alt: 'Nashville Skyline', size: 'xl' },
       { type: 'image', src: 'https://images.unsplash.com/photo-1594322436404-5a0526db4d13?w=1200&q=80', alt: 'Minimalist Furniture', size: 'xl' },
       // Large
       { type: 'image', src: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=1000&q=80', alt: 'Muralist', size: 'large' },
-      { type: 'video', src: 'https://img.youtube.com/vi/cFwytlpCJ9U/maxresdefault.jpg', alt: 'Video', link: 'https://www.youtube.com/watch?v=cFwytlpCJ9U', size: 'large' },
+      { type: 'video', src: 'https://img.youtube.com/vi/cFwytlpCJ9U/maxresdefault.jpg', alt: 'Video', link: 'https://www.youtube.com/watch?v=cFwytlpCJ9U', size: 'xl' },
       { type: 'image', src: 'https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=1000&q=80', alt: 'Brutalist Architecture', size: 'large' },
       // Medium
       { type: 'image', src: 'https://images.unsplash.com/photo-1577083552431-6e5fd01988ec?w=800&q=80', alt: 'Retail Interior', size: 'medium' },
       { type: 'image', src: 'https://images.unsplash.com/photo-1573790387438-4da905039392?w=800&q=80', alt: 'Fine Art', size: 'medium' },
-      { type: 'video', src: 'https://img.youtube.com/vi/tdrRKLjztcQ/maxresdefault.jpg', alt: 'Video', link: 'https://www.youtube.com/watch?v=tdrRKLjztcQ', size: 'medium' },
+      { type: 'video', src: 'https://img.youtube.com/vi/tdrRKLjztcQ/maxresdefault.jpg', alt: 'Video', link: 'https://www.youtube.com/watch?v=tdrRKLjztcQ', size: 'xl' },
       // Small
       { type: 'image', src: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80', alt: 'Sneaker', size: 'small' },
       { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Prada-Logo.svg/512px-Prada-Logo.svg.png', alt: 'Prada', size: 'small' },
@@ -692,7 +772,7 @@ const AltTabWebsite = () => {
       { type: 'image', src: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=1000&q=80', alt: 'Street Artist', size: 'large' },
       { type: 'image', src: 'https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=1000&q=80', alt: 'Japanese Architecture', size: 'large' },
       // Medium
-      { type: 'video', src: 'https://img.youtube.com/vi/sKE1nLc5P_c/maxresdefault.jpg', alt: 'Video', link: 'https://www.youtube.com/watch?v=sKE1nLc5P_c', size: 'medium' },
+      { type: 'video', src: 'https://img.youtube.com/vi/sKE1nLc5P_c/maxresdefault.jpg', alt: 'Video', link: 'https://www.youtube.com/watch?v=sKE1nLc5P_c', size: 'xl' },
       { type: 'image', src: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=800&q=80', alt: 'Abstract Art', size: 'medium' },
       // Small
       { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/en/thumb/7/7b/New_York_Mets.svg/440px-New_York_Mets.svg.png', alt: 'Mets', size: 'small' },
@@ -727,6 +807,42 @@ const AltTabWebsite = () => {
       { type: 'image', src: 'https://images.unsplash.com/photo-1533158307587-828f0a76ef46?w=800&q=80', alt: 'Street Typography', size: 'medium' },
     ];
 
+    // Shuffle function
+    const shuffleArray = (array) => {
+      const newArray = [...array];
+      for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+      }
+      return newArray;
+    };
+
+    const moodboardItems = moodboardOrder || baseMoodboardItems;
+
+    const handleShuffle = () => {
+      setMoodboardOrder(shuffleArray(baseMoodboardItems));
+    };
+
+    const handleDragStart = (e, index) => {
+      setDraggedMoodboardItem(index);
+      e.dataTransfer.effectAllowed = 'move';
+    };
+
+    const handleDragOver = (e, index) => {
+      e.preventDefault();
+      if (draggedMoodboardItem === null || draggedMoodboardItem === index) return;
+      const newItems = [...moodboardItems];
+      const draggedItem = newItems[draggedMoodboardItem];
+      newItems.splice(draggedMoodboardItem, 1);
+      newItems.splice(index, 0, draggedItem);
+      setMoodboardOrder(newItems);
+      setDraggedMoodboardItem(index);
+    };
+
+    const handleDragEnd = () => {
+      setDraggedMoodboardItem(null);
+    };
+
     return (
       <div className="space-y-8">
         <div className="text-center space-y-4">
@@ -734,6 +850,13 @@ const AltTabWebsite = () => {
           <p className="text-xl text-white/80 max-w-2xl mx-auto">
             Visual inspiration from architecture, fine art, and contemporary design
           </p>
+          <button
+            onClick={handleShuffle}
+            className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold rounded-full hover:scale-105 transition-all border-2 border-black"
+          >
+            <RefreshCw size={18} className="inline mr-2" />
+            Shuffle
+          </button>
         </div>
 
         {/* Masonry Grid */}
@@ -748,7 +871,11 @@ const AltTabWebsite = () => {
                   href={item.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`block ${heightClass} rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4`}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, i)}
+                  onDragOver={(e) => handleDragOver(e, i)}
+                  onDragEnd={handleDragEnd}
+                  className={`block ${heightClass} rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4 cursor-grab active:cursor-grabbing ${draggedMoodboardItem === i ? 'opacity-50' : ''}`}
                 >
                   <img src={item.src} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -764,7 +891,11 @@ const AltTabWebsite = () => {
               return (
                 <div
                   key={i}
-                  className={`${heightClass} rounded-xl bg-white border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4 flex items-center justify-center p-6`}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, i)}
+                  onDragOver={(e) => handleDragOver(e, i)}
+                  onDragEnd={handleDragEnd}
+                  className={`${heightClass} rounded-xl bg-white border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4 flex items-center justify-center p-6 cursor-grab active:cursor-grabbing ${draggedMoodboardItem === i ? 'opacity-50' : ''}`}
                 >
                   <img src={item.src} alt="" loading="lazy" decoding="async" className="max-w-full max-h-full object-contain" />
                 </div>
@@ -775,7 +906,11 @@ const AltTabWebsite = () => {
               return (
                 <div
                   key={i}
-                  className={`${heightClass} rounded-xl bg-black border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4 flex items-center justify-center p-6`}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, i)}
+                  onDragOver={(e) => handleDragOver(e, i)}
+                  onDragEnd={handleDragEnd}
+                  className={`${heightClass} rounded-xl bg-black border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4 flex items-center justify-center p-6 cursor-grab active:cursor-grabbing ${draggedMoodboardItem === i ? 'opacity-50' : ''}`}
                 >
                   <span className="text-white font-black text-2xl md:text-3xl text-center tracking-tight" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>{item.text}</span>
                 </div>
@@ -785,7 +920,11 @@ const AltTabWebsite = () => {
             return (
               <div
                 key={i}
-                className={`${heightClass} rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4`}
+                draggable
+                onDragStart={(e) => handleDragStart(e, i)}
+                onDragOver={(e) => handleDragOver(e, i)}
+                onDragEnd={handleDragEnd}
+                className={`${heightClass} rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4 cursor-grab active:cursor-grabbing ${draggedMoodboardItem === i ? 'opacity-50' : ''}`}
               >
                 <img src={item.src} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
               </div>
