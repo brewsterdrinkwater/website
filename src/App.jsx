@@ -597,11 +597,11 @@ const AltTabWebsite = () => {
     const categories = ['All', 'Product', 'Experience', 'Research', 'Digital', 'Sport', 'Education'];
 
     const projects = [
-      { name: 'USM Furniture', category: 'Product', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/USM_Logo.svg/512px-USM_Logo.svg.png', description: 'Modular furniture system design', link: 'https://us.usm.com/' },
+      { name: 'USM Furniture', category: 'Product', logo: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200&h=200&fit=crop', description: 'Modular furniture system design', link: 'https://us.usm.com/' },
       { name: 'Wonder Universe', category: 'Education', logo: 'https://images.unsplash.com/photo-1566140967404-b8b3932483f5?w=200&h=200&fit=crop', description: "Children's museum experience", link: 'https://wonderuniverse.org/' },
       { name: 'BKYSC', category: 'Sport', logo: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=200&h=200&fit=crop', description: 'Brooklyn Youth Sports Club', link: 'https://www.brooklynyouthsportsclub.org/' },
-      { name: 'Nike NYC', category: 'Experience', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Logo_NIKE.svg/512px-Logo_NIKE.svg.png', description: 'Retail experience design' },
-      { name: 'MLB Streaming', category: 'Digital', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Major_League_Baseball_logo.svg/440px-Major_League_Baseball_logo.svg.png', description: 'Digital streaming platform' },
+      { name: 'Nike NYC', category: 'Experience', logo: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=200&fit=crop', description: 'Retail experience design' },
+      { name: 'MLB Streaming', category: 'Digital', logo: 'https://images.unsplash.com/photo-1508344928928-7165b0a59e16?w=200&h=200&fit=crop', description: 'Digital streaming platform' },
       { name: 'Live Breathe Futbol', category: 'Sport', logo: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=200&h=200&fit=crop', description: 'Football apparel brand' },
       { name: 'Stanford Research Lab', category: 'Research', logo: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=200&h=200&fit=crop', description: 'Research methodology design' },
       { name: 'EdTech Platform', category: 'Education', logo: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=200&h=200&fit=crop', description: 'Learning experience design' },
@@ -767,7 +767,7 @@ const AltTabWebsite = () => {
       { type: 'video', src: 'https://img.youtube.com/vi/tdrRKLjztcQ/maxresdefault.jpg', alt: 'Video', link: 'https://www.youtube.com/watch?v=tdrRKLjztcQ', size: 'xl' },
       // Small
       { type: 'image', src: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80', alt: 'Sneaker', size: 'small' },
-      { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Prada-Logo.svg/512px-Prada-Logo.svg.png', alt: 'Prada', size: 'small' },
+      { type: 'text', text: 'PRADA', alt: 'Prada', size: 'small' },
       // Large
       { type: 'image', src: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=1000&q=80', alt: 'Street Artist', size: 'large' },
       { type: 'image', src: 'https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=1000&q=80', alt: 'Japanese Architecture', size: 'large' },
@@ -775,9 +775,9 @@ const AltTabWebsite = () => {
       { type: 'video', src: 'https://img.youtube.com/vi/sKE1nLc5P_c/maxresdefault.jpg', alt: 'Video', link: 'https://www.youtube.com/watch?v=sKE1nLc5P_c', size: 'xl' },
       { type: 'image', src: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=800&q=80', alt: 'Abstract Art', size: 'medium' },
       // Small
-      { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/en/thumb/7/7b/New_York_Mets.svg/440px-New_York_Mets.svg.png', alt: 'Mets', size: 'small' },
+      { type: 'text', text: 'METS', alt: 'Mets', size: 'small' },
       { type: 'image', src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&q=80', alt: 'Geometric', size: 'small' },
-      { type: 'logo', src: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/53/Arsenal_FC.svg/440px-Arsenal_FC.svg.png', alt: 'Arsenal', size: 'small' },
+      { type: 'text', text: 'ARSENAL', alt: 'Arsenal', size: 'small' },
       // XL
       { type: 'image', src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80', alt: 'Urban Culture', size: 'xl' },
       // Medium
