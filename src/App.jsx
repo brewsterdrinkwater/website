@@ -82,15 +82,15 @@ const AltTabWebsite = () => {
   const [draggingLetter, setDraggingLetter] = useState(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-  // Die-cut draggable objects
+  // Die-cut draggable objects - larger sizes for moodboard
   const dieCutItems = [
-    { id: 'basketball', emoji: '🏀', size: 50 },
-    { id: 'golfclub', emoji: '🏌️', size: 45 },
-    { id: '3dprinter', emoji: '🖨️', size: 40 },
-    { id: 'drill', emoji: '🔧', size: 35 },
-    { id: 'soccer', emoji: '⚽', size: 48 },
-    { id: 'headphones', emoji: '🎧', size: 42 },
-    { id: 'skateboard', emoji: '🛹', size: 55 },
+    { id: 'basketball', emoji: '🏀', size: 80 },
+    { id: 'golfclub', emoji: '🏌️', size: 75 },
+    { id: '3dprinter', emoji: '🖨️', size: 70 },
+    { id: 'drill', emoji: '🔧', size: 65 },
+    { id: 'soccer', emoji: '⚽', size: 78 },
+    { id: 'headphones', emoji: '🎧', size: 72 },
+    { id: 'skateboard', emoji: '🛹', size: 85 },
   ];
 
   const [dieCutPositions, setDieCutPositions] = useState(() => {
@@ -434,30 +434,6 @@ const AltTabWebsite = () => {
 
   const HomePage = () => (
     <div className="space-y-8">
-      {/* Die-cut draggable objects */}
-      <div className="relative">
-        {dieCutItems.map((item) => (
-          <div
-            key={item.id}
-            onMouseDown={(e) => handleDieCutMouseDown(item.id, e)}
-            style={{
-              position: 'absolute',
-              left: `calc(50% + ${dieCutPositions[item.id].x}px)`,
-              top: `calc(50% + ${dieCutPositions[item.id].y}px)`,
-              fontSize: item.size,
-              cursor: 'grab',
-              zIndex: 20,
-              userSelect: 'none',
-              filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))',
-              transition: draggingDieCut === item.id ? 'none' : 'transform 0.1s ease-out',
-            }}
-            className="hover:scale-110 active:cursor-grabbing"
-          >
-            {item.emoji}
-          </div>
-        ))}
-      </div>
-
       {/* Retro 90s header */}
       <div className="text-center space-y-3 py-8 border-4 border-black bg-gradient-to-br from-yellow-300 via-yellow-400 to-orange-400">
         <div className="flex items-center justify-center gap-2">
@@ -594,14 +570,15 @@ const AltTabWebsite = () => {
       }, 3000);
     };
 
-    const categories = ['All', 'Product', 'Experience', 'Research', 'Digital', 'Sport', 'Education'];
+    const categories = ['All', 'Product', 'Experience', 'Research', 'Digital', 'Sport', 'Education', 'Web3'];
 
     const projects = [
-      { name: 'USM Furniture', category: 'Product', logo: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200&h=200&fit=crop', description: 'Modular furniture system design', link: 'https://us.usm.com/' },
+      { name: 'USM Furniture', category: 'Product', logoText: 'USM', description: 'Modular furniture system design', link: 'https://us.usm.com/' },
       { name: 'Wonder Universe', category: 'Education', logo: 'https://images.unsplash.com/photo-1566140967404-b8b3932483f5?w=200&h=200&fit=crop', description: "Children's museum experience", link: 'https://wonderuniverse.org/' },
-      { name: 'BKYSC', category: 'Sport', logo: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=200&h=200&fit=crop', description: 'Brooklyn Youth Sports Club', link: 'https://www.brooklynyouthsportsclub.org/' },
-      { name: 'Nike NYC', category: 'Experience', logo: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=200&fit=crop', description: 'Retail experience design' },
-      { name: 'MLB Streaming', category: 'Digital', logo: 'https://images.unsplash.com/photo-1508344928928-7165b0a59e16?w=200&h=200&fit=crop', description: 'Digital streaming platform' },
+      { name: 'BKYSC', category: 'Sport', logoText: 'BKYSC', description: 'Brooklyn Youth Sports Club', link: 'https://www.brooklynyouthsportsclub.org/' },
+      { name: 'Nike NYC', category: 'Experience', logo: 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/nike.svg', description: 'Retail experience design' },
+      { name: 'MLB Streaming', category: 'Digital', logo: 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/mlb.svg', description: 'Digital streaming platform' },
+      { name: 'Akash Network', category: 'Web3', logoText: 'AKASH', description: 'Decentralized cloud computing', link: 'https://akash.network/' },
       { name: 'Live Breathe Futbol', category: 'Sport', logo: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=200&h=200&fit=crop', description: 'Football apparel brand' },
       { name: 'Stanford Research Lab', category: 'Research', logo: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=200&h=200&fit=crop', description: 'Research methodology design' },
       { name: 'EdTech Platform', category: 'Education', logo: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=200&h=200&fit=crop', description: 'Learning experience design' },
@@ -651,12 +628,18 @@ const AltTabWebsite = () => {
                 className="group bg-white rounded-xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer border-4 border-black hover:shadow-xl block"
               >
                 <div className="h-24 flex items-center justify-center mb-4">
-                  <img
-                    src={project.logo}
-                    alt={project.name}
-                    loading="lazy"
-                    className="max-h-full max-w-full object-contain"
-                  />
+                  {project.logoText ? (
+                    <span className="text-3xl md:text-4xl font-black text-black tracking-tight" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+                      {project.logoText}
+                    </span>
+                  ) : (
+                    <img
+                      src={project.logo}
+                      alt={project.name}
+                      loading="lazy"
+                      className="max-h-full max-w-full object-contain"
+                    />
+                  )}
                 </div>
                 <h3 className="font-bold text-black text-center text-lg">{project.name}</h3>
                 <p className="text-sm text-gray-600 text-center mt-2">{project.description}</p>
@@ -857,6 +840,30 @@ const AltTabWebsite = () => {
             <RefreshCw size={18} className="inline mr-2" />
             Shuffle
           </button>
+        </div>
+
+        {/* Die-cut draggable objects */}
+        <div className="relative h-32 flex items-center justify-center">
+          {dieCutItems.map((item) => (
+            <div
+              key={item.id}
+              onMouseDown={(e) => handleDieCutMouseDown(item.id, e)}
+              style={{
+                position: 'absolute',
+                left: `calc(50% + ${dieCutPositions[item.id].x}px)`,
+                top: `calc(50% + ${dieCutPositions[item.id].y}px)`,
+                fontSize: item.size,
+                cursor: 'grab',
+                zIndex: 30,
+                userSelect: 'none',
+                filter: 'drop-shadow(3px 3px 6px rgba(0,0,0,0.4))',
+                transition: draggingDieCut === item.id ? 'none' : 'transform 0.1s ease-out',
+              }}
+              className="hover:scale-125 active:cursor-grabbing"
+            >
+              {item.emoji}
+            </div>
+          ))}
         </div>
 
         {/* Masonry Grid */}
