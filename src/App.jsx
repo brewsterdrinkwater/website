@@ -67,9 +67,10 @@ const AltTabWebsite = () => {
   const [golfBall, setGolfBall] = useState({ x: 0, y: 0, visible: false });
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentGameType, setCurrentGameType] = useState(() => {
-    const games = ['tictactoe', 'connect4', 'blackjack', 'chesspuzzle'];
+    const games = ['tictactoe', 'connect4', 'blackjack', 'numbergame'];
     return games[Math.floor(Math.random() * games.length)];
   });
+  const [activeFilter, setActiveFilter] = useState('All');
   const [letterPositions, setLetterPositions] = useState({
     A: { x: 0, y: 0 },
     L: { x: 0, y: 0 },
@@ -112,7 +113,7 @@ const AltTabWebsite = () => {
   }, []);
 
   const getRandomGame = () => {
-    const games = ['tictactoe', 'connect4', 'blackjack', 'chesspuzzle'];
+    const games = ['tictactoe', 'connect4', 'blackjack', 'numbergame'];
     const availableGames = games.filter(g => g !== currentGameType);
     return availableGames[Math.floor(Math.random() * availableGames.length)];
   };
@@ -187,11 +188,11 @@ const AltTabWebsite = () => {
   }, [handleMouseMove, handleMouseUp]);
 
 
-  // Tic Tac Toe Game
+  // Tic Tac Toe Game - Player vs Simple AI
   const TicTacToeGame = () => {
     const [board, setBoard] = useState(Array(9).fill(null));
-    const [isXNext, setIsXNext] = useState(true);
-    const [winner, setWinner] = useState(null);
+    const [gameOver, setGameOver] = useState(false);
+    const [message, setMessage] = useState("Your turn (X)");
 
     const checkWinner = (squares) => {
       const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
@@ -201,41 +202,83 @@ const AltTabWebsite = () => {
       return squares.every(s => s) ? 'Draw' : null;
     };
 
+    const getAIMove = (squares) => {
+      const empty = squares.map((s, i) => s === null ? i : -1).filter(i => i !== -1);
+      return empty[Math.floor(Math.random() * empty.length)];
+    };
+
     const handleClick = (idx) => {
-      if (board[idx] || winner) return;
+      if (board[idx] || gameOver) return;
+
+      // Player move
       const newBoard = [...board];
-      newBoard[idx] = isXNext ? 'X' : 'O';
+      newBoard[idx] = 'X';
+
+      const result = checkWinner(newBoard);
+      if (result) {
+        setBoard(newBoard);
+        setGameOver(true);
+        setMessage(result === 'Draw' ? "It's a draw!" : "You win! 🎉");
+        return;
+      }
+
+      // AI move
+      const aiMove = getAIMove(newBoard);
+      if (aiMove !== undefined) {
+        newBoard[aiMove] = 'O';
+        const aiResult = checkWinner(newBoard);
+        if (aiResult) {
+          setBoard(newBoard);
+          setGameOver(true);
+          setMessage(aiResult === 'Draw' ? "It's a draw!" : "Computer wins!");
+          return;
+        }
+      }
+
       setBoard(newBoard);
-      setIsXNext(!isXNext);
-      setWinner(checkWinner(newBoard));
+      setMessage("Your turn (X)");
+    };
+
+    const resetGame = () => {
+      setBoard(Array(9).fill(null));
+      setGameOver(false);
+      setMessage("Your turn (X)");
     };
 
     return (
       <div className="p-6 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/40">
         <h3 className="text-xl font-bold text-white mb-2">Tic Tac Toe</h3>
-        <p className="text-sm text-white/70 mb-4">{winner ? (winner === 'Draw' ? "It's a draw!" : `${winner} wins!`) : `${isXNext ? 'X' : 'O'}'s turn`}</p>
-        <div className="grid grid-cols-3 gap-2 max-w-xs mx-auto mb-4">
+        <p className="text-sm text-white/70 mb-4">{message}</p>
+        <div className="grid grid-cols-3 gap-2 max-w-[200px] mx-auto mb-4">
           {board.map((cell, idx) => (
-            <button key={idx} onClick={() => handleClick(idx)} className={`aspect-square flex items-center justify-center text-3xl font-bold rounded-lg transition-all ${winner ? 'cursor-not-allowed' : 'hover:bg-white/30 cursor-pointer'} bg-white/20 ${cell === 'X' ? 'text-cyan-400' : 'text-pink-400'}`}>
+            <button
+              key={idx}
+              onClick={() => handleClick(idx)}
+              className={`w-16 h-16 flex items-center justify-center text-3xl font-bold rounded-lg transition-all bg-white/20 ${cell === 'X' ? 'text-cyan-400' : 'text-pink-400'} ${!cell && !gameOver ? 'hover:bg-white/40 cursor-pointer' : ''}`}
+            >
               {cell}
             </button>
           ))}
         </div>
-        {winner && (
-          <div className="flex gap-2">
-            <button onClick={() => setCurrentGameType(getRandomGame())} className="flex-1 px-4 py-2 bg-cyan-500 text-white rounded-lg font-bold hover:bg-cyan-400">Next Game</button>
-            <button onClick={() => { setBoard(Array(9).fill(null)); setIsXNext(true); setWinner(null); }} className="px-4 py-2 bg-white/20 text-white rounded-lg"><RefreshCw size={20} /></button>
-          </div>
-        )}
+        <div className="flex gap-2">
+          <button onClick={resetGame} className="flex-1 px-4 py-2 bg-cyan-500 text-white rounded-lg font-bold hover:bg-cyan-400">
+            {gameOver ? 'Play Again' : 'Reset'}
+          </button>
+          <button onClick={() => setCurrentGameType(getRandomGame())} className="px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30">
+            <RefreshCw size={20} />
+          </button>
+        </div>
       </div>
     );
   };
 
-  // Connect 4 Game
+  // Connect 4 Game - 2 Player
   const Connect4Game = () => {
-    const [board, setBoard] = useState(Array(6).fill(null).map(() => Array(7).fill(null)));
+    const createEmptyBoard = () => Array(6).fill(null).map(() => Array(7).fill(null));
+    const [board, setBoard] = useState(createEmptyBoard);
     const [isRedNext, setIsRedNext] = useState(true);
-    const [winner, setWinner] = useState(null);
+    const [gameOver, setGameOver] = useState(false);
+    const [message, setMessage] = useState("Red's turn");
 
     const checkWinner = (b) => {
       for (let r = 0; r < 6; r++) {
@@ -252,38 +295,58 @@ const AltTabWebsite = () => {
     };
 
     const dropPiece = (col) => {
-      if (winner) return;
+      if (gameOver) return;
       for (let row = 5; row >= 0; row--) {
         if (!board[row][col]) {
           const newBoard = board.map(r => [...r]);
           newBoard[row][col] = isRedNext ? 'R' : 'Y';
           setBoard(newBoard);
-          setIsRedNext(!isRedNext);
-          setWinner(checkWinner(newBoard));
+
+          const result = checkWinner(newBoard);
+          if (result) {
+            setGameOver(true);
+            setMessage(result === 'Draw' ? "It's a draw!" : `${result === 'R' ? 'Red' : 'Yellow'} wins! 🎉`);
+          } else {
+            setIsRedNext(!isRedNext);
+            setMessage(`${!isRedNext ? 'Red' : 'Yellow'}'s turn`);
+          }
           return;
         }
       }
     };
 
+    const resetGame = () => {
+      setBoard(createEmptyBoard());
+      setIsRedNext(true);
+      setGameOver(false);
+      setMessage("Red's turn");
+    };
+
     return (
       <div className="p-6 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/40">
         <h3 className="text-xl font-bold text-white mb-2">Connect 4</h3>
-        <p className="text-sm text-white/70 mb-4">{winner ? (winner === 'Draw' ? "Draw!" : `${winner === 'R' ? 'Red' : 'Yellow'} wins!`) : `${isRedNext ? 'Red' : 'Yellow'}'s turn`}</p>
-        <div className="bg-blue-800 p-2 rounded-lg max-w-xs mx-auto mb-4">
+        <p className="text-sm text-white/70 mb-4">{message}</p>
+        <div className="bg-blue-800 p-2 rounded-lg max-w-[280px] mx-auto mb-4">
           {board.map((row, r) => (
             <div key={r} className="flex gap-1 justify-center">
               {row.map((cell, c) => (
-                <button key={c} onClick={() => dropPiece(c)} className={`w-8 h-8 rounded-full transition-all ${cell === 'R' ? 'bg-red-500' : cell === 'Y' ? 'bg-yellow-400' : 'bg-white/30 hover:bg-white/50'}`} />
+                <button
+                  key={c}
+                  onClick={() => dropPiece(c)}
+                  className={`w-8 h-8 rounded-full transition-all ${cell === 'R' ? 'bg-red-500' : cell === 'Y' ? 'bg-yellow-400' : 'bg-white/30'} ${!cell && !gameOver ? 'hover:bg-white/50 cursor-pointer' : ''}`}
+                />
               ))}
             </div>
           ))}
         </div>
-        {winner && (
-          <div className="flex gap-2">
-            <button onClick={() => setCurrentGameType(getRandomGame())} className="flex-1 px-4 py-2 bg-cyan-500 text-white rounded-lg font-bold hover:bg-cyan-400">Next Game</button>
-            <button onClick={() => { setBoard(Array(6).fill(null).map(() => Array(7).fill(null))); setIsRedNext(true); setWinner(null); }} className="px-4 py-2 bg-white/20 text-white rounded-lg"><RefreshCw size={20} /></button>
-          </div>
-        )}
+        <div className="flex gap-2">
+          <button onClick={resetGame} className="flex-1 px-4 py-2 bg-cyan-500 text-white rounded-lg font-bold hover:bg-cyan-400">
+            {gameOver ? 'Play Again' : 'Reset'}
+          </button>
+          <button onClick={() => setCurrentGameType(getRandomGame())} className="px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30">
+            <RefreshCw size={20} />
+          </button>
+        </div>
       </div>
     );
   };
@@ -291,20 +354,21 @@ const AltTabWebsite = () => {
   // Blackjack Game
   const BlackjackGame = () => {
     const getCard = () => Math.floor(Math.random() * 10) + 2;
-    const [playerCards, setPlayerCards] = useState(() => [getCard(), getCard()]);
-    const [dealerCards, setDealerCards] = useState(() => [getCard()]);
+    const [playerCards, setPlayerCards] = useState([getCard(), getCard()]);
+    const [dealerCards, setDealerCards] = useState([getCard()]);
     const [gameOver, setGameOver] = useState(false);
-    const [result, setResult] = useState('');
+    const [message, setMessage] = useState('Hit or Stand?');
 
     const sum = (cards) => cards.reduce((a, b) => a + b, 0);
-    const playerSum = sum(playerCards);
-    const dealerSum = sum(dealerCards);
 
     const hit = () => {
       if (gameOver) return;
       const newCards = [...playerCards, getCard()];
       setPlayerCards(newCards);
-      if (sum(newCards) > 21) { setGameOver(true); setResult('Bust! You lose.'); }
+      if (sum(newCards) > 21) {
+        setGameOver(true);
+        setMessage('Bust! You lose 😢');
+      }
     };
 
     const stand = () => {
@@ -313,28 +377,36 @@ const AltTabWebsite = () => {
       while (sum(dc) < 17) dc.push(getCard());
       setDealerCards(dc);
       const ds = sum(dc);
+      const ps = sum(playerCards);
       setGameOver(true);
-      if (ds > 21) setResult('Dealer busts! You win!');
-      else if (ds > playerSum) setResult('Dealer wins.');
-      else if (ds < playerSum) setResult('You win!');
-      else setResult("It's a push.");
+      if (ds > 21) setMessage('Dealer busts! You win! 🎉');
+      else if (ds > ps) setMessage('Dealer wins 😢');
+      else if (ds < ps) setMessage('You win! 🎉');
+      else setMessage("Push - it's a tie!");
+    };
+
+    const resetGame = () => {
+      setPlayerCards([getCard(), getCard()]);
+      setDealerCards([getCard()]);
+      setGameOver(false);
+      setMessage('Hit or Stand?');
     };
 
     return (
       <div className="p-6 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/40">
         <h3 className="text-xl font-bold text-white mb-2">Blackjack</h3>
         <div className="space-y-3 mb-4">
-          <div><span className="text-white/70 text-sm">Dealer: </span><span className="text-white font-bold">{dealerCards.join(' + ')} = {dealerSum}</span></div>
-          <div><span className="text-white/70 text-sm">You: </span><span className="text-white font-bold">{playerCards.join(' + ')} = {playerSum}</span></div>
+          <div><span className="text-white/70 text-sm">Dealer: </span><span className="text-white font-bold">{dealerCards.join(' + ')} = {sum(dealerCards)}</span></div>
+          <div><span className="text-white/70 text-sm">You: </span><span className="text-white font-bold">{playerCards.join(' + ')} = {sum(playerCards)}</span></div>
         </div>
+        <p className="text-yellow-300 font-bold text-center mb-4">{message}</p>
         {gameOver ? (
-          <>
-            <p className="text-yellow-300 font-bold text-center mb-4">{result}</p>
-            <div className="flex gap-2">
-              <button onClick={() => setCurrentGameType(getRandomGame())} className="flex-1 px-4 py-2 bg-cyan-500 text-white rounded-lg font-bold hover:bg-cyan-400">Next Game</button>
-              <button onClick={() => { setPlayerCards([getCard(), getCard()]); setDealerCards([getCard()]); setGameOver(false); setResult(''); }} className="px-4 py-2 bg-white/20 text-white rounded-lg"><RefreshCw size={20} /></button>
-            </div>
-          </>
+          <div className="flex gap-2">
+            <button onClick={resetGame} className="flex-1 px-4 py-2 bg-cyan-500 text-white rounded-lg font-bold hover:bg-cyan-400">Play Again</button>
+            <button onClick={() => setCurrentGameType(getRandomGame())} className="px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30">
+              <RefreshCw size={20} />
+            </button>
+          </div>
         ) : (
           <div className="flex gap-2">
             <button onClick={hit} className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg font-bold hover:bg-green-400">Hit</button>
@@ -345,42 +417,66 @@ const AltTabWebsite = () => {
     );
   };
 
-  // Chess Puzzle Game
-  const ChessPuzzleGame = () => {
-    const puzzles = [
-      { board: ['', '', '', '', '', '', '', '', '', '', '♔', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '♜', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''], solution: 36, hint: 'Rook takes checkmate!' },
-      { board: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '♔', '', '', '', '', '', '', '', '', '', '', '♛', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''], solution: 27, hint: 'Queen delivers mate!' },
-    ];
-    const [puzzle] = useState(() => puzzles[Math.floor(Math.random() * puzzles.length)]);
-    const [selected, setSelected] = useState(null);
+  // Number Guessing Game (simpler and more reliable)
+  const NumberGame = () => {
+    const [target] = useState(() => Math.floor(Math.random() * 100) + 1);
+    const [guess, setGuess] = useState('');
+    const [attempts, setAttempts] = useState(0);
+    const [message, setMessage] = useState('Guess a number between 1-100');
     const [won, setWon] = useState(false);
 
-    const handleClick = (idx) => {
-      if (won) return;
-      if (idx === puzzle.solution) { setWon(true); }
-      else { setSelected(idx); setTimeout(() => setSelected(null), 300); }
+    const handleGuess = () => {
+      const num = parseInt(guess);
+      if (isNaN(num) || num < 1 || num > 100) {
+        setMessage('Enter a number between 1-100');
+        return;
+      }
+      setAttempts(a => a + 1);
+      if (num === target) {
+        setWon(true);
+        setMessage(`🎉 Correct! You got it in ${attempts + 1} tries!`);
+      } else if (num < target) {
+        setMessage('📈 Higher!');
+      } else {
+        setMessage('📉 Lower!');
+      }
+      setGuess('');
+    };
+
+    const resetGame = () => {
+      window.location.reload();
     };
 
     return (
       <div className="p-6 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/40">
-        <h3 className="text-xl font-bold text-white mb-2">Chess Puzzle</h3>
-        <p className="text-sm text-white/70 mb-4">{won ? 'Checkmate!' : puzzle.hint}</p>
-        <div className="grid grid-cols-8 gap-0 max-w-xs mx-auto mb-4 border-2 border-white/30">
-          {puzzle.board.map((piece, idx) => {
-            const isLight = (Math.floor(idx / 8) + idx % 8) % 2 === 0;
-            return (
-              <button key={idx} onClick={() => handleClick(idx)} className={`aspect-square flex items-center justify-center text-2xl ${isLight ? 'bg-amber-100' : 'bg-amber-800'} ${selected === idx ? 'bg-red-400' : ''} ${won && idx === puzzle.solution ? 'bg-green-400' : ''} hover:opacity-80`}>
-                {piece}
-              </button>
-            );
-          })}
-        </div>
-        {won && (
-          <div className="flex gap-2">
-            <button onClick={() => setCurrentGameType(getRandomGame())} className="flex-1 px-4 py-2 bg-cyan-500 text-white rounded-lg font-bold hover:bg-cyan-400">Next Game</button>
-            <button onClick={() => window.location.reload()} className="px-4 py-2 bg-white/20 text-white rounded-lg"><RefreshCw size={20} /></button>
+        <h3 className="text-xl font-bold text-white mb-2">Number Guessing</h3>
+        <p className="text-sm text-white/70 mb-2">Attempts: {attempts}</p>
+        <p className="text-yellow-300 font-bold text-center mb-4">{message}</p>
+        {!won ? (
+          <div className="flex gap-2 mb-4">
+            <input
+              type="number"
+              min="1"
+              max="100"
+              value={guess}
+              onChange={(e) => setGuess(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleGuess()}
+              className="flex-1 px-4 py-2 rounded-lg bg-white/20 border-2 border-white/30 text-white text-center text-xl"
+              placeholder="?"
+            />
+            <button onClick={handleGuess} className="px-6 py-2 bg-cyan-500 text-white rounded-lg font-bold hover:bg-cyan-400">
+              Guess
+            </button>
           </div>
-        )}
+        ) : null}
+        <div className="flex gap-2">
+          <button onClick={resetGame} className="flex-1 px-4 py-2 bg-cyan-500 text-white rounded-lg font-bold hover:bg-cyan-400">
+            {won ? 'Play Again' : 'Reset'}
+          </button>
+          <button onClick={() => setCurrentGameType(getRandomGame())} className="px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30">
+            <RefreshCw size={20} />
+          </button>
+        </div>
       </div>
     );
   };
@@ -404,7 +500,7 @@ const AltTabWebsite = () => {
       {currentGameType === 'tictactoe' && <TicTacToeGame />}
       {currentGameType === 'connect4' && <Connect4Game />}
       {currentGameType === 'blackjack' && <BlackjackGame />}
-      {currentGameType === 'chesspuzzle' && <ChessPuzzleGame />}
+      {currentGameType === 'numbergame' && <NumberGame />}
     </div>
   );
 
@@ -549,7 +645,6 @@ const AltTabWebsite = () => {
   );
 
   const ProjectsPage = () => {
-    const [activeFilter, setActiveFilter] = useState('All');
     const [formData, setFormData] = useState({
       name: '',
       email: '',
