@@ -668,13 +668,14 @@ const AltTabWebsite = () => {
     const categories = ['All', 'Product', 'Experience', 'Research', 'Digital', 'Sport', 'Education', 'Web3'];
 
     const projects = [
+      { name: 'Virginia Tech', category: 'Education', logo: '/images/virginia-tech-logo.svg', description: 'University partnership and research', link: 'https://www.vt.edu/' },
+      { name: 'Live Breathe Futbol', category: 'Sport', logo: '/images/lbf-logo.svg', description: 'Football apparel brand', link: 'https://www.livebreathefutbol.com/' },
       { name: 'USM Furniture', category: 'Product', logoText: 'USM', description: 'Modular furniture system design', link: 'https://us.usm.com/' },
       { name: 'Wonder Universe', category: 'Education', logo: 'https://images.unsplash.com/photo-1566140967404-b8b3932483f5?w=200&h=200&fit=crop', description: "Children's museum experience", link: 'https://wonderuniverse.org/' },
       { name: 'BKYSC', category: 'Sport', logoText: 'BKYSC', description: 'Brooklyn Youth Sports Club', link: 'https://www.brooklynyouthsportsclub.org/' },
       { name: 'Nike NYC', category: 'Experience', logo: 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/nike.svg', description: 'Retail experience design' },
       { name: 'MLB Streaming', category: 'Digital', logo: 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/mlb.svg', description: 'Digital streaming platform' },
       { name: 'Akash Network', category: 'Web3', logoText: 'AKASH', description: 'Decentralized cloud computing', link: 'https://akash.network/' },
-      { name: 'Live Breathe Futbol', category: 'Sport', logo: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=200&h=200&fit=crop', description: 'Football apparel brand' },
       { name: 'Stanford Research Lab', category: 'Research', logo: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=200&h=200&fit=crop', description: 'Research methodology design' },
       { name: 'EdTech Platform', category: 'Education', logo: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=200&h=200&fit=crop', description: 'Learning experience design' },
       { name: 'Retail Analytics', category: 'Digital', logo: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=200&h=200&fit=crop', description: 'Data visualization dashboard' },
@@ -832,30 +833,39 @@ const AltTabWebsite = () => {
     const [draggedMoodboardItem, setDraggedMoodboardItem] = useState(null);
 
     const baseMoodboardItems = [
+      // Brand Logos
+      { type: 'image', src: '/images/palace-logo.svg', alt: 'Palace Skateboards', size: 'medium' },
+      { type: 'image', src: '/images/supreme-logo.svg', alt: 'Supreme', size: 'medium' },
+      { type: 'image', src: '/images/dsm-logo.svg', alt: 'Dover Street Market', size: 'medium' },
+      { type: 'image', src: '/images/prada-logo.svg', alt: 'Prada Milano', size: 'medium' },
+      { type: 'image', src: '/images/bddw-logo.svg', alt: 'BDDW', size: 'large' },
+      { type: 'image', src: '/images/judd-logo.svg', alt: 'Judd Foundation', size: 'medium' },
+      { type: 'image', src: '/images/lichen-logo.svg', alt: 'Lichen', size: 'small' },
+      // YouTube Videos (wide format)
+      { type: 'video', src: 'https://img.youtube.com/vi/7IdoDJCssNk/maxresdefault.jpg', alt: 'Skate Video', link: 'https://www.youtube.com/watch?v=7IdoDJCssNk', size: 'xl' },
+      { type: 'video', src: 'https://img.youtube.com/vi/M_0do0LP2tk/maxresdefault.jpg', alt: 'Skate Film', link: 'https://www.youtube.com/watch?v=M_0do0LP2tk', size: 'xl' },
+      { type: 'video', src: 'https://img.youtube.com/vi/XTomk3L1R5I/maxresdefault.jpg', alt: 'Skate Edit', link: 'https://www.youtube.com/watch?v=XTomk3L1R5I', size: 'xl' },
+      { type: 'video', src: 'https://img.youtube.com/vi/cFwytlpCJ9U/maxresdefault.jpg', alt: 'Skate Clip', link: 'https://www.youtube.com/watch?v=cFwytlpCJ9U', size: 'xl' },
+      // Quartersnacks Channel
+      { type: 'text', text: 'QUARTERSNACKS', alt: 'Quartersnacks', size: 'medium', link: 'https://www.youtube.com/@quartersnacksdotcom' },
       // XL - Hero items
       { type: 'image', src: 'https://images.unsplash.com/photo-1545419913-775e2e148963?w=1200&q=80', alt: 'Nashville Skyline', size: 'xl' },
       { type: 'image', src: 'https://images.unsplash.com/photo-1594322436404-5a0526db4d13?w=1200&q=80', alt: 'Minimalist Furniture', size: 'xl' },
       // Large
       { type: 'image', src: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=1000&q=80', alt: 'Muralist', size: 'large' },
-      { type: 'video', src: 'https://img.youtube.com/vi/cFwytlpCJ9U/maxresdefault.jpg', alt: 'Video', link: 'https://www.youtube.com/watch?v=cFwytlpCJ9U', size: 'xl' },
       { type: 'image', src: 'https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=1000&q=80', alt: 'Brutalist Architecture', size: 'large' },
       // Medium
       { type: 'image', src: 'https://images.unsplash.com/photo-1577083552431-6e5fd01988ec?w=800&q=80', alt: 'Retail Interior', size: 'medium' },
       { type: 'image', src: 'https://images.unsplash.com/photo-1573790387438-4da905039392?w=800&q=80', alt: 'Fine Art', size: 'medium' },
-      { type: 'video', src: 'https://img.youtube.com/vi/tdrRKLjztcQ/maxresdefault.jpg', alt: 'Video', link: 'https://www.youtube.com/watch?v=tdrRKLjztcQ', size: 'xl' },
       // Small
       { type: 'image', src: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80', alt: 'Sneaker', size: 'small' },
-      { type: 'text', text: 'PRADA', alt: 'Prada', size: 'small' },
       // Large
       { type: 'image', src: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=1000&q=80', alt: 'Street Artist', size: 'large' },
       { type: 'image', src: 'https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=1000&q=80', alt: 'Japanese Architecture', size: 'large' },
       // Medium
-      { type: 'video', src: 'https://img.youtube.com/vi/sKE1nLc5P_c/maxresdefault.jpg', alt: 'Video', link: 'https://www.youtube.com/watch?v=sKE1nLc5P_c', size: 'xl' },
       { type: 'image', src: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=800&q=80', alt: 'Abstract Art', size: 'medium' },
       // Small
-      { type: 'text', text: 'METS', alt: 'Mets', size: 'small' },
       { type: 'image', src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&q=80', alt: 'Geometric', size: 'small' },
-      { type: 'text', text: 'ARSENAL', alt: 'Arsenal', size: 'small' },
       // XL
       { type: 'image', src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80', alt: 'Urban Culture', size: 'xl' },
       // Medium
@@ -876,8 +886,6 @@ const AltTabWebsite = () => {
       { type: 'image', src: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80', alt: 'Fallingwater', size: 'xl' },
       // BDDW style furniture
       { type: 'image', src: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1000&q=80', alt: 'BDDW Furniture', size: 'large' },
-      // Dover Street Market - using text placeholder since logo has access restrictions
-      { type: 'text', text: 'DOVER STREET MARKET', alt: 'Dover Street Market', size: 'medium' },
       // Skate shop interior with bowl
       { type: 'image', src: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80', alt: 'Retail Space', size: 'xl' },
       // Graffiti street art
@@ -1005,17 +1013,21 @@ const AltTabWebsite = () => {
             }
 
             if (item.type === 'text') {
+              const TextWrapper = item.link ? 'a' : 'div';
+              const textLinkProps = item.link ? { href: item.link, target: '_blank', rel: 'noopener noreferrer' } : {};
               return (
-                <div
+                <TextWrapper
                   key={i}
+                  {...textLinkProps}
                   draggable
                   onDragStart={(e) => handleDragStart(e, i)}
                   onDragOver={(e) => handleDragOver(e, i)}
                   onDragEnd={handleDragEnd}
-                  className={`${heightClass} rounded-xl bg-black border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4 flex items-center justify-center p-6 cursor-grab active:cursor-grabbing ${draggedMoodboardItem === i ? 'opacity-50' : ''}`}
+                  className={`${heightClass} rounded-xl bg-black border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4 flex items-center justify-center p-6 cursor-grab active:cursor-grabbing ${draggedMoodboardItem === i ? 'opacity-50' : ''} ${item.link ? 'cursor-pointer' : ''}`}
                 >
                   <span className="text-white font-black text-2xl md:text-3xl text-center tracking-tight" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>{item.text}</span>
-                </div>
+                  {item.link && <span className="absolute bottom-2 right-2 text-white/50 text-xs">↗</span>}
+                </TextWrapper>
               );
             }
 

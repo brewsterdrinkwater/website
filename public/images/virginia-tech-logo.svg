@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 250" width="400" height="250">
+  <rect fill="#660000" width="400" height="250"/>
+  <style>
+    .vt { font-family: Arial, Helvetica, sans-serif; font-size: 100px; font-weight: bold; }
+    .sub { font-family: Arial, Helvetica, sans-serif; font-size: 24px; font-weight: bold; letter-spacing: 0.15em; }
+  </style>
+  <text x="50%" y="120" text-anchor="middle" class="vt" fill="white">V</text>
+  <text x="50%" y="120" text-anchor="middle" class="vt" fill="#E87722" dx="25">T</text>
+  <text x="50%" y="180" text-anchor="middle" class="sub" fill="#E87722">VIRGINIA TECH</text>
+</svg>
