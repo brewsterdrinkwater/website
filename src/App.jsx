@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Sparkles, Grid3x3, Image, BookOpen, ShoppingBag, RefreshCw, Construction, Instagram, Sun, Moon } from 'lucide-react';
 
 // Middle Tennessee topography map background (light, optimized for web/mobile)
@@ -61,7 +62,10 @@ const NEWS_LINKS = [
 ];
 
 const AltTabWebsite = () => {
-  const [currentPage, setCurrentPage] = useState('home');
+  const location = useLocation();
+  const navigate = useNavigate();
+  // Derive currentPage from the URL path
+  const currentPage = location.pathname === '/' ? 'home' : location.pathname.slice(1);
   const [menuOpen, setMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [golfBall, setGolfBall] = useState({ x: 0, y: 0, visible: false });
@@ -119,7 +123,8 @@ const AltTabWebsite = () => {
   };
 
   const navigateTo = (page) => {
-    setCurrentPage(page);
+    const path = page === 'home' ? '/' : `/${page}`;
+    navigate(path);
     setMenuOpen(false);
     window.scrollTo(0, 0);
   };
@@ -481,19 +486,26 @@ const AltTabWebsite = () => {
     );
   };
 
-  const NavItem = ({ icon: Icon, label, page }) => (
-    <button
-      onClick={() => navigateTo(page)}
-      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
-        currentPage === page
-          ? 'bg-black/20 text-black shadow-lg scale-105'
-          : 'hover:bg-black/10 text-black/70 hover:text-black'
-      }`}
-    >
-      <Icon size={20} />
-      <span className="font-medium">{label}</span>
-    </button>
-  );
+  const NavItem = ({ icon: Icon, label, page }) => {
+    const path = page === 'home' ? '/' : `/${page}`;
+    return (
+      <Link
+        to={path}
+        onClick={() => {
+          setMenuOpen(false);
+          window.scrollTo(0, 0);
+        }}
+        className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
+          currentPage === page
+            ? 'bg-black/20 text-black shadow-lg scale-105'
+            : 'hover:bg-black/10 text-black/70 hover:text-black'
+        }`}
+      >
+        <Icon size={20} />
+        <span className="font-medium">{label}</span>
+      </Link>
+    );
+  };
 
   const GameSection = () => (
     <div className="w-full">
@@ -1191,12 +1203,12 @@ const AltTabWebsite = () => {
 
       <nav className="relative z-50 p-4 md:p-6 border-b-4 border-black bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400">
         <div className="flex justify-between items-center max-w-7xl mx-auto">
-          <button
-            onClick={() => navigateTo('home')}
+          <Link
+            to="/"
             className="text-2xl md:text-3xl font-black hover:scale-110 transition-transform text-black drop-shadow-sm"
           >
             ALT-TAB
-          </button>
+          </Link>
 
           <div className="flex items-center gap-3">
             {/* Theme Toggle */}
@@ -1237,11 +1249,13 @@ const AltTabWebsite = () => {
       </nav>
 
       <main className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
-        {currentPage === 'home' && <HomePage />}
-        {currentPage === 'projects' && <ProjectsPage />}
-        {currentPage === 'moodboards' && <MoodboardsPage />}
-        {currentPage === 'about' && <AboutPage />}
-        {currentPage === 'shop' && <ShopPage />}
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/moodboards" element={<MoodboardsPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/shop" element={<ShopPage />} />
+        </Routes>
       </main>
 
       <footer className={`relative z-10 text-center py-8 text-sm ${darkMode ? 'text-gray-600' : 'text-white/80'}`}>
