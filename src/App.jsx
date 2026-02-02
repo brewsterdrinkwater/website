@@ -529,8 +529,8 @@ const AltTabWebsite = () => {
         }}
         className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
           currentPage === page
-            ? 'bg-black/20 text-black shadow-lg scale-105'
-            : 'hover:bg-black/10 text-black/70 hover:text-black'
+            ? 'bg-white/30 text-white shadow-lg scale-105'
+            : 'hover:bg-white/20 text-white/80 hover:text-white'
         }`}
       >
         <Icon size={20} />
@@ -574,15 +574,15 @@ const AltTabWebsite = () => {
 
   const HomePage = () => (
     <div className="space-y-8">
-      {/* Retro 90s header */}
-      <div className="text-center space-y-3 py-8 border-4 border-black bg-gradient-to-br from-yellow-300 via-yellow-400 to-orange-400">
+      {/* Retro header with blue/orange gradient */}
+      <div className="text-center space-y-3 py-8 border-4 border-black bg-gradient-to-br from-blue-600 via-blue-500 to-orange-500">
         <div className="flex items-center justify-center gap-2">
-          <span className="text-xl">★</span>
-          <span className="text-xs uppercase tracking-widest font-bold text-black">Established</span>
-          <span className="text-xl">★</span>
+          <span className="text-xl text-white">★</span>
+          <span className="text-xs uppercase tracking-widest font-bold text-white">Established</span>
+          <span className="text-xl text-white">★</span>
         </div>
         <h1
-          className="text-6xl md:text-8xl font-black text-black leading-none select-none"
+          className="text-6xl md:text-8xl font-black text-white leading-none select-none"
           style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
           onTouchEnd={handleHeaderDoubleTap}
         >
@@ -601,8 +601,8 @@ const AltTabWebsite = () => {
               onTouchStart={() => handleLetterTouch(letter.key)}
               style={{
                 display: 'inline-block',
-                color: '#000000',
-                textShadow: '2px 2px 0px #ff0000, 4px 4px 0px #0000ff',
+                color: '#ffffff',
+                textShadow: '2px 2px 0px #f97316, 4px 4px 0px #1e40af',
                 cursor: isMobile ? 'pointer' : 'grab',
                 transform: `translate(${letterPositions[letter.key].x}px, ${letterPositions[letter.key].y}px)`,
                 transition: draggingLetter === letter.key ? 'none' : 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
@@ -614,11 +614,11 @@ const AltTabWebsite = () => {
             </span>
           ))}
         </h1>
-        <p className="text-base md:text-lg text-black font-bold uppercase px-4">
+        <p className="text-base md:text-lg text-white font-bold uppercase px-4">
           ★★ Multi-Disciplinary Think Tank ★★
         </p>
         {isMobile && (
-          <p className="text-xs text-black/60 mt-2 animate-pulse">
+          <p className="text-xs text-white/70 mt-2 animate-pulse">
             Tap letters to scatter • Double-tap to reset • Shake to shuffle
           </p>
         )}
@@ -634,8 +634,8 @@ const AltTabWebsite = () => {
           { city: 'JOHANNESBURG', tz: 'Africa/Johannesburg' },
           { city: 'TOKYO', tz: 'Asia/Tokyo' },
         ].map((clock) => (
-          <div key={clock.city} className="bg-black text-yellow-400 px-3 py-2 border-2 border-yellow-400 font-mono">
-            <span className="text-orange-300">{clock.city}:</span>{' '}
+          <div key={clock.city} className="bg-blue-900 text-orange-400 px-3 py-2 border-2 border-orange-400 font-mono rounded">
+            <span className="text-blue-300">{clock.city}:</span>{' '}
             {currentTime.toLocaleTimeString('en-US', {
               timeZone: clock.tz,
               hour: '2-digit',
@@ -646,8 +646,8 @@ const AltTabWebsite = () => {
         ))}
       </div>
 
-      {/* News Links + Game section - swapped */}
-      <div className="border-4 border-black bg-gradient-to-br from-yellow-200 via-yellow-300 to-orange-300 p-6 md:p-8">
+      {/* News Links + Game section */}
+      <div className="border-4 border-black bg-gradient-to-br from-blue-100 via-blue-50 to-orange-100 p-6 md:p-8">
         <div className="grid md:grid-cols-2 gap-6">
           <NewsLinks />
           <GameSection />
@@ -656,11 +656,11 @@ const AltTabWebsite = () => {
 
       {/* About sections */}
       <div className="border-4 border-black bg-white">
-        <div className="bg-gradient-to-r from-orange-500 to-yellow-500 text-black px-4 py-3 border-b-4 border-black">
+        <div className="bg-gradient-to-r from-blue-600 to-orange-500 text-white px-4 py-3 border-b-4 border-black">
           <h2 className="font-bold text-2xl md:text-3xl uppercase text-center">About Alt-Tab</h2>
         </div>
         <div className="grid md:grid-cols-3">
-          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-yellow-50 hover:bg-yellow-100 transition-colors text-left">
+          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-blue-50 hover:bg-blue-100 transition-colors text-left">
             <h3 className="font-bold text-black mb-3 underline text-lg">Human-Centric Design</h3>
             <p className="text-sm text-black">Founded by a library scientist and industrial designer, we blend research with creativity.</p>
           </button>
@@ -668,7 +668,7 @@ const AltTabWebsite = () => {
             <h3 className="font-bold text-black mb-3 underline text-lg">Multi-Disciplinary</h3>
             <p className="text-sm text-black">From digital goods to policy, we create experiences that matter.</p>
           </button>
-          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-yellow-50 hover:bg-yellow-100 transition-colors text-left">
+          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-blue-50 hover:bg-blue-100 transition-colors text-left">
             <h3 className="font-bold text-black mb-3 underline text-lg">Future-Forward</h3>
             <p className="text-sm text-black">Bridging nostalgia with innovation, one project at a time.</p>
           </button>
@@ -678,19 +678,81 @@ const AltTabWebsite = () => {
 
       {/* Focus Areas */}
       <div className="border-4 border-black bg-white">
-        <div className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black px-4 py-3 border-b-4 border-black">
+        <div className="bg-gradient-to-r from-blue-600 to-orange-500 text-white px-4 py-3 border-b-4 border-black">
           <h2 className="font-bold text-2xl md:text-3xl uppercase text-center">Areas of Focus</h2>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-5">
           {[
-            { name: 'Product Development', icon: '⚡' },
-            { name: 'Research', icon: '🔬' },
-            { name: 'Civic', icon: '🏛️' },
-            { name: 'Education', icon: '📚' },
-            { name: 'Sport', icon: '⚽' },
+            { name: 'Product Development', icon: (
+              <svg viewBox="0 0 48 48" className="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {/* Hand-drawn lightbulb */}
+                <path d="M24 4c-1 0-2 .5-2 .5s-6 2-6 12c0 4 2 6 3 8s2 4 2 6v2h6v-2c0-2 1-4 2-6s3-4 3-8c0-10-6-11.5-6-12s-1-.5-2-.5z" strokeDasharray="1 0.5" />
+                <path d="M19 34h10" strokeDasharray="2 1" />
+                <path d="M20 38h8" strokeDasharray="2 1" />
+                <path d="M22 42h4" />
+                {/* Rays */}
+                <path d="M24 0v2" strokeDasharray="1 1" />
+                <path d="M36 6l-2 2" strokeDasharray="1 1" />
+                <path d="M40 18h-3" strokeDasharray="1 1" />
+                <path d="M12 6l2 2" strokeDasharray="1 1" />
+                <path d="M8 18h3" strokeDasharray="1 1" />
+              </svg>
+            )},
+            { name: 'Research', icon: (
+              <svg viewBox="0 0 48 48" className="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {/* Hand-drawn magnifying glass */}
+                <circle cx="20" cy="20" r="12" strokeDasharray="3 1" />
+                <path d="M29 29l12 12" strokeDasharray="2 1" />
+                <path d="M40 42l2 2" />
+                {/* Lens shine */}
+                <path d="M14 14c2-2 5-3 8-3" strokeDasharray="2 2" />
+              </svg>
+            )},
+            { name: 'Civic', icon: (
+              <svg viewBox="0 0 48 48" className="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {/* Hand-drawn building with columns */}
+                <path d="M6 42h36" strokeDasharray="2 1" />
+                <path d="M8 42v-22" strokeDasharray="3 1" />
+                <path d="M16 42v-22" strokeDasharray="3 1" />
+                <path d="M24 42v-22" strokeDasharray="3 1" />
+                <path d="M32 42v-22" strokeDasharray="3 1" />
+                <path d="M40 42v-22" strokeDasharray="3 1" />
+                {/* Roof/pediment */}
+                <path d="M4 20h40" strokeDasharray="2 1" />
+                <path d="M8 20l16-14 16 14" strokeDasharray="2 1" />
+              </svg>
+            )},
+            { name: 'Education', icon: (
+              <svg viewBox="0 0 48 48" className="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {/* Hand-drawn stacked books */}
+                <path d="M8 38h28" strokeDasharray="2 1" />
+                <path d="M6 38v-6h32v6" strokeDasharray="3 1" />
+                <path d="M8 32v-6h28v6" strokeDasharray="3 1" />
+                <path d="M10 26v-6h24v6" strokeDasharray="3 1" />
+                {/* Book spines */}
+                <path d="M14 32v6" strokeDasharray="1 1" />
+                <path d="M22 26v6" strokeDasharray="1 1" />
+                <path d="M30 32v6" strokeDasharray="1 1" />
+                {/* Bookmark */}
+                <path d="M28 20v-8l3 3 3-3v8" strokeDasharray="1 1" />
+              </svg>
+            )},
+            { name: 'Sport', icon: (
+              <svg viewBox="0 0 48 48" className="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {/* Hand-drawn soccer ball */}
+                <circle cx="24" cy="24" r="18" strokeDasharray="3 1" />
+                {/* Pentagon pattern */}
+                <path d="M24 10l-6 8h12l-6-8z" strokeDasharray="2 1" />
+                <path d="M18 18l-8 4 2 10h6" strokeDasharray="2 1" />
+                <path d="M30 18l8 4-2 10h-6" strokeDasharray="2 1" />
+                <path d="M18 32l6 6 6-6" strokeDasharray="2 1" />
+                <path d="M12 22l-4 8" strokeDasharray="1 1" />
+                <path d="M36 22l4 8" strokeDasharray="1 1" />
+              </svg>
+            )},
           ].map((area, i) => (
-            <div key={i} className={`border-2 border-black p-6 ${i % 2 === 0 ? 'bg-yellow-50' : 'bg-orange-50'} text-center`}>
-              <span className="text-3xl mb-2 block">{area.icon}</span>
+            <div key={i} className={`border-2 border-black p-6 ${i % 2 === 0 ? 'bg-blue-50' : 'bg-orange-50'} text-center`}>
+              <div className="text-blue-700">{area.icon}</div>
               <h3 className="font-bold text-black text-sm md:text-base">{area.name}</h3>
             </div>
           ))}
@@ -703,25 +765,25 @@ const AltTabWebsite = () => {
           href="https://www.walt-tab.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-block px-8 py-3 rounded-full bg-gradient-to-r from-yellow-400 via-yellow-300 to-orange-400 text-black font-bold text-lg border-2 border-black hover:scale-105 hover:brightness-110 transition-all"
+          className="inline-block px-8 py-3 rounded-full bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-500 text-black font-bold text-lg border-2 border-black hover:scale-105 hover:brightness-110 transition-all animate-pulse hover:animate-none"
           style={{ boxShadow: '3px 3px 0px black' }}
         >
           Walt-tab
         </a>
       </div>
 
-      {/* Navigation buttons - now functional with neon colors */}
+      {/* Navigation buttons */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { text: 'ABOUT', color: 'bg-gradient-to-r from-yellow-400 to-orange-500', page: 'about' },
-          { text: 'MOODBOARDS', color: 'bg-gradient-to-r from-orange-400 to-yellow-500', page: 'moodboards' },
-          { text: 'VIEW PROJECTS', color: 'bg-gradient-to-r from-yellow-500 to-orange-400', page: 'projects' },
-          { text: 'SHOP', color: 'bg-gradient-to-r from-orange-500 to-yellow-400', page: 'shop' }
+          { text: 'ABOUT', color: 'bg-gradient-to-r from-blue-600 to-blue-500', page: 'about' },
+          { text: 'MOODBOARDS', color: 'bg-gradient-to-r from-blue-500 to-orange-500', page: 'moodboards' },
+          { text: 'VIEW PROJECTS', color: 'bg-gradient-to-r from-orange-500 to-blue-500', page: 'projects' },
+          { text: 'SHOP', color: 'bg-gradient-to-r from-orange-500 to-orange-400', page: 'shop' }
         ].map((link, i) => (
           <button
             key={i}
             onClick={() => navigateTo(link.page)}
-            className={`${link.color} text-black font-bold py-4 px-3 border-4 border-black hover:brightness-110 transition-all text-sm md:text-base active:scale-95`}
+            className={`${link.color} text-white font-bold py-4 px-3 border-4 border-black hover:brightness-110 transition-all text-sm md:text-base active:scale-95`}
             style={{ boxShadow: '5px 5px 0px black' }}
           >
             ► {link.text} ◄
@@ -766,12 +828,12 @@ const AltTabWebsite = () => {
 
     return (
       <div className="space-y-8">
-        <div className="text-center space-y-4">
-          <h2 className="text-5xl md:text-6xl font-black text-white drop-shadow-lg">Supportive Partners</h2>
-          <p className="text-lg text-white/90 italic max-w-2xl mx-auto">
+        <div className="text-center space-y-4 bg-white/90 backdrop-blur-sm rounded-2xl p-6 md:p-8 border-2 border-black">
+          <h2 className="text-5xl md:text-6xl font-black text-black drop-shadow-lg">Supportive Partners</h2>
+          <p className="text-lg text-black/80 italic max-w-2xl mx-auto">
             "Sometimes we do work for us; sometimes we do work with you."
           </p>
-          <p className="text-base text-white/80 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-base text-black/70 max-w-3xl mx-auto leading-relaxed">
             The organizations featured here represent collaborations where we were able to share our work publicly. Much of what the Alt-Tab team builds is protected under NDA, as we often embed directly within our clients' internal teams. As a result, this page showcases only a portion of our portfolio.
           </p>
         </div>
@@ -785,7 +847,7 @@ const AltTabWebsite = () => {
               <CardWrapper
                 key={i}
                 {...linkProps}
-                className="group bg-white rounded-lg p-4 hover:scale-105 transition-all duration-300 cursor-pointer border-2 border-black hover:shadow-lg block"
+                className="group bg-white rounded-lg p-4 hover:scale-105 transition-all duration-300 cursor-pointer border-2 border-black hover:shadow-lg hover:border-orange-500 block"
               >
                 <div className="h-16 flex items-center justify-center mb-2">
                   {project.logoText ? (
@@ -809,75 +871,75 @@ const AltTabWebsite = () => {
         </div>
 
         <div className="max-w-4xl mx-auto pt-12">
-          <div className="bg-white/20 backdrop-blur-md border-2 border-white/30 rounded-2xl p-8 md:p-12">
+          <div className="bg-white/95 backdrop-blur-md border-2 border-black rounded-2xl p-8 md:p-12">
             <div className="text-center mb-8">
-              <h3 className="text-3xl md:text-4xl font-black text-white mb-3">Work With Us</h3>
-              <p className="text-white/80 text-lg">
+              <h3 className="text-3xl md:text-4xl font-black text-black mb-3">Work With Us</h3>
+              <p className="text-black/70 text-lg">
                 Have a project in mind? Let's create something amazing together.
               </p>
             </div>
 
             {formSubmitted ? (
               <div className="text-center py-12">
-                <div className="w-20 h-20 mx-auto mb-4 bg-green-400 rounded-full flex items-center justify-center">
+                <div className="w-20 h-20 mx-auto mb-4 bg-green-500 rounded-full flex items-center justify-center">
                   <Sparkles size={40} className="text-white" />
                 </div>
-                <h4 className="text-2xl font-bold text-white mb-2">Thank You!</h4>
-                <p className="text-white/80">We will be in touch soon.</p>
+                <h4 className="text-2xl font-bold text-black mb-2">Thank You!</h4>
+                <p className="text-black/70">We will be in touch soon.</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-white font-medium mb-2">Name *</label>
+                    <label className="block text-black font-medium mb-2">Name *</label>
                     <input
                       type="text"
                       required
                       value={formData.name}
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      className="w-full px-4 py-3 rounded-lg bg-white/20 border-2 border-white/30 text-white placeholder-white/50 focus:border-white/60 focus:outline-none backdrop-blur-sm transition-colors"
+                      className="w-full px-4 py-3 rounded-lg bg-gray-100 border-2 border-gray-300 text-black placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
                       placeholder="Your name"
                     />
                   </div>
                   <div>
-                    <label className="block text-white font-medium mb-2">Email *</label>
+                    <label className="block text-black font-medium mb-2">Email *</label>
                     <input
                       type="email"
                       required
                       value={formData.email}
                       onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      className="w-full px-4 py-3 rounded-lg bg-white/20 border-2 border-white/30 text-white placeholder-white/50 focus:border-white/60 focus:outline-none backdrop-blur-sm transition-colors"
+                      className="w-full px-4 py-3 rounded-lg bg-gray-100 border-2 border-gray-300 text-black placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
                       placeholder="your@email.com"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-white font-medium mb-2">Company / Organization</label>
+                  <label className="block text-black font-medium mb-2">Company / Organization</label>
                   <input
                     type="text"
                     value={formData.company}
                     onChange={(e) => setFormData({...formData, company: e.target.value})}
-                    className="w-full px-4 py-3 rounded-lg bg-white/20 border-2 border-white/30 text-white placeholder-white/50 focus:border-white/60 focus:outline-none backdrop-blur-sm transition-colors"
+                    className="w-full px-4 py-3 rounded-lg bg-gray-100 border-2 border-gray-300 text-black placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
                     placeholder="Optional"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-white font-medium mb-2">Tell us about your project *</label>
+                  <label className="block text-black font-medium mb-2">Tell us about your project *</label>
                   <textarea
                     required
                     value={formData.message}
                     onChange={(e) => setFormData({...formData, message: e.target.value})}
                     rows={6}
-                    className="w-full px-4 py-3 rounded-lg bg-white/20 border-2 border-white/30 text-white placeholder-white/50 focus:border-white/60 focus:outline-none backdrop-blur-sm transition-colors resize-none"
+                    className="w-full px-4 py-3 rounded-lg bg-gray-100 border-2 border-gray-300 text-black placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors resize-none"
                     placeholder="What are you looking to create? What challenges are you facing?"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full md:w-auto px-8 py-4 bg-white text-purple-600 rounded-full font-bold text-lg hover:scale-105 hover:shadow-2xl transition-all duration-300"
+                  className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-orange-500 text-white rounded-full font-bold text-lg hover:scale-105 hover:shadow-2xl transition-all duration-300"
                 >
                   Send Inquiry
                 </button>
@@ -891,6 +953,7 @@ const AltTabWebsite = () => {
 
   const MoodboardsPage = () => {
     const [activeVideo, setActiveVideo] = useState(null);
+    const [shuffleKey, setShuffleKey] = useState(0);
 
     // Video collection - easy to add new videos: just add 'VIDEO_ID'
     const videos = [
@@ -905,39 +968,85 @@ const AltTabWebsite = () => {
       'sKE1nLc5P_c',
       '0zIVTDbve7k',
       'ZYAzo5OdqHM',
-      // Add more video IDs here
+      'tnFPQ57l0Dg',
+      'RqQGUJK7Na4',
+      'pYdkiWIPp-s',
+      'vtBoQuAtX3I',
     ];
+
+    // Shuffle videos and assign random sizes with weighted distribution
+    const getShuffledVideos = useCallback(() => {
+      // Weighted sizes: more small/medium, fewer large to create visual variety
+      const getRandomSize = () => {
+        const rand = Math.random();
+        if (rand < 0.35) return 'small';
+        if (rand < 0.7) return 'medium';
+        return 'large';
+      };
+      const shuffled = [...videos].sort(() => Math.random() - 0.5);
+      return shuffled.map((id) => ({
+        id,
+        size: getRandomSize()
+      }));
+    }, [shuffleKey]);
+
+    const [displayVideos, setDisplayVideos] = useState(() => getShuffledVideos());
+
+    const handleShuffle = () => {
+      setShuffleKey(k => k + 1);
+      setDisplayVideos(getShuffledVideos());
+    };
 
     // Get YouTube thumbnail URL
     const getThumbnail = (videoId) => `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
+    // Size classes for varied tile sizes
+    const getSizeClasses = (size) => {
+      switch (size) {
+        case 'large':
+          return 'col-span-2 row-span-2';
+        case 'medium':
+          return 'col-span-2 md:col-span-1 row-span-1';
+        default:
+          return 'col-span-1 row-span-1';
+      }
+    };
+
     return (
       <div className="space-y-8">
         <div className="text-center space-y-4">
-          <h2 className="text-5xl md:text-6xl font-black text-white drop-shadow-lg">Moodboards</h2>
-          <p className="text-lg text-white/70 max-w-2xl mx-auto">
+          <h2 className="text-5xl md:text-6xl font-black text-black drop-shadow-lg">Moodboards</h2>
+          <p className="text-lg text-black/70 max-w-2xl mx-auto">
             Video inspiration from skate culture and contemporary design
           </p>
+          {/* Shuffle button */}
+          <button
+            onClick={handleShuffle}
+            className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-blue-600 to-orange-500 text-white font-bold rounded-full hover:scale-105 transition-all"
+          >
+            <RefreshCw size={18} />
+            Shuffle
+          </button>
         </div>
 
-        {/* Video Thumbnail Grid - Wider tiles */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 -mx-4 md:mx-0">
-          {videos.map((videoId) => (
+        {/* Video Thumbnail Grid - Masonry-like with varied sizes */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 auto-rows-[120px] md:auto-rows-[150px] -mx-4 md:mx-0">
+          {displayVideos.map(({ id, size }) => (
             <button
-              key={videoId}
-              onClick={() => setActiveVideo(videoId)}
-              className="group relative aspect-video bg-black/40 overflow-hidden border border-white/10 hover:border-white/40 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl md:rounded-lg"
+              key={id + shuffleKey}
+              onClick={() => setActiveVideo(id)}
+              className={`group relative bg-black/40 overflow-hidden border border-black/20 hover:border-orange-500 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl md:rounded-lg ${getSizeClasses(size)}`}
             >
               {/* Thumbnail */}
               <img
-                src={getThumbnail(videoId)}
+                src={getThumbnail(id)}
                 alt=""
                 loading="lazy"
                 className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
               />
               {/* Play button overlay */}
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="w-14 h-14 md:w-16 md:h-16 bg-black/70 group-hover:bg-red-600 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+                <div className="w-14 h-14 md:w-16 md:h-16 bg-black/70 group-hover:bg-orange-500 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110">
                   <svg className="w-6 h-6 md:w-7 md:h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
                   </svg>
@@ -953,7 +1062,7 @@ const AltTabWebsite = () => {
             href="https://www.youtube.com/@quartersnacksdotcom"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block px-6 py-3 bg-black/80 text-white font-bold text-sm md:text-base rounded-lg border-2 border-white/20 hover:border-white/50 hover:bg-black transition-all"
+            className="inline-block px-6 py-3 bg-black/80 text-white font-bold text-sm md:text-base rounded-lg border-2 border-black/20 hover:border-orange-500 hover:bg-black transition-all"
           >
             QUARTERSNACKS →
           </a>
@@ -994,69 +1103,69 @@ const AltTabWebsite = () => {
   const AboutPage = () => {
     return (
       <div className="space-y-12">
-        <div className="text-center space-y-4">
-          <h2 className="text-5xl md:text-6xl font-black text-white drop-shadow-lg">Philosophy</h2>
-          <p className="text-xl text-white/80 max-w-2xl mx-auto">
+        <div className="text-center space-y-4 bg-white/90 backdrop-blur-sm rounded-2xl p-6 md:p-8 border-2 border-black">
+          <h2 className="text-5xl md:text-6xl font-black text-black drop-shadow-lg">Philosophy</h2>
+          <p className="text-xl text-black/70 max-w-2xl mx-auto">
             Where research meets creativity, and ideas become reality
           </p>
         </div>
 
         {/* Mission - First and foremost */}
-        <div className="p-8 md:p-12 rounded-2xl bg-gradient-to-br from-cyan-500/30 to-purple-500/30 backdrop-blur-md border-2 border-white/30">
+        <div className="p-8 md:p-12 rounded-2xl bg-gradient-to-br from-blue-600 to-orange-500 border-2 border-black">
           <div className="max-w-3xl mx-auto text-center">
             <h3 className="text-3xl font-bold text-white mb-6">Our Mission</h3>
-            <p className="text-xl text-white/90 leading-relaxed mb-6">
+            <p className="text-xl text-white leading-relaxed mb-6">
               Alt-Tab exists to bridge the gap between human needs and technological possibility. We are a think tank dedicated to designing experiences and products that enhance the quality of human life.
             </p>
-            <p className="text-lg text-white/80 leading-relaxed mb-6">
+            <p className="text-lg text-white/90 leading-relaxed mb-6">
               Whether developing digital platforms, physical products, policy frameworks, or immersive experiences, we maintain an unwavering commitment to thoughtful, intentional design that serves people first.
             </p>
-            <p className="text-lg text-white/80 leading-relaxed mb-6">
+            <p className="text-lg text-white/90 leading-relaxed mb-6">
               Our team is led by real humans who prefer working in the shadows. We're not chasing clout or followers—we'd rather meet you for coffee, shake your hand, and have a real conversation. We believe the best ideas emerge from genuine connection, not comment sections.
             </p>
-            <p className="text-base text-white/60 italic">
+            <p className="text-base text-white/80 italic">
               Yes, we're actually human. We have coffee addictions, strong opinions about fonts, and we occasionally forget to unmute ourselves on video calls. No AI wrote this. (We checked.)
             </p>
           </div>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
-          <div className="p-8 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/30">
-            <h3 className="text-2xl font-bold text-white mb-4">Human-Centric Design</h3>
-            <p className="text-white/90 leading-relaxed mb-4">
+          <div className="p-8 rounded-2xl bg-white/95 backdrop-blur-md border-2 border-black">
+            <h3 className="text-2xl font-bold text-black mb-4">Human-Centric Design</h3>
+            <p className="text-black/80 leading-relaxed mb-4">
               At Alt-Tab, we believe that exceptional design begins with deep understanding. Our human-centric approach places people at the center of every project, ensuring that the products and experiences we create genuinely improve lives.
             </p>
-            <p className="text-white/80 leading-relaxed">
+            <p className="text-black/70 leading-relaxed">
               Through rigorous user research and empathy-driven methodologies, we uncover insights that inform meaningful solutions. We don't design for users—we design with them.
             </p>
           </div>
 
-          <div className="p-8 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/30">
-            <h3 className="text-2xl font-bold text-white mb-4">Research-Driven Process</h3>
-            <p className="text-white/90 leading-relaxed mb-4">
+          <div className="p-8 rounded-2xl bg-white/95 backdrop-blur-md border-2 border-black">
+            <h3 className="text-2xl font-bold text-black mb-4">Research-Driven Process</h3>
+            <p className="text-black/80 leading-relaxed mb-4">
               Our process is grounded in systematic research and evidence-based decision making. We combine qualitative and quantitative methods to build a comprehensive understanding of complex challenges.
             </p>
-            <p className="text-white/80 leading-relaxed">
+            <p className="text-black/70 leading-relaxed">
               From ethnographic studies to data analysis, our research practice ensures that every design decision is informed by real-world insights rather than assumptions.
             </p>
           </div>
 
-          <div className="p-8 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/30">
-            <h3 className="text-2xl font-bold text-white mb-4">Rapid Prototyping</h3>
-            <p className="text-white/90 leading-relaxed mb-4">
+          <div className="p-8 rounded-2xl bg-white/95 backdrop-blur-md border-2 border-black">
+            <h3 className="text-2xl font-bold text-black mb-4">Rapid Prototyping</h3>
+            <p className="text-black/80 leading-relaxed mb-4">
               We believe in learning by making. Our rapid prototyping approach allows us to quickly test ideas, gather feedback, and iterate toward optimal solutions.
             </p>
-            <p className="text-white/80 leading-relaxed">
+            <p className="text-black/70 leading-relaxed">
               By creating tangible artifacts early in the process, we reduce risk and accelerate innovation. Fail fast, learn faster—that's the Alt-Tab way.
             </p>
           </div>
 
-          <div className="p-8 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/30">
-            <h3 className="text-2xl font-bold text-white mb-4">Multi-Disciplinary Collaboration</h3>
-            <p className="text-white/90 leading-relaxed mb-4">
+          <div className="p-8 rounded-2xl bg-white/95 backdrop-blur-md border-2 border-black">
+            <h3 className="text-2xl font-bold text-black mb-4">Multi-Disciplinary Collaboration</h3>
+            <p className="text-black/80 leading-relaxed mb-4">
               Complex problems require diverse perspectives. Our team brings together expertise from industrial design, library science, technology, and strategic consulting.
             </p>
-            <p className="text-white/80 leading-relaxed">
+            <p className="text-black/70 leading-relaxed">
               This cross-pollination of disciplines enables us to approach challenges from multiple angles and deliver holistic solutions that address both immediate needs and long-term impact.
             </p>
           </div>
@@ -1069,16 +1178,16 @@ const AltTabWebsite = () => {
 
   const ShopPage = () => (
     <div className="space-y-8">
-      <div className="text-center space-y-4">
-        <h2 className="text-5xl md:text-6xl font-black text-white drop-shadow-lg">Shop</h2>
-        <p className="text-xl text-white/80 max-w-2xl mx-auto">
+      <div className="text-center space-y-4 bg-white/90 backdrop-blur-sm rounded-2xl p-6 md:p-8 border-2 border-black">
+        <h2 className="text-5xl md:text-6xl font-black text-black drop-shadow-lg">Shop</h2>
+        <p className="text-xl text-black/70 max-w-2xl mx-auto">
           Curated goods from Alt-Tab
         </p>
       </div>
 
       {/* Under Construction Notice */}
       <div className="max-w-2xl mx-auto">
-        <div className="p-8 md:p-12 rounded-2xl bg-yellow-400/90 border-4 border-black text-center">
+        <div className="p-8 md:p-12 rounded-2xl bg-gradient-to-br from-orange-400 to-yellow-400 border-4 border-black text-center">
           <Construction size={64} className="mx-auto text-black mb-4" />
           <h3 className="text-3xl font-black text-black mb-4">Under Construction</h3>
           <p className="text-lg text-black/80 mb-6">
@@ -1138,49 +1247,65 @@ const AltTabWebsite = () => {
         </>
       )}
 
-      <nav className="relative z-50 p-4 md:p-6 border-b-4 border-black bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400">
+      <nav className="relative z-50 p-4 md:p-6 border-b-4 border-black bg-gradient-to-r from-blue-700 via-blue-600 to-orange-500">
         <div className="flex justify-between items-center max-w-7xl mx-auto">
           <Link
             to="/"
-            className="text-2xl md:text-3xl font-black hover:scale-110 transition-transform text-black drop-shadow-sm"
+            className="text-2xl md:text-3xl font-black hover:scale-110 transition-transform text-white drop-shadow-sm"
           >
             ALT-TAB
           </Link>
 
-          <div className="flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2">
+            <NavItem icon={Sparkles} label="Home" page="home" />
+            <NavItem icon={BookOpen} label="About" page="about" />
+            <NavItem icon={Image} label="Moodboards" page="moodboards" />
+            <NavItem icon={Grid3x3} label="Projects" page="projects" />
+            <NavItem icon={ShoppingBag} label="Shop" page="shop" />
+            {/* Walt-tab Button */}
+            <a
+              href="https://www.walt-tab.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-2 px-4 py-2 bg-gradient-to-r from-orange-400 to-yellow-400 text-black font-bold rounded-full hover:scale-105 hover:brightness-110 transition-all border-2 border-black animate-pulse hover:animate-none"
+            >
+              Walt-tab
+            </a>
+          </div>
+
+          <div className="flex items-center gap-2">
             {/* Theme Toggle */}
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className="p-2 rounded-full transition-all bg-black/10 hover:bg-black/20 text-black"
+              className="p-2 rounded-full transition-all bg-white/20 hover:bg-white/30 text-white"
               title={darkMode ? 'Switch to dark mode' : 'Switch to light mode'}
             >
               {darkMode ? <Moon size={20} /> : <Sun size={20} />}
             </button>
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="md:hidden p-2 rounded-lg transition-colors hover:bg-white/20 text-white"
+            >
+              {menuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
-
-          <div className="hidden md:flex gap-2">
-            <NavItem icon={Sparkles} label="Home" page="home" />
-            <NavItem icon={BookOpen} label="About" page="about" />
-            <NavItem icon={Image} label="Moodboards" page="moodboards" />
-            <NavItem icon={Grid3x3} label="Projects" page="projects" />
-            <NavItem icon={ShoppingBag} label="Shop" page="shop" />
-          </div>
-
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden p-2 rounded-lg transition-colors hover:bg-black/10 text-black"
-          >
-            {menuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
         </div>
 
         {menuOpen && (
-          <div className="md:hidden absolute top-full left-0 right-0 bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400 p-4 space-y-2 border-b-4 border-black">
+          <div className="md:hidden absolute top-full left-0 right-0 bg-gradient-to-r from-blue-700 via-blue-600 to-orange-500 p-4 space-y-2 border-b-4 border-black">
             <NavItem icon={Sparkles} label="Home" page="home" />
             <NavItem icon={BookOpen} label="About" page="about" />
             <NavItem icon={Image} label="Moodboards" page="moodboards" />
             <NavItem icon={Grid3x3} label="Projects" page="projects" />
             <NavItem icon={ShoppingBag} label="Shop" page="shop" />
+            <a
+              href="https://www.walt-tab.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-center px-4 py-3 bg-gradient-to-r from-orange-400 to-yellow-400 text-black font-bold rounded-lg hover:brightness-110 transition-all border-2 border-black"
+            >
+              Walt-tab
+            </a>
           </div>
         )}
       </nav>
@@ -1195,19 +1320,60 @@ const AltTabWebsite = () => {
         </Routes>
       </main>
 
-      <footer className={`relative z-10 text-center py-8 text-sm ${darkMode ? 'text-gray-600' : 'text-white/80'}`}>
-        <div className="flex items-center justify-center gap-4 mb-3">
+      <footer className="relative z-10 py-8 text-sm bg-gradient-to-r from-blue-900 to-blue-800 border-t-4 border-black">
+        {/* World Clocks - shown on all pages except homepage */}
+        {currentPage !== 'home' && (
+          <div className="flex flex-wrap justify-center gap-3 text-xs mb-6 px-4">
+            {[
+              { city: 'LOS ANGELES', tz: 'America/Los_Angeles' },
+              { city: 'NASHVILLE', tz: 'America/Chicago' },
+              { city: 'NEW YORK', tz: 'America/New_York' },
+              { city: 'LISBON', tz: 'Europe/Lisbon' },
+              { city: 'JOHANNESBURG', tz: 'Africa/Johannesburg' },
+              { city: 'TOKYO', tz: 'Asia/Tokyo' },
+            ].map((clock) => (
+              <div key={clock.city} className="bg-black/50 text-orange-400 px-3 py-2 border border-orange-400/50 font-mono rounded">
+                <span className="text-blue-300">{clock.city}:</span>{' '}
+                {currentTime.toLocaleTimeString('en-US', {
+                  timeZone: clock.tz,
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: true
+                })}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Footer Links */}
+        <div className="flex flex-wrap items-center justify-center gap-4 mb-4 px-4">
+          <Link
+            to="/about"
+            onClick={() => window.scrollTo(0, 0)}
+            className="flex items-center gap-2 px-4 py-2 rounded-full transition-all hover:scale-105 bg-white/10 hover:bg-white/20 text-white"
+          >
+            <BookOpen size={18} />
+            <span className="font-medium">About</span>
+          </Link>
           <a
             href="https://www.instagram.com/alttab.xyz/#"
             target="_blank"
             rel="noopener noreferrer"
-            className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all hover:scale-105 ${darkMode ? 'bg-gray-200 hover:bg-gray-300 text-gray-800' : 'bg-white/20 hover:bg-white/30 text-white'}`}
+            className="flex items-center gap-2 px-4 py-2 rounded-full transition-all hover:scale-105 bg-white/10 hover:bg-white/20 text-white"
           >
             <Instagram size={18} />
             <span className="font-medium">@alttab</span>
           </a>
+          <a
+            href="https://www.walt-tab.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-4 py-2 bg-gradient-to-r from-orange-400 to-yellow-400 text-black font-bold rounded-full hover:scale-105 transition-all"
+          >
+            Walt-tab
+          </a>
         </div>
-        <p>© {new Date().getFullYear()} Alt-Tab Think Tank · Multi-Disciplinary</p>
+        <p className="text-white/60 text-center">© {new Date().getFullYear()} Alt-Tab Think Tank · Multi-Disciplinary</p>
       </footer>
     </div>
   );
