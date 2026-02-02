@@ -589,12 +589,46 @@ const AltTabWebsite = () => {
       </div>
 
 
+      {/* Focus Areas */}
+      <div className="border-4 border-black bg-white">
+        <div className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black px-4 py-3 border-b-4 border-black">
+          <h2 className="font-bold text-2xl md:text-3xl uppercase text-center">Areas of Focus</h2>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-5">
+          {[
+            { name: 'Product Development', icon: '⚡' },
+            { name: 'Research', icon: '🔬' },
+            { name: 'Civic', icon: '🏛️' },
+            { name: 'Education', icon: '📚' },
+            { name: 'Sport', icon: '⚽' },
+          ].map((area, i) => (
+            <div key={i} className={`border-2 border-black p-6 ${i % 2 === 0 ? 'bg-yellow-50' : 'bg-orange-50'} text-center`}>
+              <span className="text-3xl mb-2 block">{area.icon}</span>
+              <h3 className="font-bold text-black text-sm md:text-base">{area.name}</h3>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Walt-tab Link */}
+      <div className="text-center">
+        <a
+          href="https://www.walt-tab.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block px-8 py-3 rounded-full bg-gradient-to-r from-yellow-400 via-yellow-300 to-orange-400 text-black font-bold text-lg border-2 border-black hover:scale-105 hover:brightness-110 transition-all"
+          style={{ boxShadow: '3px 3px 0px black' }}
+        >
+          Walt-tab
+        </a>
+      </div>
+
       {/* Navigation buttons - now functional with neon colors */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { text: 'VIEW PROJECTS', color: 'bg-gradient-to-r from-yellow-400 to-orange-500', page: 'projects' },
+          { text: 'ABOUT', color: 'bg-gradient-to-r from-yellow-400 to-orange-500', page: 'about' },
           { text: 'MOODBOARDS', color: 'bg-gradient-to-r from-orange-400 to-yellow-500', page: 'moodboards' },
-          { text: 'ABOUT', color: 'bg-gradient-to-r from-yellow-500 to-orange-400', page: 'about' },
+          { text: 'VIEW PROJECTS', color: 'bg-gradient-to-r from-yellow-500 to-orange-400', page: 'projects' },
           { text: 'SHOP', color: 'bg-gradient-to-r from-orange-500 to-yellow-400', page: 'shop' }
         ].map((link, i) => (
           <button
@@ -646,9 +680,12 @@ const AltTabWebsite = () => {
     return (
       <div className="space-y-8">
         <div className="text-center space-y-4">
-          <h2 className="text-5xl md:text-6xl font-black text-white drop-shadow-lg">Alt-Tab Work</h2>
-          <p className="text-xl text-white/80 max-w-2xl mx-auto">
-            From digital tools to physical spaces, policy frameworks to immersive experiences
+          <h2 className="text-5xl md:text-6xl font-black text-white drop-shadow-lg">Supportive Partners</h2>
+          <p className="text-lg text-white/90 italic max-w-2xl mx-auto">
+            "Sometimes we do work for us; sometimes we do work with you."
+          </p>
+          <p className="text-base text-white/80 max-w-3xl mx-auto leading-relaxed">
+            The organizations featured here represent collaborations where we were able to share our work publicly. Much of what the Alt-Tab team builds is protected under NDA, as we often embed directly within our clients' internal teams. As a result, this page showcases only a portion of our portfolio.
           </p>
         </div>
 
@@ -827,6 +864,25 @@ const AltTabWebsite = () => {
           </p>
         </div>
 
+        {/* Mission - First and foremost */}
+        <div className="p-8 md:p-12 rounded-2xl bg-gradient-to-br from-cyan-500/30 to-purple-500/30 backdrop-blur-md border-2 border-white/30">
+          <div className="max-w-3xl mx-auto text-center">
+            <h3 className="text-3xl font-bold text-white mb-6">Our Mission</h3>
+            <p className="text-xl text-white/90 leading-relaxed mb-6">
+              Alt-Tab exists to bridge the gap between human needs and technological possibility. We are a think tank dedicated to designing experiences and products that enhance the quality of human life.
+            </p>
+            <p className="text-lg text-white/80 leading-relaxed mb-6">
+              Whether developing digital platforms, physical products, policy frameworks, or immersive experiences, we maintain an unwavering commitment to thoughtful, intentional design that serves people first.
+            </p>
+            <p className="text-lg text-white/80 leading-relaxed mb-6">
+              Our team is led by real humans who prefer working in the shadows. We're not chasing clout or followers—we'd rather meet you for coffee, shake your hand, and have a real conversation. We believe the best ideas emerge from genuine connection, not comment sections.
+            </p>
+            <p className="text-base text-white/60 italic">
+              Yes, we're actually human. We have coffee addictions, strong opinions about fonts, and we occasionally forget to unmute ourselves on video calls. No AI wrote this. (We checked.)
+            </p>
+          </div>
+        </div>
+
         <div className="grid md:grid-cols-2 gap-8">
           <div className="p-8 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/30">
             <h3 className="text-2xl font-bold text-white mb-4">Human-Centric Design</h3>
@@ -865,18 +921,6 @@ const AltTabWebsite = () => {
             </p>
             <p className="text-white/80 leading-relaxed">
               This cross-pollination of disciplines enables us to approach challenges from multiple angles and deliver holistic solutions that address both immediate needs and long-term impact.
-            </p>
-          </div>
-        </div>
-
-        <div className="p-8 md:p-12 rounded-2xl bg-gradient-to-br from-cyan-500/30 to-purple-500/30 backdrop-blur-md border-2 border-white/30">
-          <div className="max-w-3xl mx-auto text-center">
-            <h3 className="text-3xl font-bold text-white mb-6">Our Mission</h3>
-            <p className="text-xl text-white/90 leading-relaxed mb-6">
-              Alt-Tab exists to bridge the gap between human needs and technological possibility. We are a think tank dedicated to designing experiences and products that enhance the quality of human life.
-            </p>
-            <p className="text-lg text-white/80 leading-relaxed">
-              Whether developing digital platforms, physical products, policy frameworks, or immersive experiences, we maintain an unwavering commitment to thoughtful, intentional design that serves people first.
             </p>
           </div>
         </div>
@@ -979,9 +1023,9 @@ const AltTabWebsite = () => {
 
           <div className="hidden md:flex gap-2">
             <NavItem icon={Sparkles} label="Home" page="home" />
-            <NavItem icon={Grid3x3} label="Projects" page="projects" />
-            <NavItem icon={Image} label="Moodboards" page="moodboards" />
             <NavItem icon={BookOpen} label="About" page="about" />
+            <NavItem icon={Image} label="Moodboards" page="moodboards" />
+            <NavItem icon={Grid3x3} label="Projects" page="projects" />
             <NavItem icon={ShoppingBag} label="Shop" page="shop" />
           </div>
 
@@ -996,9 +1040,9 @@ const AltTabWebsite = () => {
         {menuOpen && (
           <div className="md:hidden absolute top-full left-0 right-0 bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400 p-4 space-y-2 border-b-4 border-black">
             <NavItem icon={Sparkles} label="Home" page="home" />
-            <NavItem icon={Grid3x3} label="Projects" page="projects" />
-            <NavItem icon={Image} label="Moodboards" page="moodboards" />
             <NavItem icon={BookOpen} label="About" page="about" />
+            <NavItem icon={Image} label="Moodboards" page="moodboards" />
+            <NavItem icon={Grid3x3} label="Projects" page="projects" />
             <NavItem icon={ShoppingBag} label="Shop" page="shop" />
           </div>
         )}
