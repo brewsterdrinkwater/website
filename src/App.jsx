@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Sparkles, Grid3x3, Image, BookOpen, ShoppingBag, RefreshCw, Construction, Instagram, Sun, Moon } from 'lucide-react';
 
 // Middle Tennessee topography map background (light, optimized for web/mobile)
@@ -61,7 +62,10 @@ const NEWS_LINKS = [
 ];
 
 const AltTabWebsite = () => {
-  const [currentPage, setCurrentPage] = useState('home');
+  const location = useLocation();
+  const navigate = useNavigate();
+  // Derive currentPage from the URL path
+  const currentPage = location.pathname === '/' ? 'home' : location.pathname.slice(1);
   const [menuOpen, setMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [golfBall, setGolfBall] = useState({ x: 0, y: 0, visible: false });
@@ -70,7 +74,6 @@ const AltTabWebsite = () => {
     const games = ['tictactoe', 'connect4', 'blackjack', 'numbergame'];
     return games[Math.floor(Math.random() * games.length)];
   });
-  const [activeFilter, setActiveFilter] = useState('All');
   const [letterPositions, setLetterPositions] = useState({
     A: { x: 0, y: 0 },
     L: { x: 0, y: 0 },
@@ -82,29 +85,6 @@ const AltTabWebsite = () => {
   });
   const [draggingLetter, setDraggingLetter] = useState(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-
-  // Die-cut draggable objects - larger sizes for moodboard
-  const dieCutItems = [
-    { id: 'basketball', emoji: '🏀', size: 80 },
-    { id: 'golfclub', emoji: '🏌️', size: 75 },
-    { id: '3dprinter', emoji: '🖨️', size: 70 },
-    { id: 'drill', emoji: '🔧', size: 65 },
-    { id: 'soccer', emoji: '⚽', size: 78 },
-    { id: 'headphones', emoji: '🎧', size: 72 },
-    { id: 'skateboard', emoji: '🛹', size: 85 },
-  ];
-
-  const [dieCutPositions, setDieCutPositions] = useState(() => {
-    const positions = {};
-    dieCutItems.forEach(item => {
-      positions[item.id] = {
-        x: Math.random() * 300 - 150,
-        y: Math.random() * 200 - 100,
-      };
-    });
-    return positions;
-  });
-  const [draggingDieCut, setDraggingDieCut] = useState(null);
 
   // Update time every second for world clocks
   useEffect(() => {
@@ -119,7 +99,8 @@ const AltTabWebsite = () => {
   };
 
   const navigateTo = (page) => {
-    setCurrentPage(page);
+    const path = page === 'home' ? '/' : `/${page}`;
+    navigate(path);
     setMenuOpen(false);
     window.scrollTo(0, 0);
   };
@@ -145,21 +126,7 @@ const AltTabWebsite = () => {
       }));
       setDragStart({ x: e.clientX, y: e.clientY });
     }
-
-    // Handle die-cut dragging
-    if (draggingDieCut) {
-      const deltaX = e.clientX - dragStart.x;
-      const deltaY = e.clientY - dragStart.y;
-      setDieCutPositions(prev => ({
-        ...prev,
-        [draggingDieCut]: {
-          x: prev[draggingDieCut].x + deltaX,
-          y: prev[draggingDieCut].y + deltaY,
-        }
-      }));
-      setDragStart({ x: e.clientX, y: e.clientY });
-    }
-  }, [draggingLetter, draggingDieCut, dragStart]);
+  }, [draggingLetter, dragStart]);
 
   const handleLetterMouseDown = (letter, e) => {
     e.preventDefault();
@@ -167,15 +134,8 @@ const AltTabWebsite = () => {
     setDragStart({ x: e.clientX, y: e.clientY });
   };
 
-  const handleDieCutMouseDown = (id, e) => {
-    e.preventDefault();
-    setDraggingDieCut(id);
-    setDragStart({ x: e.clientX, y: e.clientY });
-  };
-
   const handleMouseUp = useCallback(() => {
     setDraggingLetter(null);
-    setDraggingDieCut(null);
   }, []);
 
   useEffect(() => {
@@ -481,19 +441,26 @@ const AltTabWebsite = () => {
     );
   };
 
-  const NavItem = ({ icon: Icon, label, page }) => (
-    <button
-      onClick={() => navigateTo(page)}
-      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
-        currentPage === page
-          ? 'bg-black/20 text-black shadow-lg scale-105'
-          : 'hover:bg-black/10 text-black/70 hover:text-black'
-      }`}
-    >
-      <Icon size={20} />
-      <span className="font-medium">{label}</span>
-    </button>
-  );
+  const NavItem = ({ icon: Icon, label, page }) => {
+    const path = page === 'home' ? '/' : `/${page}`;
+    return (
+      <Link
+        to={path}
+        onClick={() => {
+          setMenuOpen(false);
+          window.scrollTo(0, 0);
+        }}
+        className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
+          currentPage === page
+            ? 'bg-black/20 text-black shadow-lg scale-105'
+            : 'hover:bg-black/10 text-black/70 hover:text-black'
+        }`}
+      >
+        <Icon size={20} />
+        <span className="font-medium">{label}</span>
+      </Link>
+    );
+  };
 
   const GameSection = () => (
     <div className="w-full">
@@ -665,29 +632,19 @@ const AltTabWebsite = () => {
       }, 3000);
     };
 
-    const categories = ['All', 'Product', 'Experience', 'Research', 'Digital', 'Sport', 'Education', 'Web3'];
-
     const projects = [
-      { name: 'Virginia Tech', category: 'Education', logo: '/images/virginia-tech-logo.svg', description: 'University partnership and research', link: 'https://www.vt.edu/' },
-      { name: 'Live Breathe Futbol', category: 'Sport', logo: '/images/lbf-logo.svg', description: 'Football apparel brand', link: 'https://www.livebreathefutbol.com/' },
-      { name: 'USM Furniture', category: 'Product', logoText: 'USM', description: 'Modular furniture system design', link: 'https://us.usm.com/' },
-      { name: 'Wonder Universe', category: 'Education', logo: 'https://images.unsplash.com/photo-1566140967404-b8b3932483f5?w=200&h=200&fit=crop', description: "Children's museum experience", link: 'https://wonderuniverse.org/' },
-      { name: 'BKYSC', category: 'Sport', logoText: 'BKYSC', description: 'Brooklyn Youth Sports Club', link: 'https://www.brooklynyouthsportsclub.org/' },
-      { name: 'Nike NYC', category: 'Experience', logo: 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/nike.svg', description: 'Retail experience design' },
-      { name: 'MLB Streaming', category: 'Digital', logo: 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/mlb.svg', description: 'Digital streaming platform' },
-      { name: 'Akash Network', category: 'Web3', logoText: 'AKASH', description: 'Decentralized cloud computing', link: 'https://akash.network/' },
-      { name: 'Stanford Research Lab', category: 'Research', logo: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=200&h=200&fit=crop', description: 'Research methodology design' },
-      { name: 'EdTech Platform', category: 'Education', logo: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=200&h=200&fit=crop', description: 'Learning experience design' },
-      { name: 'Retail Analytics', category: 'Digital', logo: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=200&h=200&fit=crop', description: 'Data visualization dashboard' },
-      { name: 'Museum Interactive', category: 'Experience', logo: 'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=200&h=200&fit=crop', description: 'Interactive exhibit design' },
+      { name: 'Virginia Tech', logo: '/images/virginia-tech-logo.svg', description: 'University partnership and research', link: 'https://www.vt.edu/' },
+      { name: 'Live Breathe Futbol', logo: '/images/lbf-logo.svg', description: 'Football apparel brand', link: 'https://www.livebreathefutbol.com/' },
+      { name: 'USM Furniture', logoText: 'USM', description: 'Modular furniture system design', link: 'https://us.usm.com/' },
+      { name: 'Wonder Universe', logo: 'https://images.unsplash.com/photo-1566140967404-b8b3932483f5?w=200&h=200&fit=crop', description: "Children's museum experience", link: 'https://wonderuniverse.org/' },
+      { name: 'BKYSC', logoText: 'BKYSC', description: 'Brooklyn Youth Sports Club', link: 'https://www.brooklynyouthsportsclub.org/' },
+      { name: 'Nike NYC', logo: 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/nike.svg', description: 'Retail experience design' },
+      { name: 'MLB Streaming', logo: 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/mlb.svg', description: 'Digital streaming platform' },
+      { name: 'Akash Network', logoText: 'AKASH', description: 'Decentralized cloud computing', link: 'https://akash.network/' },
     ];
 
-    const filteredProjects = activeFilter === 'All'
-      ? projects
-      : projects.filter(p => p.category === activeFilter);
-
     return (
-      <div className="space-y-12">
+      <div className="space-y-8">
         <div className="text-center space-y-4">
           <h2 className="text-5xl md:text-6xl font-black text-white drop-shadow-lg">Alt-Tab Work</h2>
           <p className="text-xl text-white/80 max-w-2xl mx-auto">
@@ -695,37 +652,20 @@ const AltTabWebsite = () => {
           </p>
         </div>
 
-        {/* Filter Labels */}
-        <div className="flex flex-wrap justify-center gap-2">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveFilter(cat)}
-              className={`px-4 py-2 text-sm font-bold uppercase tracking-wider transition-all ${
-                activeFilter === cat
-                  ? 'bg-white text-black'
-                  : 'bg-white/10 text-white hover:bg-white/20'
-              } border-2 border-white/30 hover:border-white/60`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
         {/* Projects Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {filteredProjects.map((project, i) => {
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {projects.map((project, i) => {
             const CardWrapper = project.link ? 'a' : 'div';
             const linkProps = project.link ? { href: project.link, target: '_blank', rel: 'noopener noreferrer' } : {};
             return (
               <CardWrapper
                 key={i}
                 {...linkProps}
-                className="group bg-white rounded-xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer border-4 border-black hover:shadow-xl block"
+                className="group bg-white rounded-lg p-4 hover:scale-105 transition-all duration-300 cursor-pointer border-2 border-black hover:shadow-lg block"
               >
-                <div className="h-24 flex items-center justify-center mb-4">
+                <div className="h-16 flex items-center justify-center mb-2">
                   {project.logoText ? (
-                    <span className="text-3xl md:text-4xl font-black text-black tracking-tight" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+                    <span className="text-2xl md:text-3xl font-black text-black tracking-tight" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
                       {project.logoText}
                     </span>
                   ) : (
@@ -737,11 +677,8 @@ const AltTabWebsite = () => {
                     />
                   )}
                 </div>
-                <h3 className="font-bold text-black text-center text-lg">{project.name}</h3>
-                <p className="text-sm text-gray-600 text-center mt-2">{project.description}</p>
-                <div className="mt-3 text-center">
-                  <span className="text-xs font-bold uppercase tracking-wider text-gray-400">{project.category}</span>
-                </div>
+                <h3 className="font-bold text-black text-center text-sm">{project.name}</h3>
+                <p className="text-xs text-gray-600 text-center mt-1">{project.description}</p>
               </CardWrapper>
             );
           })}
@@ -829,221 +766,52 @@ const AltTabWebsite = () => {
   };
 
   const MoodboardsPage = () => {
-    const [moodboardOrder, setMoodboardOrder] = useState(null);
-    const [draggedMoodboardItem, setDraggedMoodboardItem] = useState(null);
-
-    const baseMoodboardItems = [
-      // Brand Logos
-      { type: 'image', src: '/images/palace-logo.svg', alt: 'Palace Skateboards', size: 'medium' },
-      { type: 'image', src: '/images/supreme-logo.svg', alt: 'Supreme', size: 'medium' },
-      { type: 'image', src: '/images/dsm-logo.svg', alt: 'Dover Street Market', size: 'medium' },
-      { type: 'image', src: '/images/prada-logo.svg', alt: 'Prada Milano', size: 'medium' },
-      { type: 'image', src: '/images/bddw-logo.svg', alt: 'BDDW', size: 'large' },
-      { type: 'image', src: '/images/judd-logo.svg', alt: 'Judd Foundation', size: 'medium' },
-      { type: 'image', src: '/images/lichen-logo.svg', alt: 'Lichen', size: 'small' },
-      // YouTube Videos (wide format)
-      { type: 'video', src: 'https://img.youtube.com/vi/7IdoDJCssNk/maxresdefault.jpg', alt: 'Skate Video', link: 'https://www.youtube.com/watch?v=7IdoDJCssNk', size: 'xl' },
-      { type: 'video', src: 'https://img.youtube.com/vi/M_0do0LP2tk/maxresdefault.jpg', alt: 'Skate Film', link: 'https://www.youtube.com/watch?v=M_0do0LP2tk', size: 'xl' },
-      { type: 'video', src: 'https://img.youtube.com/vi/XTomk3L1R5I/maxresdefault.jpg', alt: 'Skate Edit', link: 'https://www.youtube.com/watch?v=XTomk3L1R5I', size: 'xl' },
-      { type: 'video', src: 'https://img.youtube.com/vi/cFwytlpCJ9U/maxresdefault.jpg', alt: 'Skate Clip', link: 'https://www.youtube.com/watch?v=cFwytlpCJ9U', size: 'xl' },
-      // Quartersnacks Channel
-      { type: 'text', text: 'QUARTERSNACKS', alt: 'Quartersnacks', size: 'medium', link: 'https://www.youtube.com/@quartersnacksdotcom' },
-      // XL - Hero items
-      { type: 'image', src: 'https://images.unsplash.com/photo-1545419913-775e2e148963?w=1200&q=80', alt: 'Nashville Skyline', size: 'xl' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1594322436404-5a0526db4d13?w=1200&q=80', alt: 'Minimalist Furniture', size: 'xl' },
-      // Large
-      { type: 'image', src: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=1000&q=80', alt: 'Muralist', size: 'large' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=1000&q=80', alt: 'Brutalist Architecture', size: 'large' },
-      // Medium
-      { type: 'image', src: 'https://images.unsplash.com/photo-1577083552431-6e5fd01988ec?w=800&q=80', alt: 'Retail Interior', size: 'medium' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1573790387438-4da905039392?w=800&q=80', alt: 'Fine Art', size: 'medium' },
-      // Small
-      { type: 'image', src: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80', alt: 'Sneaker', size: 'small' },
-      // Large
-      { type: 'image', src: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=1000&q=80', alt: 'Street Artist', size: 'large' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=1000&q=80', alt: 'Japanese Architecture', size: 'large' },
-      // Medium
-      { type: 'image', src: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=800&q=80', alt: 'Abstract Art', size: 'medium' },
-      // Small
-      { type: 'image', src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&q=80', alt: 'Geometric', size: 'small' },
-      // XL
-      { type: 'image', src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80', alt: 'Urban Culture', size: 'xl' },
-      // Medium
-      { type: 'image', src: 'https://images.unsplash.com/photo-1574182245530-967d9b3831af?w=800&q=80', alt: 'Impressionist', size: 'medium' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1582582621959-48d27397dc69?w=800&q=80', alt: 'Street Art', size: 'medium' },
-      // Small
-      { type: 'image', src: 'https://images.unsplash.com/photo-1533158326339-7f3cf2404354?w=600&q=80', alt: 'Neon', size: 'small' },
-      // Large
-      { type: 'image', src: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1000&q=80', alt: 'Fashion', size: 'large' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=1000&q=80', alt: 'Installation', size: 'large' },
-      // Medium
-      { type: 'image', src: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=800&q=80', alt: 'Architecture', size: 'medium' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=800&q=80', alt: 'Sunset', size: 'medium' },
-      // Small
-      { type: 'image', src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&q=80', alt: 'Basketball', size: 'small' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=600&q=80', alt: 'Hoops', size: 'small' },
-      // Frank Lloyd Wright - Fallingwater
-      { type: 'image', src: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80', alt: 'Fallingwater', size: 'xl' },
-      // BDDW style furniture
-      { type: 'image', src: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1000&q=80', alt: 'BDDW Furniture', size: 'large' },
-      // Skate shop interior with bowl
-      { type: 'image', src: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80', alt: 'Retail Space', size: 'xl' },
-      // Graffiti street art
-      { type: 'image', src: 'https://images.unsplash.com/photo-1557672172-298e090bd0f1?w=1000&q=80', alt: 'Graffiti', size: 'large' },
-      { type: 'image', src: 'https://images.unsplash.com/photo-1533158307587-828f0a76ef46?w=800&q=80', alt: 'Street Typography', size: 'medium' },
+    // YouTube videos - user will add more later
+    const videos = [
+      { id: '7IdoDJCssNk', title: 'Skate Video' },
+      { id: 'M_0do0LP2tk', title: 'Skate Film' },
+      { id: 'XTomk3L1R5I', title: 'Skate Edit' },
+      { id: 'cFwytlpCJ9U', title: 'Skate Clip' },
     ];
-
-    // Shuffle function
-    const shuffleArray = (array) => {
-      const newArray = [...array];
-      for (let i = newArray.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-      }
-      return newArray;
-    };
-
-    const moodboardItems = moodboardOrder || baseMoodboardItems;
-
-    const handleShuffle = () => {
-      setMoodboardOrder(shuffleArray(baseMoodboardItems));
-    };
-
-    const handleDragStart = (e, index) => {
-      setDraggedMoodboardItem(index);
-      e.dataTransfer.effectAllowed = 'move';
-    };
-
-    const handleDragOver = (e, index) => {
-      e.preventDefault();
-      if (draggedMoodboardItem === null || draggedMoodboardItem === index) return;
-      const newItems = [...moodboardItems];
-      const draggedItem = newItems[draggedMoodboardItem];
-      newItems.splice(draggedMoodboardItem, 1);
-      newItems.splice(index, 0, draggedItem);
-      setMoodboardOrder(newItems);
-      setDraggedMoodboardItem(index);
-    };
-
-    const handleDragEnd = () => {
-      setDraggedMoodboardItem(null);
-    };
 
     return (
       <div className="space-y-8">
         <div className="text-center space-y-4">
           <h2 className="text-5xl md:text-6xl font-black text-white drop-shadow-lg">Moodboards</h2>
           <p className="text-xl text-white/80 max-w-2xl mx-auto">
-            Visual inspiration from architecture, fine art, and contemporary design
+            Video inspiration from skate culture and contemporary design
           </p>
-          <button
-            onClick={handleShuffle}
-            className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold rounded-full hover:scale-105 transition-all border-2 border-black"
-          >
-            <RefreshCw size={18} className="inline mr-2" />
-            Shuffle
-          </button>
         </div>
 
-        {/* Die-cut draggable objects */}
-        <div className="relative h-32 flex items-center justify-center">
-          {dieCutItems.map((item) => (
+        {/* Video Grid - Wide Format */}
+        <div className="space-y-6">
+          {videos.map((video) => (
             <div
-              key={item.id}
-              onMouseDown={(e) => handleDieCutMouseDown(item.id, e)}
-              style={{
-                position: 'absolute',
-                left: `calc(50% + ${dieCutPositions[item.id].x}px)`,
-                top: `calc(50% + ${dieCutPositions[item.id].y}px)`,
-                fontSize: item.size,
-                cursor: 'grab',
-                zIndex: 30,
-                userSelect: 'none',
-                filter: 'drop-shadow(3px 3px 6px rgba(0,0,0,0.4))',
-                transition: draggingDieCut === item.id ? 'none' : 'transform 0.1s ease-out',
-              }}
-              className="hover:scale-125 active:cursor-grabbing"
+              key={video.id}
+              className="w-full rounded-xl overflow-hidden border-2 border-white/20 hover:border-white/40 transition-all"
+              style={{ aspectRatio: '16/9' }}
             >
-              {item.emoji}
+              <iframe
+                src={`https://www.youtube.com/embed/${video.id}`}
+                title={video.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
             </div>
           ))}
         </div>
 
-        {/* Masonry Grid */}
-        <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
-          {moodboardItems.map((item, i) => {
-            const heightClass = item.size === 'xl' ? 'h-96 md:h-[28rem]' : item.size === 'large' ? 'h-80 md:h-96' : item.size === 'medium' ? 'h-64 md:h-72' : 'h-48 md:h-56';
-
-            if (item.type === 'video') {
-              return (
-                <a
-                  key={i}
-                  href={item.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, i)}
-                  onDragOver={(e) => handleDragOver(e, i)}
-                  onDragEnd={handleDragEnd}
-                  className={`block ${heightClass} rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4 cursor-grab active:cursor-grabbing ${draggedMoodboardItem === i ? 'opacity-50' : ''}`}
-                >
-                  <img src={item.src} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-14 h-14 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                      <div className="w-0 h-0 border-t-6 border-t-transparent border-b-6 border-b-transparent ml-1" style={{ borderLeftWidth: '12px', borderLeftColor: 'white', borderLeftStyle: 'solid' }} />
-                    </div>
-                  </div>
-                </a>
-              );
-            }
-
-            if (item.type === 'logo') {
-              return (
-                <div
-                  key={i}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, i)}
-                  onDragOver={(e) => handleDragOver(e, i)}
-                  onDragEnd={handleDragEnd}
-                  className={`${heightClass} rounded-xl bg-white border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4 flex items-center justify-center p-6 cursor-grab active:cursor-grabbing ${draggedMoodboardItem === i ? 'opacity-50' : ''}`}
-                >
-                  <img src={item.src} alt="" loading="lazy" decoding="async" className="max-w-full max-h-full object-contain" />
-                </div>
-              );
-            }
-
-            if (item.type === 'text') {
-              const TextWrapper = item.link ? 'a' : 'div';
-              const textLinkProps = item.link ? { href: item.link, target: '_blank', rel: 'noopener noreferrer' } : {};
-              return (
-                <TextWrapper
-                  key={i}
-                  {...textLinkProps}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, i)}
-                  onDragOver={(e) => handleDragOver(e, i)}
-                  onDragEnd={handleDragEnd}
-                  className={`${heightClass} rounded-xl bg-black border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4 flex items-center justify-center p-6 cursor-grab active:cursor-grabbing ${draggedMoodboardItem === i ? 'opacity-50' : ''} ${item.link ? 'cursor-pointer' : ''}`}
-                >
-                  <span className="text-white font-black text-2xl md:text-3xl text-center tracking-tight" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>{item.text}</span>
-                  {item.link && <span className="absolute bottom-2 right-2 text-white/50 text-xs">↗</span>}
-                </TextWrapper>
-              );
-            }
-
-            return (
-              <div
-                key={i}
-                draggable
-                onDragStart={(e) => handleDragStart(e, i)}
-                onDragOver={(e) => handleDragOver(e, i)}
-                onDragEnd={handleDragEnd}
-                className={`${heightClass} rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:border-white/50 transition-all duration-300 hover:scale-[1.02] overflow-hidden relative group break-inside-avoid mb-4 cursor-grab active:cursor-grabbing ${draggedMoodboardItem === i ? 'opacity-50' : ''}`}
-              >
-                <img src={item.src} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
-              </div>
-            );
-          })}
+        {/* Quartersnacks Channel Link */}
+        <div className="text-center">
+          <a
+            href="https://www.youtube.com/@quartersnacksdotcom"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block px-8 py-4 bg-black text-white font-bold text-xl rounded-lg border-2 border-white/30 hover:border-white/60 hover:bg-white/10 transition-all"
+          >
+            QUARTERSNACKS →
+          </a>
         </div>
       </div>
     );
@@ -1191,12 +959,12 @@ const AltTabWebsite = () => {
 
       <nav className="relative z-50 p-4 md:p-6 border-b-4 border-black bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400">
         <div className="flex justify-between items-center max-w-7xl mx-auto">
-          <button
-            onClick={() => navigateTo('home')}
+          <Link
+            to="/"
             className="text-2xl md:text-3xl font-black hover:scale-110 transition-transform text-black drop-shadow-sm"
           >
             ALT-TAB
-          </button>
+          </Link>
 
           <div className="flex items-center gap-3">
             {/* Theme Toggle */}
@@ -1237,11 +1005,13 @@ const AltTabWebsite = () => {
       </nav>
 
       <main className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
-        {currentPage === 'home' && <HomePage />}
-        {currentPage === 'projects' && <ProjectsPage />}
-        {currentPage === 'moodboards' && <MoodboardsPage />}
-        {currentPage === 'about' && <AboutPage />}
-        {currentPage === 'shop' && <ShopPage />}
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/moodboards" element={<MoodboardsPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/shop" element={<ShopPage />} />
+        </Routes>
       </main>
 
       <footer className={`relative z-10 text-center py-8 text-sm ${darkMode ? 'text-gray-600' : 'text-white/80'}`}>

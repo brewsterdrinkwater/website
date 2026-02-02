@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 250" width="300" height="250">
-  <rect fill="white" width="300" height="250"/>
-  <polygon points="150,220 30,50 270,50" fill="none" stroke="#333" stroke-width="3"/>
-  <text x="150" y="100" text-anchor="middle" font-family="Times, serif" font-size="36" font-weight="bold" fill="#333">PRADA</text>
-  <text x="150" y="135" text-anchor="middle" font-family="Times, serif" font-size="18" fill="#333">MILANO</text>
-  <circle cx="150" cy="160" r="20" fill="none" stroke="#333" stroke-width="1.5"/>
-  <text x="150" y="165" text-anchor="middle" font-family="Times, serif" font-size="8" fill="#333">DAL 1913</text>
-</svg>
