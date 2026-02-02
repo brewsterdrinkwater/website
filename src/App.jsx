@@ -892,16 +892,23 @@ const AltTabWebsite = () => {
   const MoodboardsPage = () => {
     const [activeVideo, setActiveVideo] = useState(null);
 
-    // Video collection - easy to add new videos: just add { id: 'YOUTUBE_ID', title: 'Title' }
+    // Video collection - easy to add new videos: just add 'VIDEO_ID'
     const videos = [
-      { id: '7IdoDJCssNk', title: 'Skate Video' },
-      { id: 'M_0do0LP2tk', title: 'Skate Film' },
-      { id: 'XTomk3L1R5I', title: 'Skate Edit' },
-      { id: 'cFwytlpCJ9U', title: 'Skate Clip' },
-      // Add more videos here: { id: 'VIDEO_ID', title: 'Video Title' },
+      '7IdoDJCssNk',
+      'M_0do0LP2tk',
+      'XTomk3L1R5I',
+      'cFwytlpCJ9U',
+      'l126-q8Ne5I',
+      '0JpVNPH6cl8',
+      'P_QJKaKD-i8',
+      'mBjo4Dmsmok',
+      'sKE1nLc5P_c',
+      '0zIVTDbve7k',
+      'ZYAzo5OdqHM',
+      // Add more video IDs here
     ];
 
-    // Get YouTube thumbnail URL (maxresdefault for HD, hqdefault as fallback)
+    // Get YouTube thumbnail URL
     const getThumbnail = (videoId) => `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
     return (
@@ -913,32 +920,28 @@ const AltTabWebsite = () => {
           </p>
         </div>
 
-        {/* Video Thumbnail Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-          {videos.map((video) => (
+        {/* Video Thumbnail Grid - Wider tiles */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 -mx-4 md:mx-0">
+          {videos.map((videoId) => (
             <button
-              key={video.id}
-              onClick={() => setActiveVideo(video)}
-              className="group relative aspect-video bg-black/40 rounded-lg overflow-hidden border-2 border-white/10 hover:border-white/40 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
+              key={videoId}
+              onClick={() => setActiveVideo(videoId)}
+              className="group relative aspect-video bg-black/40 overflow-hidden border border-white/10 hover:border-white/40 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl md:rounded-lg"
             >
               {/* Thumbnail */}
               <img
-                src={getThumbnail(video.id)}
-                alt={video.title}
+                src={getThumbnail(videoId)}
+                alt=""
                 loading="lazy"
-                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
               />
               {/* Play button overlay */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-12 h-12 md:w-14 md:h-14 bg-black/60 group-hover:bg-red-600 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110">
-                  <svg className="w-5 h-5 md:w-6 md:h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="w-14 h-14 md:w-16 md:h-16 bg-black/70 group-hover:bg-red-600 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+                  <svg className="w-6 h-6 md:w-7 md:h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
                   </svg>
                 </div>
-              </div>
-              {/* Title overlay */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 md:p-3">
-                <p className="text-white text-xs md:text-sm font-medium truncate">{video.title}</p>
               </div>
             </button>
           ))}
@@ -974,15 +977,13 @@ const AltTabWebsite = () => {
               {/* Video player */}
               <div className="aspect-video bg-black rounded-lg overflow-hidden">
                 <iframe
-                  src={`https://www.youtube.com/embed/${activeVideo.id}?autoplay=1&rel=0`}
-                  title={activeVideo.title}
+                  src={`https://www.youtube.com/embed/${activeVideo}?autoplay=1&rel=0`}
+                  title="Video"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   className="w-full h-full"
                 />
               </div>
-              {/* Video title */}
-              <p className="text-white text-center mt-4 text-lg font-medium">{activeVideo.title}</p>
             </div>
           </div>
         )}
