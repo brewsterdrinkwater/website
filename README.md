@@ -5,6 +5,7 @@ A multi-disciplinary think tank website built with React, Vite, and Tailwind CSS
 ## Tech Stack
 
 - **React 18** - UI framework
+- **React Router** - Client-side routing (URLs like /projects, /moodboards)
 - **Vite** - Build tool and dev server
 - **Tailwind CSS** - Utility-first CSS framework
 - **Lucide React** - Icon library
@@ -31,168 +32,141 @@ npm run preview
 ```
 src/
 ├── App.jsx          # Main application component (all pages and components)
-├── main.jsx         # React entry point
+├── main.jsx         # React entry point with BrowserRouter
 └── index.css        # Tailwind CSS imports and global styles
 
-public/              # Static assets
+public/
+├── images/          # Logo images (virginia-tech-logo.svg, lbf-logo.svg)
+└── vite.svg
+
 dist/                # Production build output
 ```
+
+## URL Routing
+
+The website uses React Router for client-side navigation. URLs are:
+
+- `/` - Home page
+- `/projects` - Projects page
+- `/moodboards` - Moodboards page (YouTube videos)
+- `/about` - About/Philosophy page
+- `/shop` - Shop page
+
+---
+
+## How to Add a New Page
+
+### Step 1: Create the Page Component
+
+In `src/App.jsx`, add a new page component inside the `AltTabWebsite` component (before the `return` statement):
+
+```javascript
+const MyNewPage = () => {
+  return (
+    <div className="space-y-8">
+      <div className="text-center space-y-4">
+        <h2 className="text-5xl md:text-6xl font-black text-white drop-shadow-lg">Page Title</h2>
+        <p className="text-xl text-white/80 max-w-2xl mx-auto">
+          Page description here
+        </p>
+      </div>
+
+      {/* Your page content */}
+      <div>
+        Content goes here
+      </div>
+    </div>
+  );
+};
+```
+
+### Step 2: Add the Route
+
+Find the `<Routes>` section in App.jsx and add your new route:
+
+```javascript
+<Routes>
+  <Route path="/" element={<HomePage />} />
+  <Route path="/projects" element={<ProjectsPage />} />
+  <Route path="/moodboards" element={<MoodboardsPage />} />
+  <Route path="/about" element={<AboutPage />} />
+  <Route path="/shop" element={<ShopPage />} />
+  <Route path="/mynewpage" element={<MyNewPage />} />  {/* Add this */}
+</Routes>
+```
+
+### Step 3: Add Navigation Link
+
+Find the `NavItem` components in the navigation section and add your new link:
+
+```javascript
+<NavItem icon={YourIcon} label="My Page" page="mynewpage" />
+```
+
+Import your icon from lucide-react at the top of the file:
+
+```javascript
+import { Menu, X, Sparkles, Grid3x3, Image, BookOpen, ShoppingBag, YourIcon } from 'lucide-react';
+```
+
+### Step 4: Test
+
+1. Run `npm run dev`
+2. Navigate to `http://localhost:5173/mynewpage`
+3. Verify the URL changes and the page displays correctly
 
 ---
 
 ## Content Management Guide
 
-All content is managed in `src/App.jsx`. Below are instructions for updating each dynamic section.
+All content is managed in `src/App.jsx`.
 
 ### Projects Page
 
-Located in the `ProjectsPage` component (~line 783). Edit the `projects` array:
+Located in the `ProjectsPage` component. Edit the `projects` array:
 
 ```javascript
 const projects = [
   {
-    title: 'Project Name',           // Display title
-    category: 'Category Name',       // e.g., 'Digital Goods', 'Furniture', 'Web Design'
-    size: 'large',                   // Options: 'small', 'medium', 'large'
-    image: 'https://...'             // Image URL (Unsplash recommended)
+    name: 'Project Name',
+    logo: '/images/logo.svg',        // Local image in public/images/
+    // OR
+    logoText: 'TEXT',                // Text displayed as logo
+    description: 'Short description',
+    link: 'https://example.com'      // Optional: external link
   },
-  // Add more projects...
 ];
 ```
-
-**Image Size Guidelines:**
-- `small`: 400x400px recommended
-- `medium`: 600x400px recommended
-- `large`: 800x600px recommended
-
-**Using Unsplash Images:**
-```
-https://images.unsplash.com/photo-ID?w=WIDTH&h=HEIGHT&fit=crop
-```
-
----
 
 ### Moodboards Page
 
-Located in the `MoodboardsPage` component (~line 932). Edit the `moodboardImages` array:
+Located in the `MoodboardsPage` component. Edit the `videos` array to add YouTube videos:
 
 ```javascript
-const moodboardImages = [
-  {
-    src: 'https://images.unsplash.com/...',  // Image URL
-    alt: 'Image description',                 // Alt text (shows on hover)
-    category: 'Category Name'                 // e.g., 'Skate Culture', 'Footwear', 'Art'
-  },
-  // Add more images...
+const videos = [
+  { id: 'YOUTUBE_VIDEO_ID', title: 'Video Title' },
 ];
 ```
 
-**Best Practices:**
-- Use square images (600x600px recommended)
-- Add descriptive alt text for accessibility
-- Group by category for visual coherence
+To get the video ID, take the part after `v=` from a YouTube URL:
+- URL: `https://www.youtube.com/watch?v=7IdoDJCssNk`
+- ID: `7IdoDJCssNk`
 
----
+### News Links (Homepage Sidebar)
 
-### Shop Page
-
-Located in the `ShopPage` component (~line 1053). Currently displays an "Under Construction" notice.
-
-**To add products when ready:**
-
-1. Create a `products` array similar to projects:
-
-```javascript
-const products = [
-  {
-    title: 'Product Name',
-    price: 29.99,
-    image: 'https://...',
-    description: 'Short description',
-    link: 'https://checkout-url.com'  // External checkout link
-  },
-];
-```
-
-2. Replace the construction notice with a product grid
-3. Consider integrating with Shopify, Gumroad, or Stripe for payments
-
----
-
-### News Links (Headlines)
-
-Located at the top of the file (~line 8). Edit the `NEWS_LINKS` array:
+Located at the top of the file. Edit the `NEWS_LINKS` array:
 
 ```javascript
 const NEWS_LINKS = [
   { title: 'SITE NAME', url: 'https://example.com' },
-  // Add more links...
 ];
 ```
-
-Links appear in the homepage sidebar in alphabetical order.
-
----
-
-### World Clocks
-
-Located in `HomePage` component (~line 695). Edit the clock array:
-
-```javascript
-{[
-  { city: 'CITY NAME', tz: 'Timezone/Region' },
-  // Examples:
-  // { city: 'NASHVILLE', tz: 'America/Chicago' },
-  // { city: 'LONDON', tz: 'Europe/London' },
-  // { city: 'TOKYO', tz: 'Asia/Tokyo' },
-].map((clock) => (
-```
-
-Find timezone strings at: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-
----
-
-## Static Pages
-
-These pages require less frequent updates:
-
-### Home Page
-- Header branding and tagline (~line 665)
-- About section tiles (~line 725)
-- Navigation buttons (~line 747)
-
-### About Page
-- Philosophy cards (~line 994)
-- Mission statement (~line 1036)
-- Content is mostly static brand copy
-
----
-
-## Customization
-
-### Background Image
-
-Edit line 5:
-```javascript
-const BACKGROUND_IMAGE = 'https://images.unsplash.com/...';
-```
-
-### Brand Colors
-
-The site uses a yellow-orange gradient navbar. Key color classes:
-- `bg-yellow-300`, `bg-yellow-400`, `bg-orange-400` - Navbar
-- `bg-red-600` - Accent headers
-- `bg-cyan-500` - Interactive elements
-
-### Dark/Light Mode
-
-Toggle is built-in. Dark mode uses light grays; default mode uses the background image with overlay.
 
 ---
 
 ## Deployment
 
-The site is configured for Vercel deployment.
+The site is configured for Vercel with SPA routing support.
 
 **vercel.json:**
 ```json
@@ -206,6 +180,8 @@ The site is configured for Vercel deployment.
 }
 ```
 
+The `rewrites` configuration ensures that all routes (like /projects, /moodboards) work correctly by redirecting to index.html for client-side routing.
+
 **To deploy:**
 1. Push changes to the repository
 2. Vercel auto-deploys from connected branch
@@ -213,23 +189,16 @@ The site is configured for Vercel deployment.
 
 ---
 
-## SEO Considerations
+## Adding Images
 
-For production, consider adding to `index.html`:
-
-```html
-<title>Alt-Tab | Multi-Disciplinary Think Tank | Nashville, TN</title>
-<meta name="description" content="Alt-Tab is a multi-disciplinary think tank in Nashville, TN. We design human-centric experiences across digital goods, furniture, sportswear, and policy.">
-<meta property="og:title" content="Alt-Tab Think Tank">
-<meta property="og:description" content="Multi-disciplinary design studio in Nashville, TN">
-<meta property="og:image" content="https://your-domain.com/og-image.jpg">
-<link rel="canonical" href="https://your-domain.com">
-```
+1. Add images to `public/images/`
+2. Reference them with `/images/filename.svg` (note: starts with `/`)
+3. For SVG logos, you can create them or use tools like Figma
 
 ---
 
 ## Support
 
 - Instagram: [@alttab.xyz](https://www.instagram.com/alttab.xyz/)
-- Location: Eartth
+- Location: Earth
 - Founded: Yes
