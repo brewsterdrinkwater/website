@@ -909,16 +909,22 @@ const AltTabWebsite = () => {
       'tnFPQ57l0Dg',
       'RqQGUJK7Na4',
       'pYdkiWIPp-s',
-      // Add more video IDs here
+      'vtBoQuAtX3I',
     ];
 
-    // Shuffle videos and assign random sizes
+    // Shuffle videos and assign random sizes with weighted distribution
     const getShuffledVideos = useCallback(() => {
-      const sizes = ['small', 'medium', 'large'];
+      // Weighted sizes: more small/medium, fewer large to create visual variety
+      const getRandomSize = () => {
+        const rand = Math.random();
+        if (rand < 0.35) return 'small';
+        if (rand < 0.7) return 'medium';
+        return 'large';
+      };
       const shuffled = [...videos].sort(() => Math.random() - 0.5);
-      return shuffled.map((id, i) => ({
+      return shuffled.map((id) => ({
         id,
-        size: sizes[i % 3] // Distribute sizes evenly
+        size: getRandomSize()
       }));
     }, [shuffleKey]);
 
