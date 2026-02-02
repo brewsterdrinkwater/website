@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Sparkles, Grid3x3, Image, BookOpen, ShoppingBag, RefreshCw, Construction, Instagram, Sun, Moon } from 'lucide-react';
 
@@ -953,10 +953,9 @@ const AltTabWebsite = () => {
 
   const MoodboardsPage = () => {
     const [activeVideo, setActiveVideo] = useState(null);
-    const [shuffleKey, setShuffleKey] = useState(0);
 
     // Video collection - easy to add new videos: just add 'VIDEO_ID'
-    const videos = [
+    const videos = useMemo(() => [
       '7IdoDJCssNk',
       'M_0do0LP2tk',
       'XTomk3L1R5I',
@@ -972,11 +971,10 @@ const AltTabWebsite = () => {
       'RqQGUJK7Na4',
       'pYdkiWIPp-s',
       'vtBoQuAtX3I',
-    ];
+    ], []);
 
-    // Shuffle videos and assign random sizes with weighted distribution
-    const getShuffledVideos = useCallback(() => {
-      // Weighted sizes: more small/medium, fewer large to create visual variety
+    // Generate shuffled videos with random sizes
+    const generateShuffledVideos = useCallback(() => {
       const getRandomSize = () => {
         const rand = Math.random();
         if (rand < 0.35) return 'small';
@@ -988,14 +986,29 @@ const AltTabWebsite = () => {
         id,
         size: getRandomSize()
       }));
-    }, [shuffleKey]);
+    }, [videos]);
 
-    const [displayVideos, setDisplayVideos] = useState(() => getShuffledVideos());
+    // Initialize displayVideos once on mount - stable reference
+    const [displayVideos, setDisplayVideos] = useState(() => {
+      const getRandomSize = () => {
+        const rand = Math.random();
+        if (rand < 0.35) return 'small';
+        if (rand < 0.7) return 'medium';
+        return 'large';
+      };
+      const videoIds = [
+        '7IdoDJCssNk', 'M_0do0LP2tk', 'XTomk3L1R5I', 'cFwytlpCJ9U',
+        'l126-q8Ne5I', '0JpVNPH6cl8', 'P_QJKaKD-i8', 'mBjo4Dmsmok',
+        'sKE1nLc5P_c', '0zIVTDbve7k', 'ZYAzo5OdqHM', 'tnFPQ57l0Dg',
+        'RqQGUJK7Na4', 'pYdkiWIPp-s', 'vtBoQuAtX3I',
+      ];
+      const shuffled = [...videoIds].sort(() => Math.random() - 0.5);
+      return shuffled.map((id) => ({ id, size: getRandomSize() }));
+    });
 
-    const handleShuffle = () => {
-      setShuffleKey(k => k + 1);
-      setDisplayVideos(getShuffledVideos());
-    };
+    const handleShuffle = useCallback(() => {
+      setDisplayVideos(generateShuffledVideos());
+    }, [generateShuffledVideos]);
 
     // Get YouTube thumbnail URL
     const getThumbnail = (videoId) => `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
@@ -1257,20 +1270,10 @@ const AltTabWebsite = () => {
           </Link>
 
           <div className="hidden md:flex items-center gap-2">
-            <NavItem icon={Sparkles} label="Home" page="home" />
             <NavItem icon={BookOpen} label="About" page="about" />
             <NavItem icon={Image} label="Moodboards" page="moodboards" />
             <NavItem icon={Grid3x3} label="Projects" page="projects" />
             <NavItem icon={ShoppingBag} label="Shop" page="shop" />
-            {/* Walt-tab Button */}
-            <a
-              href="https://www.walt-tab.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ml-2 px-4 py-2 bg-gradient-to-r from-orange-400 to-yellow-400 text-black font-bold rounded-full hover:scale-105 hover:brightness-110 transition-all border-2 border-black animate-pulse hover:animate-none"
-            >
-              Walt-tab
-            </a>
           </div>
 
           <div className="flex items-center gap-2">
@@ -1298,14 +1301,6 @@ const AltTabWebsite = () => {
             <NavItem icon={Image} label="Moodboards" page="moodboards" />
             <NavItem icon={Grid3x3} label="Projects" page="projects" />
             <NavItem icon={ShoppingBag} label="Shop" page="shop" />
-            <a
-              href="https://www.walt-tab.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block text-center px-4 py-3 bg-gradient-to-r from-orange-400 to-yellow-400 text-black font-bold rounded-lg hover:brightness-110 transition-all border-2 border-black"
-            >
-              Walt-tab
-            </a>
           </div>
         )}
       </nav>
