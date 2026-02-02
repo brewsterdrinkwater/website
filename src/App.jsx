@@ -85,6 +85,83 @@ const AltTabWebsite = () => {
   });
   const [draggingLetter, setDraggingLetter] = useState(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.matchMedia('(max-width: 768px)').matches);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Shake detection for mobile - scatter letters
+  useEffect(() => {
+    if (!isMobile) return;
+
+    let lastX = 0, lastY = 0, lastZ = 0;
+    let shakeThreshold = 15;
+
+    const handleMotion = (e) => {
+      const { x, y, z } = e.accelerationIncludingGravity || {};
+      if (x === null) return;
+
+      const deltaX = Math.abs(x - lastX);
+      const deltaY = Math.abs(y - lastY);
+      const deltaZ = Math.abs(z - lastZ);
+
+      if ((deltaX > shakeThreshold && deltaY > shakeThreshold) ||
+          (deltaX > shakeThreshold && deltaZ > shakeThreshold) ||
+          (deltaY > shakeThreshold && deltaZ > shakeThreshold)) {
+        // Scatter letters randomly
+        setLetterPositions({
+          A: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
+          L: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
+          T: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
+          '-': { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
+          T2: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
+          A2: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
+          B: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
+        });
+      }
+
+      lastX = x; lastY = y; lastZ = z;
+    };
+
+    window.addEventListener('devicemotion', handleMotion);
+    return () => window.removeEventListener('devicemotion', handleMotion);
+  }, [isMobile]);
+
+  // Touch to scatter a single letter (mobile)
+  const handleLetterTouch = (letter) => {
+    if (!isMobile) return;
+    setLetterPositions(prev => ({
+      ...prev,
+      [letter]: {
+        x: (Math.random() - 0.5) * 120,
+        y: (Math.random() - 0.5) * 80,
+      }
+    }));
+  };
+
+  // Double tap to reset all letters
+  const [lastTap, setLastTap] = useState(0);
+  const handleHeaderDoubleTap = () => {
+    const now = Date.now();
+    if (now - lastTap < 300) {
+      // Double tap detected - reset all letters
+      setLetterPositions({
+        A: { x: 0, y: 0 },
+        L: { x: 0, y: 0 },
+        T: { x: 0, y: 0 },
+        '-': { x: 0, y: 0 },
+        T2: { x: 0, y: 0 },
+        A2: { x: 0, y: 0 },
+        B: { x: 0, y: 0 },
+      });
+    }
+    setLastTap(now);
+  };
 
   // Update time every second for world clocks
   useEffect(() => {
@@ -504,7 +581,11 @@ const AltTabWebsite = () => {
           <span className="text-xs uppercase tracking-widest font-bold text-black">Established</span>
           <span className="text-xl">★</span>
         </div>
-        <h1 className="text-6xl md:text-8xl font-black text-black leading-none select-none" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+        <h1
+          className="text-6xl md:text-8xl font-black text-black leading-none select-none"
+          style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+          onTouchEnd={handleHeaderDoubleTap}
+        >
           {[
             { key: 'A', char: 'A' },
             { key: 'L', char: 'L' },
@@ -517,16 +598,17 @@ const AltTabWebsite = () => {
             <span
               key={letter.key}
               onMouseDown={(e) => handleLetterMouseDown(letter.key, e)}
+              onTouchStart={() => handleLetterTouch(letter.key)}
               style={{
                 display: 'inline-block',
                 color: '#000000',
                 textShadow: '2px 2px 0px #ff0000, 4px 4px 0px #0000ff',
-                cursor: 'grab',
+                cursor: isMobile ? 'pointer' : 'grab',
                 transform: `translate(${letterPositions[letter.key].x}px, ${letterPositions[letter.key].y}px)`,
-                transition: draggingLetter === letter.key ? 'none' : 'transform 0.1s ease-out',
+                transition: draggingLetter === letter.key ? 'none' : 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
                 userSelect: 'none',
               }}
-              className="hover:scale-110 active:cursor-grabbing"
+              className="hover:scale-110 active:cursor-grabbing active:scale-95"
             >
               {letter.char}
             </span>
@@ -535,6 +617,11 @@ const AltTabWebsite = () => {
         <p className="text-base md:text-lg text-black font-bold uppercase px-4">
           ★★ Multi-Disciplinary Think Tank ★★
         </p>
+        {isMobile && (
+          <p className="text-xs text-black/60 mt-2 animate-pulse">
+            Tap letters to scatter • Double-tap to reset • Shake to shuffle
+          </p>
+        )}
       </div>
 
       {/* World Clocks */}
@@ -589,12 +676,46 @@ const AltTabWebsite = () => {
       </div>
 
 
+      {/* Focus Areas */}
+      <div className="border-4 border-black bg-white">
+        <div className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black px-4 py-3 border-b-4 border-black">
+          <h2 className="font-bold text-2xl md:text-3xl uppercase text-center">Areas of Focus</h2>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-5">
+          {[
+            { name: 'Product Development', icon: '⚡' },
+            { name: 'Research', icon: '🔬' },
+            { name: 'Civic', icon: '🏛️' },
+            { name: 'Education', icon: '📚' },
+            { name: 'Sport', icon: '⚽' },
+          ].map((area, i) => (
+            <div key={i} className={`border-2 border-black p-6 ${i % 2 === 0 ? 'bg-yellow-50' : 'bg-orange-50'} text-center`}>
+              <span className="text-3xl mb-2 block">{area.icon}</span>
+              <h3 className="font-bold text-black text-sm md:text-base">{area.name}</h3>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Walt-tab Link */}
+      <div className="text-center">
+        <a
+          href="https://www.walt-tab.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block px-8 py-3 rounded-full bg-gradient-to-r from-yellow-400 via-yellow-300 to-orange-400 text-black font-bold text-lg border-2 border-black hover:scale-105 hover:brightness-110 transition-all"
+          style={{ boxShadow: '3px 3px 0px black' }}
+        >
+          Walt-tab
+        </a>
+      </div>
+
       {/* Navigation buttons - now functional with neon colors */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { text: 'VIEW PROJECTS', color: 'bg-gradient-to-r from-yellow-400 to-orange-500', page: 'projects' },
+          { text: 'ABOUT', color: 'bg-gradient-to-r from-yellow-400 to-orange-500', page: 'about' },
           { text: 'MOODBOARDS', color: 'bg-gradient-to-r from-orange-400 to-yellow-500', page: 'moodboards' },
-          { text: 'ABOUT', color: 'bg-gradient-to-r from-yellow-500 to-orange-400', page: 'about' },
+          { text: 'VIEW PROJECTS', color: 'bg-gradient-to-r from-yellow-500 to-orange-400', page: 'projects' },
           { text: 'SHOP', color: 'bg-gradient-to-r from-orange-500 to-yellow-400', page: 'shop' }
         ].map((link, i) => (
           <button
@@ -636,19 +757,22 @@ const AltTabWebsite = () => {
       { name: 'Virginia Tech', logo: '/images/virginia-tech-logo.svg', description: 'University partnership and research', link: 'https://www.vt.edu/' },
       { name: 'Live Breathe Futbol', logo: '/images/lbf-logo.svg', description: 'Football apparel brand', link: 'https://www.livebreathefutbol.com/' },
       { name: 'USM Furniture', logoText: 'USM', description: 'Modular furniture system design', link: 'https://us.usm.com/' },
-      { name: 'Wonder Universe', logo: 'https://images.unsplash.com/photo-1566140967404-b8b3932483f5?w=200&h=200&fit=crop', description: "Children's museum experience", link: 'https://wonderuniverse.org/' },
+      { name: 'Wonder Universe', logoText: 'WU', description: "Children's museum experience", link: 'https://wonderuniverse.org/' },
       { name: 'BKYSC', logoText: 'BKYSC', description: 'Brooklyn Youth Sports Club', link: 'https://www.brooklynyouthsportsclub.org/' },
-      { name: 'Nike NYC', logo: 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/nike.svg', description: 'Retail experience design' },
-      { name: 'MLB Streaming', logo: 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/mlb.svg', description: 'Digital streaming platform' },
+      { name: 'Nike NYC', logoText: 'NIKE', description: 'Retail experience design' },
+      { name: 'MLB Streaming', logoText: 'MLB', description: 'Digital streaming platform' },
       { name: 'Akash Network', logoText: 'AKASH', description: 'Decentralized cloud computing', link: 'https://akash.network/' },
     ];
 
     return (
       <div className="space-y-8">
         <div className="text-center space-y-4">
-          <h2 className="text-5xl md:text-6xl font-black text-white drop-shadow-lg">Alt-Tab Work</h2>
-          <p className="text-xl text-white/80 max-w-2xl mx-auto">
-            From digital tools to physical spaces, policy frameworks to immersive experiences
+          <h2 className="text-5xl md:text-6xl font-black text-white drop-shadow-lg">Supportive Partners</h2>
+          <p className="text-lg text-white/90 italic max-w-2xl mx-auto">
+            "Sometimes we do work for us; sometimes we do work with you."
+          </p>
+          <p className="text-base text-white/80 max-w-3xl mx-auto leading-relaxed">
+            The organizations featured here represent collaborations where we were able to share our work publicly. Much of what the Alt-Tab team builds is protected under NDA, as we often embed directly within our clients' internal teams. As a result, this page showcases only a portion of our portfolio.
           </p>
         </div>
 
@@ -827,6 +951,25 @@ const AltTabWebsite = () => {
           </p>
         </div>
 
+        {/* Mission - First and foremost */}
+        <div className="p-8 md:p-12 rounded-2xl bg-gradient-to-br from-cyan-500/30 to-purple-500/30 backdrop-blur-md border-2 border-white/30">
+          <div className="max-w-3xl mx-auto text-center">
+            <h3 className="text-3xl font-bold text-white mb-6">Our Mission</h3>
+            <p className="text-xl text-white/90 leading-relaxed mb-6">
+              Alt-Tab exists to bridge the gap between human needs and technological possibility. We are a think tank dedicated to designing experiences and products that enhance the quality of human life.
+            </p>
+            <p className="text-lg text-white/80 leading-relaxed mb-6">
+              Whether developing digital platforms, physical products, policy frameworks, or immersive experiences, we maintain an unwavering commitment to thoughtful, intentional design that serves people first.
+            </p>
+            <p className="text-lg text-white/80 leading-relaxed mb-6">
+              Our team is led by real humans who prefer working in the shadows. We're not chasing clout or followers—we'd rather meet you for coffee, shake your hand, and have a real conversation. We believe the best ideas emerge from genuine connection, not comment sections.
+            </p>
+            <p className="text-base text-white/60 italic">
+              Yes, we're actually human. We have coffee addictions, strong opinions about fonts, and we occasionally forget to unmute ourselves on video calls. No AI wrote this. (We checked.)
+            </p>
+          </div>
+        </div>
+
         <div className="grid md:grid-cols-2 gap-8">
           <div className="p-8 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/30">
             <h3 className="text-2xl font-bold text-white mb-4">Human-Centric Design</h3>
@@ -865,18 +1008,6 @@ const AltTabWebsite = () => {
             </p>
             <p className="text-white/80 leading-relaxed">
               This cross-pollination of disciplines enables us to approach challenges from multiple angles and deliver holistic solutions that address both immediate needs and long-term impact.
-            </p>
-          </div>
-        </div>
-
-        <div className="p-8 md:p-12 rounded-2xl bg-gradient-to-br from-cyan-500/30 to-purple-500/30 backdrop-blur-md border-2 border-white/30">
-          <div className="max-w-3xl mx-auto text-center">
-            <h3 className="text-3xl font-bold text-white mb-6">Our Mission</h3>
-            <p className="text-xl text-white/90 leading-relaxed mb-6">
-              Alt-Tab exists to bridge the gap between human needs and technological possibility. We are a think tank dedicated to designing experiences and products that enhance the quality of human life.
-            </p>
-            <p className="text-lg text-white/80 leading-relaxed">
-              Whether developing digital platforms, physical products, policy frameworks, or immersive experiences, we maintain an unwavering commitment to thoughtful, intentional design that serves people first.
             </p>
           </div>
         </div>
@@ -979,9 +1110,9 @@ const AltTabWebsite = () => {
 
           <div className="hidden md:flex gap-2">
             <NavItem icon={Sparkles} label="Home" page="home" />
-            <NavItem icon={Grid3x3} label="Projects" page="projects" />
-            <NavItem icon={Image} label="Moodboards" page="moodboards" />
             <NavItem icon={BookOpen} label="About" page="about" />
+            <NavItem icon={Image} label="Moodboards" page="moodboards" />
+            <NavItem icon={Grid3x3} label="Projects" page="projects" />
             <NavItem icon={ShoppingBag} label="Shop" page="shop" />
           </div>
 
@@ -996,9 +1127,9 @@ const AltTabWebsite = () => {
         {menuOpen && (
           <div className="md:hidden absolute top-full left-0 right-0 bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400 p-4 space-y-2 border-b-4 border-black">
             <NavItem icon={Sparkles} label="Home" page="home" />
-            <NavItem icon={Grid3x3} label="Projects" page="projects" />
-            <NavItem icon={Image} label="Moodboards" page="moodboards" />
             <NavItem icon={BookOpen} label="About" page="about" />
+            <NavItem icon={Image} label="Moodboards" page="moodboards" />
+            <NavItem icon={Grid3x3} label="Projects" page="projects" />
             <NavItem icon={ShoppingBag} label="Shop" page="shop" />
           </div>
         )}
@@ -1026,7 +1157,7 @@ const AltTabWebsite = () => {
             <span className="font-medium">@alttab</span>
           </a>
         </div>
-        <p>© 2024 Alt-Tab Think Tank · Multi-Disciplinary</p>
+        <p>© {new Date().getFullYear()} Alt-Tab Think Tank · Multi-Disciplinary</p>
       </footer>
     </div>
   );
