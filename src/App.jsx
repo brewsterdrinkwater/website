@@ -683,14 +683,76 @@ const AltTabWebsite = () => {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-5">
           {[
-            { name: 'Product Development', icon: '⚡' },
-            { name: 'Research', icon: '🔬' },
-            { name: 'Civic', icon: '🏛️' },
-            { name: 'Education', icon: '📚' },
-            { name: 'Sport', icon: '⚽' },
+            { name: 'Product Development', icon: (
+              <svg viewBox="0 0 48 48" className="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {/* Hand-drawn lightbulb */}
+                <path d="M24 4c-1 0-2 .5-2 .5s-6 2-6 12c0 4 2 6 3 8s2 4 2 6v2h6v-2c0-2 1-4 2-6s3-4 3-8c0-10-6-11.5-6-12s-1-.5-2-.5z" strokeDasharray="1 0.5" />
+                <path d="M19 34h10" strokeDasharray="2 1" />
+                <path d="M20 38h8" strokeDasharray="2 1" />
+                <path d="M22 42h4" />
+                {/* Rays */}
+                <path d="M24 0v2" strokeDasharray="1 1" />
+                <path d="M36 6l-2 2" strokeDasharray="1 1" />
+                <path d="M40 18h-3" strokeDasharray="1 1" />
+                <path d="M12 6l2 2" strokeDasharray="1 1" />
+                <path d="M8 18h3" strokeDasharray="1 1" />
+              </svg>
+            )},
+            { name: 'Research', icon: (
+              <svg viewBox="0 0 48 48" className="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {/* Hand-drawn magnifying glass */}
+                <circle cx="20" cy="20" r="12" strokeDasharray="3 1" />
+                <path d="M29 29l12 12" strokeDasharray="2 1" />
+                <path d="M40 42l2 2" />
+                {/* Lens shine */}
+                <path d="M14 14c2-2 5-3 8-3" strokeDasharray="2 2" />
+              </svg>
+            )},
+            { name: 'Civic', icon: (
+              <svg viewBox="0 0 48 48" className="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {/* Hand-drawn building with columns */}
+                <path d="M6 42h36" strokeDasharray="2 1" />
+                <path d="M8 42v-22" strokeDasharray="3 1" />
+                <path d="M16 42v-22" strokeDasharray="3 1" />
+                <path d="M24 42v-22" strokeDasharray="3 1" />
+                <path d="M32 42v-22" strokeDasharray="3 1" />
+                <path d="M40 42v-22" strokeDasharray="3 1" />
+                {/* Roof/pediment */}
+                <path d="M4 20h40" strokeDasharray="2 1" />
+                <path d="M8 20l16-14 16 14" strokeDasharray="2 1" />
+              </svg>
+            )},
+            { name: 'Education', icon: (
+              <svg viewBox="0 0 48 48" className="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {/* Hand-drawn stacked books */}
+                <path d="M8 38h28" strokeDasharray="2 1" />
+                <path d="M6 38v-6h32v6" strokeDasharray="3 1" />
+                <path d="M8 32v-6h28v6" strokeDasharray="3 1" />
+                <path d="M10 26v-6h24v6" strokeDasharray="3 1" />
+                {/* Book spines */}
+                <path d="M14 32v6" strokeDasharray="1 1" />
+                <path d="M22 26v6" strokeDasharray="1 1" />
+                <path d="M30 32v6" strokeDasharray="1 1" />
+                {/* Bookmark */}
+                <path d="M28 20v-8l3 3 3-3v8" strokeDasharray="1 1" />
+              </svg>
+            )},
+            { name: 'Sport', icon: (
+              <svg viewBox="0 0 48 48" className="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {/* Hand-drawn soccer ball */}
+                <circle cx="24" cy="24" r="18" strokeDasharray="3 1" />
+                {/* Pentagon pattern */}
+                <path d="M24 10l-6 8h12l-6-8z" strokeDasharray="2 1" />
+                <path d="M18 18l-8 4 2 10h6" strokeDasharray="2 1" />
+                <path d="M30 18l8 4-2 10h-6" strokeDasharray="2 1" />
+                <path d="M18 32l6 6 6-6" strokeDasharray="2 1" />
+                <path d="M12 22l-4 8" strokeDasharray="1 1" />
+                <path d="M36 22l4 8" strokeDasharray="1 1" />
+              </svg>
+            )},
           ].map((area, i) => (
             <div key={i} className={`border-2 border-black p-6 ${i % 2 === 0 ? 'bg-blue-50' : 'bg-orange-50'} text-center`}>
-              <span className="text-3xl mb-2 block">{area.icon}</span>
+              <div className="text-blue-700">{area.icon}</div>
               <h3 className="font-bold text-black text-sm md:text-base">{area.name}</h3>
             </div>
           ))}
