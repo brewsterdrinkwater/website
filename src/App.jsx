@@ -85,6 +85,83 @@ const AltTabWebsite = () => {
   });
   const [draggingLetter, setDraggingLetter] = useState(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.matchMedia('(max-width: 768px)').matches);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Shake detection for mobile - scatter letters
+  useEffect(() => {
+    if (!isMobile) return;
+
+    let lastX = 0, lastY = 0, lastZ = 0;
+    let shakeThreshold = 15;
+
+    const handleMotion = (e) => {
+      const { x, y, z } = e.accelerationIncludingGravity || {};
+      if (x === null) return;
+
+      const deltaX = Math.abs(x - lastX);
+      const deltaY = Math.abs(y - lastY);
+      const deltaZ = Math.abs(z - lastZ);
+
+      if ((deltaX > shakeThreshold && deltaY > shakeThreshold) ||
+          (deltaX > shakeThreshold && deltaZ > shakeThreshold) ||
+          (deltaY > shakeThreshold && deltaZ > shakeThreshold)) {
+        // Scatter letters randomly
+        setLetterPositions({
+          A: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
+          L: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
+          T: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
+          '-': { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
+          T2: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
+          A2: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
+          B: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
+        });
+      }
+
+      lastX = x; lastY = y; lastZ = z;
+    };
+
+    window.addEventListener('devicemotion', handleMotion);
+    return () => window.removeEventListener('devicemotion', handleMotion);
+  }, [isMobile]);
+
+  // Touch to scatter a single letter (mobile)
+  const handleLetterTouch = (letter) => {
+    if (!isMobile) return;
+    setLetterPositions(prev => ({
+      ...prev,
+      [letter]: {
+        x: (Math.random() - 0.5) * 120,
+        y: (Math.random() - 0.5) * 80,
+      }
+    }));
+  };
+
+  // Double tap to reset all letters
+  const [lastTap, setLastTap] = useState(0);
+  const handleHeaderDoubleTap = () => {
+    const now = Date.now();
+    if (now - lastTap < 300) {
+      // Double tap detected - reset all letters
+      setLetterPositions({
+        A: { x: 0, y: 0 },
+        L: { x: 0, y: 0 },
+        T: { x: 0, y: 0 },
+        '-': { x: 0, y: 0 },
+        T2: { x: 0, y: 0 },
+        A2: { x: 0, y: 0 },
+        B: { x: 0, y: 0 },
+      });
+    }
+    setLastTap(now);
+  };
 
   // Update time every second for world clocks
   useEffect(() => {
@@ -504,7 +581,11 @@ const AltTabWebsite = () => {
           <span className="text-xs uppercase tracking-widest font-bold text-black">Established</span>
           <span className="text-xl">★</span>
         </div>
-        <h1 className="text-6xl md:text-8xl font-black text-black leading-none select-none" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
+        <h1
+          className="text-6xl md:text-8xl font-black text-black leading-none select-none"
+          style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+          onTouchEnd={handleHeaderDoubleTap}
+        >
           {[
             { key: 'A', char: 'A' },
             { key: 'L', char: 'L' },
@@ -517,16 +598,17 @@ const AltTabWebsite = () => {
             <span
               key={letter.key}
               onMouseDown={(e) => handleLetterMouseDown(letter.key, e)}
+              onTouchStart={() => handleLetterTouch(letter.key)}
               style={{
                 display: 'inline-block',
                 color: '#000000',
                 textShadow: '2px 2px 0px #ff0000, 4px 4px 0px #0000ff',
-                cursor: 'grab',
+                cursor: isMobile ? 'pointer' : 'grab',
                 transform: `translate(${letterPositions[letter.key].x}px, ${letterPositions[letter.key].y}px)`,
-                transition: draggingLetter === letter.key ? 'none' : 'transform 0.1s ease-out',
+                transition: draggingLetter === letter.key ? 'none' : 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
                 userSelect: 'none',
               }}
-              className="hover:scale-110 active:cursor-grabbing"
+              className="hover:scale-110 active:cursor-grabbing active:scale-95"
             >
               {letter.char}
             </span>
@@ -535,6 +617,11 @@ const AltTabWebsite = () => {
         <p className="text-base md:text-lg text-black font-bold uppercase px-4">
           ★★ Multi-Disciplinary Think Tank ★★
         </p>
+        {isMobile && (
+          <p className="text-xs text-black/60 mt-2 animate-pulse">
+            Tap letters to scatter • Double-tap to reset • Shake to shuffle
+          </p>
+        )}
       </div>
 
       {/* World Clocks */}
@@ -670,10 +757,10 @@ const AltTabWebsite = () => {
       { name: 'Virginia Tech', logo: '/images/virginia-tech-logo.svg', description: 'University partnership and research', link: 'https://www.vt.edu/' },
       { name: 'Live Breathe Futbol', logo: '/images/lbf-logo.svg', description: 'Football apparel brand', link: 'https://www.livebreathefutbol.com/' },
       { name: 'USM Furniture', logoText: 'USM', description: 'Modular furniture system design', link: 'https://us.usm.com/' },
-      { name: 'Wonder Universe', logo: 'https://images.unsplash.com/photo-1566140967404-b8b3932483f5?w=200&h=200&fit=crop', description: "Children's museum experience", link: 'https://wonderuniverse.org/' },
+      { name: 'Wonder Universe', logoText: 'WU', description: "Children's museum experience", link: 'https://wonderuniverse.org/' },
       { name: 'BKYSC', logoText: 'BKYSC', description: 'Brooklyn Youth Sports Club', link: 'https://www.brooklynyouthsportsclub.org/' },
-      { name: 'Nike NYC', logo: 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/nike.svg', description: 'Retail experience design' },
-      { name: 'MLB Streaming', logo: 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/mlb.svg', description: 'Digital streaming platform' },
+      { name: 'Nike NYC', logoText: 'NIKE', description: 'Retail experience design' },
+      { name: 'MLB Streaming', logoText: 'MLB', description: 'Digital streaming platform' },
       { name: 'Akash Network', logoText: 'AKASH', description: 'Decentralized cloud computing', link: 'https://akash.network/' },
     ];
 
@@ -1070,7 +1157,7 @@ const AltTabWebsite = () => {
             <span className="font-medium">@alttab</span>
           </a>
         </div>
-        <p>© 2024 Alt-Tab Think Tank · Multi-Disciplinary</p>
+        <p>© {new Date().getFullYear()} Alt-Tab Think Tank · Multi-Disciplinary</p>
       </footer>
     </div>
   );
