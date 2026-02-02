@@ -890,53 +890,102 @@ const AltTabWebsite = () => {
   };
 
   const MoodboardsPage = () => {
-    // YouTube videos - user will add more later
+    const [activeVideo, setActiveVideo] = useState(null);
+
+    // Video collection - easy to add new videos: just add { id: 'YOUTUBE_ID', title: 'Title' }
     const videos = [
       { id: '7IdoDJCssNk', title: 'Skate Video' },
       { id: 'M_0do0LP2tk', title: 'Skate Film' },
       { id: 'XTomk3L1R5I', title: 'Skate Edit' },
       { id: 'cFwytlpCJ9U', title: 'Skate Clip' },
+      // Add more videos here: { id: 'VIDEO_ID', title: 'Video Title' },
     ];
+
+    // Get YouTube thumbnail URL (maxresdefault for HD, hqdefault as fallback)
+    const getThumbnail = (videoId) => `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
     return (
       <div className="space-y-8">
         <div className="text-center space-y-4">
           <h2 className="text-5xl md:text-6xl font-black text-white drop-shadow-lg">Moodboards</h2>
-          <p className="text-xl text-white/80 max-w-2xl mx-auto">
+          <p className="text-lg text-white/70 max-w-2xl mx-auto">
             Video inspiration from skate culture and contemporary design
           </p>
         </div>
 
-        {/* Video Grid - Wide Format */}
-        <div className="space-y-6">
+        {/* Video Thumbnail Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
           {videos.map((video) => (
-            <div
+            <button
               key={video.id}
-              className="w-full rounded-xl overflow-hidden border-2 border-white/20 hover:border-white/40 transition-all"
-              style={{ aspectRatio: '16/9' }}
+              onClick={() => setActiveVideo(video)}
+              className="group relative aspect-video bg-black/40 rounded-lg overflow-hidden border-2 border-white/10 hover:border-white/40 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
             >
-              <iframe
-                src={`https://www.youtube.com/embed/${video.id}`}
-                title={video.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="w-full h-full"
+              {/* Thumbnail */}
+              <img
+                src={getThumbnail(video.id)}
+                alt={video.title}
+                loading="lazy"
+                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
               />
-            </div>
+              {/* Play button overlay */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-12 h-12 md:w-14 md:h-14 bg-black/60 group-hover:bg-red-600 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+                  <svg className="w-5 h-5 md:w-6 md:h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+              </div>
+              {/* Title overlay */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 md:p-3">
+                <p className="text-white text-xs md:text-sm font-medium truncate">{video.title}</p>
+              </div>
+            </button>
           ))}
         </div>
 
         {/* Quartersnacks Channel Link */}
-        <div className="text-center">
+        <div className="text-center pt-4">
           <a
             href="https://www.youtube.com/@quartersnacksdotcom"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block px-8 py-4 bg-black text-white font-bold text-xl rounded-lg border-2 border-white/30 hover:border-white/60 hover:bg-white/10 transition-all"
+            className="inline-block px-6 py-3 bg-black/80 text-white font-bold text-sm md:text-base rounded-lg border-2 border-white/20 hover:border-white/50 hover:bg-black transition-all"
           >
             QUARTERSNACKS →
           </a>
         </div>
+
+        {/* Video Modal */}
+        {activeVideo && (
+          <div
+            className="fixed inset-0 z-[200] bg-black/95 flex items-center justify-center p-4"
+            onClick={() => setActiveVideo(null)}
+          >
+            <div className="relative w-full max-w-5xl" onClick={(e) => e.stopPropagation()}>
+              {/* Close button */}
+              <button
+                onClick={() => setActiveVideo(null)}
+                className="absolute -top-12 right-0 text-white/70 hover:text-white text-sm flex items-center gap-2 transition-colors"
+              >
+                <span>Close</span>
+                <X size={20} />
+              </button>
+              {/* Video player */}
+              <div className="aspect-video bg-black rounded-lg overflow-hidden">
+                <iframe
+                  src={`https://www.youtube.com/embed/${activeVideo.id}?autoplay=1&rel=0`}
+                  title={activeVideo.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full"
+                />
+              </div>
+              {/* Video title */}
+              <p className="text-white text-center mt-4 text-lg font-medium">{activeVideo.title}</p>
+            </div>
+          </div>
+        )}
       </div>
     );
   };
