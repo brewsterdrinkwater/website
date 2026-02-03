@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Sparkles, Grid3x3, Image, BookOpen, ShoppingBag, RefreshCw, Construction, Instagram, Sun, Moon } from 'lucide-react';
+import { Button } from './components/ui/button';
 
 // Middle Tennessee topography map background (light, optimized for web/mobile)
 const BACKGROUND_IMAGE = 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1920&q=80';
@@ -646,36 +647,6 @@ const AltTabWebsite = () => {
         ))}
       </div>
 
-      {/* News Links + Game section */}
-      <div className="border-4 border-black bg-gradient-to-br from-blue-100 via-blue-50 to-orange-100 p-6 md:p-8">
-        <div className="grid md:grid-cols-2 gap-6">
-          <NewsLinks />
-          <GameSection />
-        </div>
-      </div>
-
-      {/* About sections */}
-      <div className="border-4 border-black bg-white">
-        <div className="bg-gradient-to-r from-blue-600 to-orange-500 text-white px-4 py-3 border-b-4 border-black">
-          <h2 className="font-bold text-2xl md:text-3xl uppercase text-center">About Alt-Tab</h2>
-        </div>
-        <div className="grid md:grid-cols-3">
-          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-blue-50 hover:bg-blue-100 transition-colors text-left">
-            <h3 className="font-bold text-black mb-3 underline text-lg">Human-Centric Design</h3>
-            <p className="text-sm text-black">Founded by a library scientist and industrial designer, we blend research with creativity.</p>
-          </button>
-          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-orange-50 hover:bg-orange-100 transition-colors text-left">
-            <h3 className="font-bold text-black mb-3 underline text-lg">Multi-Disciplinary</h3>
-            <p className="text-sm text-black">From digital goods to policy, we create experiences that matter.</p>
-          </button>
-          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-blue-50 hover:bg-blue-100 transition-colors text-left">
-            <h3 className="font-bold text-black mb-3 underline text-lg">Future-Forward</h3>
-            <p className="text-sm text-black">Bridging nostalgia with innovation, one project at a time.</p>
-          </button>
-        </div>
-      </div>
-
-
       {/* Focus Areas */}
       <div className="border-4 border-black bg-white">
         <div className="bg-gradient-to-r from-blue-600 to-orange-500 text-white px-4 py-3 border-b-4 border-black">
@@ -759,6 +730,35 @@ const AltTabWebsite = () => {
         </div>
       </div>
 
+      {/* News Links + Game section */}
+      <div className="border-4 border-black bg-gradient-to-br from-blue-100 via-blue-50 to-orange-100 p-6 md:p-8">
+        <div className="grid md:grid-cols-2 gap-6">
+          <NewsLinks />
+          <GameSection />
+        </div>
+      </div>
+
+      {/* About sections */}
+      <div className="border-4 border-black bg-white">
+        <div className="bg-gradient-to-r from-blue-600 to-orange-500 text-white px-4 py-3 border-b-4 border-black">
+          <h2 className="font-bold text-2xl md:text-3xl uppercase text-center">About Alt-Tab</h2>
+        </div>
+        <div className="grid md:grid-cols-3">
+          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-blue-50 hover:bg-blue-100 transition-colors text-left">
+            <h3 className="font-bold text-black mb-3 underline text-lg">Human-Centric Design</h3>
+            <p className="text-sm text-black">Founded by a library scientist and industrial designer, we blend research with creativity.</p>
+          </button>
+          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-orange-50 hover:bg-orange-100 transition-colors text-left">
+            <h3 className="font-bold text-black mb-3 underline text-lg">Multi-Disciplinary</h3>
+            <p className="text-sm text-black">From digital goods to policy, we create experiences that matter.</p>
+          </button>
+          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-blue-50 hover:bg-blue-100 transition-colors text-left">
+            <h3 className="font-bold text-black mb-3 underline text-lg">Future-Forward</h3>
+            <p className="text-sm text-black">Bridging nostalgia with innovation, one project at a time.</p>
+          </button>
+        </div>
+      </div>
+
       {/* Walt-tab Link */}
       <div className="text-center">
         <a
@@ -775,19 +775,19 @@ const AltTabWebsite = () => {
       {/* Navigation buttons */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { text: 'ABOUT', color: 'bg-gradient-to-r from-blue-600 to-blue-500', page: 'about' },
-          { text: 'MOODBOARDS', color: 'bg-gradient-to-r from-blue-500 to-orange-500', page: 'moodboards' },
-          { text: 'VIEW PROJECTS', color: 'bg-gradient-to-r from-orange-500 to-blue-500', page: 'projects' },
-          { text: 'SHOP', color: 'bg-gradient-to-r from-orange-500 to-orange-400', page: 'shop' }
+          { text: 'ABOUT', color: 'from-blue-600 to-blue-500', page: 'about' },
+          { text: 'MOODBOARDS', color: 'from-blue-500 to-orange-500', page: 'moodboards' },
+          { text: 'VIEW PROJECTS', color: 'from-orange-500 to-blue-500', page: 'projects' },
+          { text: 'SHOP', color: 'from-orange-500 to-orange-400', page: 'shop' }
         ].map((link, i) => (
-          <button
+          <Button
             key={i}
             onClick={() => navigateTo(link.page)}
-            className={`${link.color} text-white font-bold py-4 px-3 border-4 border-black hover:brightness-110 transition-all text-sm md:text-base active:scale-95`}
+            className={`bg-gradient-to-r ${link.color} text-white font-bold py-6 px-3 border-4 border-black hover:brightness-110 text-sm md:text-base active:scale-95 rounded-none h-auto`}
             style={{ boxShadow: '5px 5px 0px black' }}
           >
-            ► {link.text} ◄
-          </button>
+            {link.text}
+          </Button>
         ))}
       </div>
 
@@ -937,12 +937,13 @@ const AltTabWebsite = () => {
                   />
                 </div>
 
-                <button
+                <Button
                   type="submit"
-                  className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-orange-500 text-white rounded-full font-bold text-lg hover:scale-105 hover:shadow-2xl transition-all duration-300"
+                  size="xl"
+                  className="w-full md:w-auto"
                 >
                   Send Inquiry
-                </button>
+                </Button>
               </form>
             )}
           </div>
@@ -1033,13 +1034,10 @@ const AltTabWebsite = () => {
             Video inspiration from skate culture and contemporary design
           </p>
           {/* Shuffle button */}
-          <button
-            onClick={handleShuffle}
-            className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-blue-600 to-orange-500 text-white font-bold rounded-full hover:scale-105 transition-all"
-          >
+          <Button onClick={handleShuffle} size="lg" className="rounded-full">
             <RefreshCw size={18} />
             Shuffle
-          </button>
+          </Button>
         </div>
 
         {/* Video Thumbnail Grid - Masonry-like with varied sizes */}
