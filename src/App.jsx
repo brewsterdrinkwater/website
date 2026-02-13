@@ -71,10 +71,16 @@ const AltTabWebsite = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [golfBall, setGolfBall] = useState({ x: 0, y: 0, visible: false });
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [currentGameType, setCurrentGameType] = useState(() => {
-    const games = ['tictactoe', 'connect4', 'blackjack', 'numbergame'];
-    return games[Math.floor(Math.random() * games.length)];
+  // Reaction game state
+  const [gameState, setGameState] = useState('waiting'); // waiting, ready, go, result
+  const [reactionTime, setReactionTime] = useState(null);
+  const [bestTime, setBestTime] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('bestReactionTime') || null;
+    }
+    return null;
   });
+  const [gameStartTime, setGameStartTime] = useState(null);
   const [letterPositions, setLetterPositions] = useState({
     A: { x: 0, y: 0 },
     L: { x: 0, y: 0 },
@@ -170,10 +176,42 @@ const AltTabWebsite = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const getRandomGame = () => {
-    const games = ['tictactoe', 'connect4', 'blackjack', 'numbergame'];
-    const availableGames = games.filter(g => g !== currentGameType);
-    return availableGames[Math.floor(Math.random() * availableGames.length)];
+  // Reaction time game timeout ref
+  const gameTimeoutRef = React.useRef(null);
+
+  const startReactionGame = () => {
+    setGameState('ready');
+    setReactionTime(null);
+
+    // Random delay between 1-4 seconds
+    const delay = Math.random() * 3000 + 1000;
+    gameTimeoutRef.current = setTimeout(() => {
+      setGameState('go');
+      setGameStartTime(Date.now());
+    }, delay);
+  };
+
+  const handleGameClick = () => {
+    if (gameState === 'waiting') {
+      startReactionGame();
+    } else if (gameState === 'ready') {
+      // Clicked too early!
+      clearTimeout(gameTimeoutRef.current);
+      setGameState('waiting');
+      setReactionTime('Too early!');
+    } else if (gameState === 'go') {
+      const time = Date.now() - gameStartTime;
+      setReactionTime(time);
+      setGameState('result');
+
+      // Save best time
+      if (!bestTime || time < parseInt(bestTime)) {
+        setBestTime(time.toString());
+        localStorage.setItem('bestReactionTime', time.toString());
+      }
+    } else if (gameState === 'result') {
+      startReactionGame();
+    }
   };
 
   const navigateTo = (page) => {
@@ -226,299 +264,6 @@ const AltTabWebsite = () => {
   }, [handleMouseMove, handleMouseUp]);
 
 
-  // Tic Tac Toe Game - Player vs Simple AI
-  const TicTacToeGame = () => {
-    const [board, setBoard] = useState(Array(9).fill(null));
-    const [gameOver, setGameOver] = useState(false);
-    const [message, setMessage] = useState("Your turn (X)");
-
-    const checkWinner = (squares) => {
-      const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-      for (let [a,b,c] of lines) {
-        if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) return squares[a];
-      }
-      return squares.every(s => s) ? 'Draw' : null;
-    };
-
-    const getAIMove = (squares) => {
-      const empty = squares.map((s, i) => s === null ? i : -1).filter(i => i !== -1);
-      return empty[Math.floor(Math.random() * empty.length)];
-    };
-
-    const handleClick = (idx) => {
-      if (board[idx] || gameOver) return;
-
-      // Player move
-      const newBoard = [...board];
-      newBoard[idx] = 'X';
-
-      const result = checkWinner(newBoard);
-      if (result) {
-        setBoard(newBoard);
-        setGameOver(true);
-        setMessage(result === 'Draw' ? "It's a draw!" : "You win! 🎉");
-        return;
-      }
-
-      // AI move
-      const aiMove = getAIMove(newBoard);
-      if (aiMove !== undefined) {
-        newBoard[aiMove] = 'O';
-        const aiResult = checkWinner(newBoard);
-        if (aiResult) {
-          setBoard(newBoard);
-          setGameOver(true);
-          setMessage(aiResult === 'Draw' ? "It's a draw!" : "Computer wins!");
-          return;
-        }
-      }
-
-      setBoard(newBoard);
-      setMessage("Your turn (X)");
-    };
-
-    const resetGame = () => {
-      setBoard(Array(9).fill(null));
-      setGameOver(false);
-      setMessage("Your turn (X)");
-    };
-
-    return (
-      <div className="p-6 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/40">
-        <h3 className="text-xl font-bold text-white mb-2">Tic Tac Toe</h3>
-        <p className="text-sm text-white/70 mb-4">{message}</p>
-        <div className="grid grid-cols-3 gap-2 max-w-[200px] mx-auto mb-4">
-          {board.map((cell, idx) => (
-            <button
-              key={idx}
-              onClick={() => handleClick(idx)}
-              className={`w-16 h-16 flex items-center justify-center text-3xl font-bold rounded-lg transition-all bg-white/20 ${cell === 'X' ? 'text-cyan-400' : 'text-pink-400'} ${!cell && !gameOver ? 'hover:bg-white/40 cursor-pointer' : ''}`}
-            >
-              {cell}
-            </button>
-          ))}
-        </div>
-        <div className="flex gap-2">
-          <button onClick={resetGame} className="flex-1 px-4 py-2 bg-cyan-500 text-white rounded-lg font-bold hover:bg-cyan-400">
-            {gameOver ? 'Play Again' : 'Reset'}
-          </button>
-          <button onClick={() => setCurrentGameType(getRandomGame())} className="px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30">
-            <RefreshCw size={20} />
-          </button>
-        </div>
-      </div>
-    );
-  };
-
-  // Connect 4 Game - 2 Player
-  const Connect4Game = () => {
-    const createEmptyBoard = () => Array(6).fill(null).map(() => Array(7).fill(null));
-    const [board, setBoard] = useState(createEmptyBoard);
-    const [isRedNext, setIsRedNext] = useState(true);
-    const [gameOver, setGameOver] = useState(false);
-    const [message, setMessage] = useState("Red's turn");
-
-    const checkWinner = (b) => {
-      for (let r = 0; r < 6; r++) {
-        for (let c = 0; c < 7; c++) {
-          if (!b[r][c]) continue;
-          const p = b[r][c];
-          if (c + 3 < 7 && p === b[r][c+1] && p === b[r][c+2] && p === b[r][c+3]) return p;
-          if (r + 3 < 6 && p === b[r+1][c] && p === b[r+2][c] && p === b[r+3][c]) return p;
-          if (r + 3 < 6 && c + 3 < 7 && p === b[r+1][c+1] && p === b[r+2][c+2] && p === b[r+3][c+3]) return p;
-          if (r + 3 < 6 && c - 3 >= 0 && p === b[r+1][c-1] && p === b[r+2][c-2] && p === b[r+3][c-3]) return p;
-        }
-      }
-      return b.every(row => row.every(cell => cell)) ? 'Draw' : null;
-    };
-
-    const dropPiece = (col) => {
-      if (gameOver) return;
-      for (let row = 5; row >= 0; row--) {
-        if (!board[row][col]) {
-          const newBoard = board.map(r => [...r]);
-          newBoard[row][col] = isRedNext ? 'R' : 'Y';
-          setBoard(newBoard);
-
-          const result = checkWinner(newBoard);
-          if (result) {
-            setGameOver(true);
-            setMessage(result === 'Draw' ? "It's a draw!" : `${result === 'R' ? 'Red' : 'Yellow'} wins! 🎉`);
-          } else {
-            setIsRedNext(!isRedNext);
-            setMessage(`${!isRedNext ? 'Red' : 'Yellow'}'s turn`);
-          }
-          return;
-        }
-      }
-    };
-
-    const resetGame = () => {
-      setBoard(createEmptyBoard());
-      setIsRedNext(true);
-      setGameOver(false);
-      setMessage("Red's turn");
-    };
-
-    return (
-      <div className="p-6 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/40">
-        <h3 className="text-xl font-bold text-white mb-2">Connect 4</h3>
-        <p className="text-sm text-white/70 mb-4">{message}</p>
-        <div className="bg-blue-800 p-2 rounded-lg max-w-[280px] mx-auto mb-4">
-          {board.map((row, r) => (
-            <div key={r} className="flex gap-1 justify-center">
-              {row.map((cell, c) => (
-                <button
-                  key={c}
-                  onClick={() => dropPiece(c)}
-                  className={`w-8 h-8 rounded-full transition-all ${cell === 'R' ? 'bg-red-500' : cell === 'Y' ? 'bg-yellow-400' : 'bg-white/30'} ${!cell && !gameOver ? 'hover:bg-white/50 cursor-pointer' : ''}`}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
-        <div className="flex gap-2">
-          <button onClick={resetGame} className="flex-1 px-4 py-2 bg-cyan-500 text-white rounded-lg font-bold hover:bg-cyan-400">
-            {gameOver ? 'Play Again' : 'Reset'}
-          </button>
-          <button onClick={() => setCurrentGameType(getRandomGame())} className="px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30">
-            <RefreshCw size={20} />
-          </button>
-        </div>
-      </div>
-    );
-  };
-
-  // Blackjack Game
-  const BlackjackGame = () => {
-    const getCard = () => Math.floor(Math.random() * 10) + 2;
-    const [playerCards, setPlayerCards] = useState([getCard(), getCard()]);
-    const [dealerCards, setDealerCards] = useState([getCard()]);
-    const [gameOver, setGameOver] = useState(false);
-    const [message, setMessage] = useState('Hit or Stand?');
-
-    const sum = (cards) => cards.reduce((a, b) => a + b, 0);
-
-    const hit = () => {
-      if (gameOver) return;
-      const newCards = [...playerCards, getCard()];
-      setPlayerCards(newCards);
-      if (sum(newCards) > 21) {
-        setGameOver(true);
-        setMessage('Bust! You lose 😢');
-      }
-    };
-
-    const stand = () => {
-      if (gameOver) return;
-      let dc = [...dealerCards];
-      while (sum(dc) < 17) dc.push(getCard());
-      setDealerCards(dc);
-      const ds = sum(dc);
-      const ps = sum(playerCards);
-      setGameOver(true);
-      if (ds > 21) setMessage('Dealer busts! You win! 🎉');
-      else if (ds > ps) setMessage('Dealer wins 😢');
-      else if (ds < ps) setMessage('You win! 🎉');
-      else setMessage("Push - it's a tie!");
-    };
-
-    const resetGame = () => {
-      setPlayerCards([getCard(), getCard()]);
-      setDealerCards([getCard()]);
-      setGameOver(false);
-      setMessage('Hit or Stand?');
-    };
-
-    return (
-      <div className="p-6 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/40">
-        <h3 className="text-xl font-bold text-white mb-2">Blackjack</h3>
-        <div className="space-y-3 mb-4">
-          <div><span className="text-white/70 text-sm">Dealer: </span><span className="text-white font-bold">{dealerCards.join(' + ')} = {sum(dealerCards)}</span></div>
-          <div><span className="text-white/70 text-sm">You: </span><span className="text-white font-bold">{playerCards.join(' + ')} = {sum(playerCards)}</span></div>
-        </div>
-        <p className="text-yellow-300 font-bold text-center mb-4">{message}</p>
-        {gameOver ? (
-          <div className="flex gap-2">
-            <button onClick={resetGame} className="flex-1 px-4 py-2 bg-cyan-500 text-white rounded-lg font-bold hover:bg-cyan-400">Play Again</button>
-            <button onClick={() => setCurrentGameType(getRandomGame())} className="px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30">
-              <RefreshCw size={20} />
-            </button>
-          </div>
-        ) : (
-          <div className="flex gap-2">
-            <button onClick={hit} className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg font-bold hover:bg-green-400">Hit</button>
-            <button onClick={stand} className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg font-bold hover:bg-red-400">Stand</button>
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  // Number Guessing Game (simpler and more reliable)
-  const NumberGame = () => {
-    const [target] = useState(() => Math.floor(Math.random() * 100) + 1);
-    const [guess, setGuess] = useState('');
-    const [attempts, setAttempts] = useState(0);
-    const [message, setMessage] = useState('Guess a number between 1-100');
-    const [won, setWon] = useState(false);
-
-    const handleGuess = () => {
-      const num = parseInt(guess);
-      if (isNaN(num) || num < 1 || num > 100) {
-        setMessage('Enter a number between 1-100');
-        return;
-      }
-      setAttempts(a => a + 1);
-      if (num === target) {
-        setWon(true);
-        setMessage(`🎉 Correct! You got it in ${attempts + 1} tries!`);
-      } else if (num < target) {
-        setMessage('📈 Higher!');
-      } else {
-        setMessage('📉 Lower!');
-      }
-      setGuess('');
-    };
-
-    const resetGame = () => {
-      window.location.reload();
-    };
-
-    return (
-      <div className="p-6 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/40">
-        <h3 className="text-xl font-bold text-white mb-2">Number Guessing</h3>
-        <p className="text-sm text-white/70 mb-2">Attempts: {attempts}</p>
-        <p className="text-yellow-300 font-bold text-center mb-4">{message}</p>
-        {!won ? (
-          <div className="flex gap-2 mb-4">
-            <input
-              type="number"
-              min="1"
-              max="100"
-              value={guess}
-              onChange={(e) => setGuess(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleGuess()}
-              className="flex-1 px-4 py-2 rounded-lg bg-white/20 border-2 border-white/30 text-white text-center text-xl"
-              placeholder="?"
-            />
-            <button onClick={handleGuess} className="px-6 py-2 bg-cyan-500 text-white rounded-lg font-bold hover:bg-cyan-400">
-              Guess
-            </button>
-          </div>
-        ) : null}
-        <div className="flex gap-2">
-          <button onClick={resetGame} className="flex-1 px-4 py-2 bg-cyan-500 text-white rounded-lg font-bold hover:bg-cyan-400">
-            {won ? 'Play Again' : 'Reset'}
-          </button>
-          <button onClick={() => setCurrentGameType(getRandomGame())} className="px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30">
-            <RefreshCw size={20} />
-          </button>
-        </div>
-      </div>
-    );
-  };
-
   const NavItem = ({ icon: Icon, label, page }) => {
     const path = page === 'home' ? '/' : `/${page}`;
     return (
@@ -540,20 +285,56 @@ const AltTabWebsite = () => {
     );
   };
 
-  const GameSection = () => (
-    <div className="w-full">
-      {currentGameType === 'tictactoe' && <TicTacToeGame />}
-      {currentGameType === 'connect4' && <Connect4Game />}
-      {currentGameType === 'blackjack' && <BlackjackGame />}
-      {currentGameType === 'numbergame' && <NumberGame />}
-    </div>
-  );
+  // Reaction Time Game Component
+  const GameSection = () => {
+    const getBackgroundColor = () => {
+      switch (gameState) {
+        case 'waiting': return 'bg-gradient-to-br from-blue-500 to-blue-600';
+        case 'ready': return 'bg-gradient-to-br from-red-500 to-red-600';
+        case 'go': return 'bg-gradient-to-br from-green-400 to-green-500';
+        case 'result': return 'bg-gradient-to-br from-blue-500 to-orange-500';
+        default: return 'bg-gradient-to-br from-blue-500 to-blue-600';
+      }
+    };
+
+    const getMessage = () => {
+      switch (gameState) {
+        case 'waiting': return 'Tap to Start';
+        case 'ready': return 'Wait for green...';
+        case 'go': return 'TAP NOW!';
+        case 'result':
+          if (reactionTime === 'Too early!') return 'Too early! Tap to retry';
+          return `${reactionTime}ms - Tap to play again`;
+        default: return 'Tap to Start';
+      }
+    };
+
+    return (
+      <div className="w-full">
+        <button
+          onClick={handleGameClick}
+          className={`w-full p-8 rounded-2xl border-2 border-black/20 transition-all active:scale-95 cursor-pointer ${getBackgroundColor()}`}
+        >
+          <h3 className="text-xl font-bold text-white mb-2">Reaction Time</h3>
+          <div className="text-4xl font-black text-white mb-3">
+            {gameState === 'result' && reactionTime !== 'Too early!' ? `${reactionTime}ms` : ''}
+          </div>
+          <p className="text-lg text-white/90 font-medium">{getMessage()}</p>
+          {bestTime && (
+            <p className="text-sm text-white/70 mt-3">
+              Best: {bestTime}ms
+            </p>
+          )}
+        </button>
+      </div>
+    );
+  };
 
   // Drudge-style links component - 2 row layout
   const NewsLinks = () => (
-    <div className="p-4 rounded-2xl bg-black/90 border-2 border-white/20">
-      <h3 className="text-center font-bold text-red-500 text-lg mb-3 border-b border-white/20 pb-2">
-        ★ HEADLINES ★
+    <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-orange-50 border-2 border-black/20">
+      <h3 className="text-center font-bold text-blue-700 text-lg mb-3 border-b border-black/20 pb-2">
+        HEADLINES
       </h3>
       <div className="max-h-80 overflow-y-auto pr-2 scrollbar-thin">
         <div className="grid grid-cols-2 gap-x-4 gap-y-1">
@@ -563,7 +344,7 @@ const AltTabWebsite = () => {
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="block text-xs text-white hover:text-yellow-400 hover:bg-white/10 px-2 py-1 rounded transition-colors truncate"
+              className="block text-xs text-black hover:text-blue-600 hover:bg-blue-100 px-2 py-1 rounded transition-colors truncate"
             >
               {link.title}
             </a>
