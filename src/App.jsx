@@ -387,6 +387,37 @@ const ReactionGame = () => {
   );
 };
 
+// Golf Ball Cursor - manages its own state to prevent parent re-renders
+const GolfBallCursor = () => {
+  const [position, setPosition] = useState({ x: 0, y: 0, visible: false });
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setPosition({ x: e.clientX, y: e.clientY, visible: true });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  if (!position.visible) return null;
+
+  return (
+    <div
+      className="fixed w-6 h-6 rounded-full pointer-events-none z-[100] shadow-lg"
+      style={{
+        left: position.x - 12,
+        top: position.y - 12,
+        background: 'radial-gradient(circle at 30% 30%, #ffffff, #e0e0e0, #a0a0a0)',
+        boxShadow: 'inset -2px -2px 4px rgba(0,0,0,0.3), 2px 2px 8px rgba(0,0,0,0.4)',
+      }}
+    >
+      <div className="absolute inset-1 rounded-full opacity-30" style={{
+        background: 'repeating-radial-gradient(circle at 50% 50%, transparent 0px, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 3px)'
+      }} />
+    </div>
+  );
+};
+
 // World Clocks - manages its own time state to prevent parent re-renders
 const WorldClocks = () => {
   const [time, setTime] = useState(new Date());
@@ -429,7 +460,6 @@ const AltTabWebsite = () => {
   const currentPage = location.pathname === '/' ? 'home' : location.pathname.slice(1);
   const [menuOpen, setMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  const [golfBall, setGolfBall] = useState({ x: 0, y: 0, visible: false });
   // Daily trivia state
   const [triviaAnswered, setTriviaAnswered] = useState(false);
   const [triviaChoice, setTriviaChoice] = useState(null);
@@ -569,16 +599,17 @@ const AltTabWebsite = () => {
     window.scrollTo(0, 0);
   };
 
-  // Golf ball cursor effect
-  const handleMouseMove = useCallback((e) => {
-    setGolfBall({
-      x: e.clientX,
-      y: e.clientY,
-      visible: true
-    });
+  // Letter dragging handlers
+  const handleLetterMouseDown = (letter, e) => {
+    e.preventDefault();
+    setDraggingLetter(letter);
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
 
-    // Handle letter dragging
-    if (draggingLetter) {
+  useEffect(() => {
+    if (!draggingLetter) return;
+
+    const handleMouseMove = (e) => {
       const deltaX = e.clientX - dragStart.x;
       const deltaY = e.clientY - dragStart.y;
       setLetterPositions(prev => ({
@@ -589,27 +620,19 @@ const AltTabWebsite = () => {
         }
       }));
       setDragStart({ x: e.clientX, y: e.clientY });
-    }
-  }, [draggingLetter, dragStart]);
+    };
 
-  const handleLetterMouseDown = (letter, e) => {
-    e.preventDefault();
-    setDraggingLetter(letter);
-    setDragStart({ x: e.clientX, y: e.clientY });
-  };
+    const handleMouseUp = () => {
+      setDraggingLetter(null);
+    };
 
-  const handleMouseUp = useCallback(() => {
-    setDraggingLetter(null);
-  }, []);
-
-  useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [handleMouseMove, handleMouseUp]);
+  }, [draggingLetter, dragStart]);
 
 
   const NavItem = ({ icon: Icon, label, page }) => {
@@ -660,8 +683,8 @@ const AltTabWebsite = () => {
 
   const HomePage = () => (
     <div className="-mx-4 md:-mx-6">
-      {/* Hero Banner - Full viewport, bold type */}
-      <div className="relative min-h-[70vh] md:min-h-[85vh] flex flex-col items-center justify-center bg-gradient-to-br from-blue-700 via-blue-600 to-orange-500 px-4 md:px-6">
+      {/* Hero Banner */}
+      <div className="relative min-h-[50vh] md:min-h-[60vh] flex flex-col items-center justify-center bg-gradient-to-br from-blue-700 via-blue-600 to-orange-500 px-4 md:px-6">
         <Reveal direction="scale">
           <div className="text-center space-y-6 max-w-5xl mx-auto">
             <div className="flex items-center justify-center gap-3">
@@ -812,7 +835,7 @@ const AltTabWebsite = () => {
       <div className="bg-gradient-to-br from-blue-50 via-white to-orange-50 py-16 md:py-24 px-4 md:px-6">
         <Reveal direction="up" delay={0.1}>
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-4xl md:text-6xl font-black text-black text-center mb-4 tracking-tight">Stay Connected</h2>
+            <h2 className="text-4xl md:text-6xl font-black text-black text-center mb-4 tracking-tight">Supporting and Challenging the World</h2>
             <p className="text-lg text-black/50 text-center mb-12 md:mb-16 max-w-2xl mx-auto">Headlines, trivia, and games — all in one place</p>
             <div className="grid md:grid-cols-3 gap-6 md:gap-8">
               <NewsLinks />
@@ -1325,22 +1348,7 @@ const AltTabWebsite = () => {
   return (
     <div className={`min-h-screen overflow-x-hidden cursor-none ${darkMode ? 'bg-gray-100 text-gray-900' : 'text-white'}`}>
       {/* Golf Ball Cursor */}
-      {golfBall.visible && (
-        <div
-          className="fixed w-6 h-6 rounded-full pointer-events-none z-[100] shadow-lg"
-          style={{
-            left: golfBall.x - 12,
-            top: golfBall.y - 12,
-            background: 'radial-gradient(circle at 30% 30%, #ffffff, #e0e0e0, #a0a0a0)',
-            boxShadow: 'inset -2px -2px 4px rgba(0,0,0,0.3), 2px 2px 8px rgba(0,0,0,0.4)',
-          }}
-        >
-          {/* Golf ball dimples */}
-          <div className="absolute inset-1 rounded-full opacity-30" style={{
-            background: 'repeating-radial-gradient(circle at 50% 50%, transparent 0px, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 3px)'
-          }} />
-        </div>
-      )}
+      <GolfBallCursor />
 
       {/* Background - Light or Dark mode */}
       {darkMode ? (
@@ -1365,7 +1373,7 @@ const AltTabWebsite = () => {
         </>
       )}
 
-      <nav className="relative z-50 p-4 md:p-6 border-b-4 border-black bg-gradient-to-r from-blue-700 via-blue-600 to-orange-500 md:sticky md:top-0">
+      <nav className="relative z-50 p-4 md:p-6 border-b-4 border-black bg-gradient-to-r from-blue-700 via-blue-600 to-orange-500 md:fixed md:top-0 md:left-0 md:right-0">
         <div className="flex justify-between items-center max-w-7xl mx-auto">
           <Link
             to="/"
@@ -1410,7 +1418,7 @@ const AltTabWebsite = () => {
         )}
       </nav>
 
-      <main className="relative z-10">
+      <main className="relative z-10 md:pt-[76px]">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/projects" element={<div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12"><ProjectsPage /></div>} />
