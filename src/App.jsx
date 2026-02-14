@@ -387,6 +387,41 @@ const ReactionGame = () => {
   );
 };
 
+// World Clocks - manages its own time state to prevent parent re-renders
+const WorldClocks = () => {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const clocks = [
+    { city: 'LOS ANGELES', tz: 'America/Los_Angeles' },
+    { city: 'NASHVILLE', tz: 'America/Chicago' },
+    { city: 'NEW YORK', tz: 'America/New_York' },
+    { city: 'LISBON', tz: 'Europe/Lisbon' },
+    { city: 'JOHANNESBURG', tz: 'Africa/Johannesburg' },
+    { city: 'TOKYO', tz: 'Asia/Tokyo' },
+  ];
+
+  return (
+    <div className="flex flex-wrap justify-center gap-3 text-xs">
+      {clocks.map((clock) => (
+        <div key={clock.city} className="bg-blue-900 text-orange-400 px-3 py-2 border-2 border-orange-400 font-mono rounded">
+          <span className="text-blue-300">{clock.city}:</span>{' '}
+          {time.toLocaleTimeString('en-US', {
+            timeZone: clock.tz,
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+          })}
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const AltTabWebsite = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -395,7 +430,6 @@ const AltTabWebsite = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [golfBall, setGolfBall] = useState({ x: 0, y: 0, visible: false });
-  const [currentTime, setCurrentTime] = useState(new Date());
   // Daily trivia state
   const [triviaAnswered, setTriviaAnswered] = useState(false);
   const [triviaChoice, setTriviaChoice] = useState(null);
@@ -491,12 +525,6 @@ const AltTabWebsite = () => {
     }
     setLastTap(now);
   };
-
-  // Update time every second for world clocks
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   // Daily Trivia render function
   const renderTrivia = () => {
@@ -683,26 +711,7 @@ const AltTabWebsite = () => {
       </div>
 
       {/* World Clocks */}
-      <div className="flex flex-wrap justify-center gap-3 text-xs">
-        {[
-          { city: 'LOS ANGELES', tz: 'America/Los_Angeles' },
-          { city: 'NASHVILLE', tz: 'America/Chicago' },
-          { city: 'NEW YORK', tz: 'America/New_York' },
-          { city: 'LISBON', tz: 'Europe/Lisbon' },
-          { city: 'JOHANNESBURG', tz: 'Africa/Johannesburg' },
-          { city: 'TOKYO', tz: 'Asia/Tokyo' },
-        ].map((clock) => (
-          <div key={clock.city} className="bg-blue-900 text-orange-400 px-3 py-2 border-2 border-orange-400 font-mono rounded">
-            <span className="text-blue-300">{clock.city}:</span>{' '}
-            {currentTime.toLocaleTimeString('en-US', {
-              timeZone: clock.tz,
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: true
-            })}
-          </div>
-        ))}
-      </div>
+      <WorldClocks />
 
       {/* Focus Areas */}
       <Reveal direction="up">
@@ -753,30 +762,40 @@ const AltTabWebsite = () => {
             )},
             { name: 'Education', icon: (
               <svg viewBox="0 0 48 48" className="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                {/* Hand-drawn stacked books */}
-                <path d="M8 38h28" strokeDasharray="2 1" />
-                <path d="M6 38v-6h32v6" strokeDasharray="3 1" />
-                <path d="M8 32v-6h28v6" strokeDasharray="3 1" />
-                <path d="M10 26v-6h24v6" strokeDasharray="3 1" />
-                {/* Book spines */}
-                <path d="M14 32v6" strokeDasharray="1 1" />
-                <path d="M22 26v6" strokeDasharray="1 1" />
-                <path d="M30 32v6" strokeDasharray="1 1" />
-                {/* Bookmark */}
-                <path d="M28 20v-8l3 3 3-3v8" strokeDasharray="1 1" />
+                {/* Open book */}
+                <path d="M6 12c4-2 8-2 12 0v28c-4-2-8-2-12 0V12z" strokeDasharray="2 1" />
+                <path d="M18 12c4-2 8-2 12 0v28c-4-2-8-2-12 0V12z" strokeDasharray="2 1" />
+                <path d="M30 12c4-2 8-2 12 0v28c-4-2-8-2-12 0V12z" strokeDasharray="2 1" />
+                {/* Page lines */}
+                <path d="M9 18h6" strokeDasharray="1 1" />
+                <path d="M9 24h6" strokeDasharray="1 1" />
+                <path d="M9 30h6" strokeDasharray="1 1" />
+                <path d="M33 18h6" strokeDasharray="1 1" />
+                <path d="M33 24h6" strokeDasharray="1 1" />
+                <path d="M33 30h6" strokeDasharray="1 1" />
+                {/* Spine */}
+                <path d="M24 10v32" strokeDasharray="2 2" />
               </svg>
             )},
             { name: 'Sport', icon: (
               <svg viewBox="0 0 48 48" className="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                {/* Hand-drawn soccer ball */}
-                <circle cx="24" cy="24" r="18" strokeDasharray="3 1" />
-                {/* Pentagon pattern */}
-                <path d="M24 10l-6 8h12l-6-8z" strokeDasharray="2 1" />
-                <path d="M18 18l-8 4 2 10h6" strokeDasharray="2 1" />
-                <path d="M30 18l8 4-2 10h-6" strokeDasharray="2 1" />
-                <path d="M18 32l6 6 6-6" strokeDasharray="2 1" />
-                <path d="M12 22l-4 8" strokeDasharray="1 1" />
-                <path d="M36 22l4 8" strokeDasharray="1 1" />
+                {/* Soccer ball - left */}
+                <circle cx="10" cy="24" r="8" strokeDasharray="2 1" />
+                <path d="M10 18l-2 3h4l-2-3z" strokeDasharray="1 0.5" />
+                {/* Basketball - center top */}
+                <circle cx="24" cy="12" r="7" strokeDasharray="2 1" />
+                <path d="M17 12h14" strokeDasharray="1 1" />
+                <path d="M24 5v14" strokeDasharray="1 1" />
+                <path d="M19 7c2 2 2 8 0 10" strokeDasharray="1 0.5" />
+                <path d="M29 7c-2 2-2 8 0 10" strokeDasharray="1 0.5" />
+                {/* Golf ball and tee - right */}
+                <circle cx="38" cy="26" r="6" strokeDasharray="2 1" />
+                <path d="M38 32v8" strokeDasharray="1 1" />
+                <path d="M35 40h6" strokeDasharray="1 0.5" />
+                {/* Golf dimples */}
+                <circle cx="36" cy="24" r="1" strokeDasharray="0.5 0.5" />
+                <circle cx="40" cy="25" r="1" strokeDasharray="0.5 0.5" />
+                <circle cx="38" cy="28" r="1" strokeDasharray="0.5 0.5" />
               </svg>
             )},
           ].map((area, i) => (
@@ -1115,9 +1134,9 @@ const AltTabWebsite = () => {
 
         {/* Video Thumbnail Grid - Masonry-like with varied sizes */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 auto-rows-[120px] md:auto-rows-[150px] -mx-4 md:mx-0">
-          {displayVideos.map(({ id, size }) => (
+          {displayVideos.map(({ id, size }, idx) => (
             <button
-              key={id + shuffleKey}
+              key={`${id}-${idx}`}
               onClick={() => setActiveVideo(id)}
               className={`group relative bg-black/40 overflow-hidden border border-black/20 hover:border-orange-500 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl md:rounded-lg ${getSizeClasses(size)}`}
             >
@@ -1389,25 +1408,8 @@ const AltTabWebsite = () => {
       <footer className="relative z-10 py-8 text-sm bg-gradient-to-r from-blue-900 to-blue-800 border-t-4 border-black">
         {/* World Clocks - shown on all pages except homepage */}
         {currentPage !== 'home' && (
-          <div className="flex flex-wrap justify-center gap-3 text-xs mb-6 px-4">
-            {[
-              { city: 'LOS ANGELES', tz: 'America/Los_Angeles' },
-              { city: 'NASHVILLE', tz: 'America/Chicago' },
-              { city: 'NEW YORK', tz: 'America/New_York' },
-              { city: 'LISBON', tz: 'Europe/Lisbon' },
-              { city: 'JOHANNESBURG', tz: 'Africa/Johannesburg' },
-              { city: 'TOKYO', tz: 'Asia/Tokyo' },
-            ].map((clock) => (
-              <div key={clock.city} className="bg-black/50 text-orange-400 px-3 py-2 border border-orange-400/50 font-mono rounded">
-                <span className="text-blue-300">{clock.city}:</span>{' '}
-                {currentTime.toLocaleTimeString('en-US', {
-                  timeZone: clock.tz,
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  hour12: true
-                })}
-              </div>
-            ))}
+          <div className="mb-6 px-4">
+            <WorldClocks />
           </div>
         )}
 
