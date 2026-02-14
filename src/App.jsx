@@ -1,7 +1,113 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Sparkles, Grid3x3, Image, BookOpen, ShoppingBag, RefreshCw, Construction, Instagram, Sun, Moon } from 'lucide-react';
 import { Button } from './components/ui/button';
+
+// Scroll-reveal hook using IntersectionObserver
+const useScrollReveal = () => {
+  const ref = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(node);
+        }
+      },
+      { threshold: 0.15 }
+    );
+
+    observer.observe(node);
+    return () => observer.unobserve(node);
+  }, []);
+
+  return [ref, isVisible];
+};
+
+// ScrollReveal wrapper component
+const Reveal = ({ children, direction = 'up', delay = 0 }) => {
+  const [ref, isVisible] = useScrollReveal();
+
+  const transforms = {
+    up: 'translateY(40px)',
+    down: 'translateY(-40px)',
+    left: 'translateX(40px)',
+    right: 'translateX(-40px)',
+    scale: 'scale(0.9)',
+  };
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? 'none' : transforms[direction],
+        transition: `opacity 0.6s ease ${delay}s, transform 0.6s ease ${delay}s`,
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
+// Daily Sports Trivia - 50 obscure questions, one per day
+const SPORTS_TRIVIA = [
+  { q: "Which NBA player holds the record for most turnovers in a single game with 14?", a: "Jason Kidd", choices: ["Jason Kidd", "James Harden", "LeBron James", "Russell Westbrook"] },
+  { q: "What is the only country to have played in every FIFA World Cup?", a: "Brazil", choices: ["Germany", "Brazil", "Argentina", "Italy"] },
+  { q: "Which MLB pitcher threw a perfect game while on LSD, according to his own account?", a: "Dock Ellis", choices: ["Dock Ellis", "Nolan Ryan", "Randy Johnson", "Sandy Koufax"] },
+  { q: "How many dimples are on a regulation golf ball?", a: "336", choices: ["252", "336", "412", "198"] },
+  { q: "Which NHL goalie scored the most career goals?", a: "Martin Brodeur", choices: ["Patrick Roy", "Martin Brodeur", "Ron Hextall", "Tom Barrasso"] },
+  { q: "What was the shortest boxing match in history?", a: "4 seconds", choices: ["4 seconds", "10 seconds", "17 seconds", "23 seconds"] },
+  { q: "Which tennis player has the fastest recorded serve at 163.7 mph?", a: "Sam Groth", choices: ["John Isner", "Sam Groth", "Ivo Karlovic", "Andy Roddick"] },
+  { q: "What sport was the first to be played on the moon?", a: "Golf", choices: ["Baseball", "Golf", "Frisbee", "Cricket"] },
+  { q: "Which country invented the game of cricket?", a: "England", choices: ["India", "Australia", "England", "South Africa"] },
+  { q: "How many stitches are on a regulation MLB baseball?", a: "108", choices: ["88", "108", "116", "98"] },
+  { q: "Which NBA player has the most career blocks?", a: "Hakeem Olajuwon", choices: ["Dikembe Mutombo", "Hakeem Olajuwon", "Kareem Abdul-Jabbar", "Shaquille O'Neal"] },
+  { q: "What year were women first allowed to run the Boston Marathon officially?", a: "1972", choices: ["1966", "1972", "1980", "1975"] },
+  { q: "Which country has won the most Olympic medals in fencing?", a: "Italy", choices: ["France", "Italy", "Hungary", "Russia"] },
+  { q: "What is the diameter of a basketball hoop in inches?", a: "18 inches", choices: ["16 inches", "18 inches", "20 inches", "17 inches"] },
+  { q: "Which NFL quarterback threw the longest pass in recorded history at 83 yards?", a: "Baker Mayfield", choices: ["Patrick Mahomes", "Baker Mayfield", "Aaron Rodgers", "Josh Allen"] },
+  { q: "What sport uses the terms 'stone' and 'hog line'?", a: "Curling", choices: ["Curling", "Shuffleboard", "Bocce", "Bowling"] },
+  { q: "Which MLB team has lost the most World Series?", a: "NY Yankees (with 13 losses)", choices: ["Brooklyn/LA Dodgers", "NY Yankees (with 13 losses)", "San Francisco Giants", "St. Louis Cardinals"] },
+  { q: "What is the only Grand Slam tennis tournament played on clay?", a: "French Open", choices: ["Australian Open", "French Open", "Wimbledon", "US Open"] },
+  { q: "Which sprinter held the 100m world record before Usain Bolt?", a: "Asafa Powell", choices: ["Tyson Gay", "Asafa Powell", "Justin Gatlin", "Maurice Greene"] },
+  { q: "How long is an Olympic swimming pool in meters?", a: "50 meters", choices: ["25 meters", "50 meters", "75 meters", "100 meters"] },
+  { q: "Which soccer player has scored the most own goals in Premier League history?", a: "Richard Dunne", choices: ["Jamie Carragher", "Richard Dunne", "Martin Skrtel", "Phil Jagielka"] },
+  { q: "What is the maximum weight of a regulation bowling ball in pounds?", a: "16 pounds", choices: ["14 pounds", "15 pounds", "16 pounds", "18 pounds"] },
+  { q: "Which country has won the most Rugby World Cups?", a: "South Africa (4)", choices: ["New Zealand (3)", "South Africa (4)", "Australia (2)", "England (1)"] },
+  { q: "What was the longest professional tennis match ever played?", a: "11 hours 5 minutes", choices: ["6 hours 33 minutes", "8 hours 15 minutes", "11 hours 5 minutes", "9 hours 45 minutes"] },
+  { q: "Which Formula 1 driver has the most career wins?", a: "Lewis Hamilton", choices: ["Michael Schumacher", "Lewis Hamilton", "Sebastian Vettel", "Ayrton Senna"] },
+  { q: "What sport did Michael Jordan play professionally besides basketball?", a: "Baseball", choices: ["Golf", "Baseball", "Football", "Tennis"] },
+  { q: "Which NHL team went 12 years without making the playoffs (2004-2016)?", a: "Edmonton Oilers", choices: ["Buffalo Sabres", "Edmonton Oilers", "Toronto Maple Leafs", "Florida Panthers"] },
+  { q: "How tall is an NBA regulation basketball hoop from the floor?", a: "10 feet", choices: ["9 feet", "10 feet", "11 feet", "12 feet"] },
+  { q: "Which jockey has won the most Kentucky Derbys?", a: "Eddie Arcaro (5)", choices: ["Bill Hartack (5)", "Eddie Arcaro (5)", "Willie Shoemaker (4)", "Calvin Borel (3)"] },
+  { q: "What is the rarest play in baseball?", a: "Unassisted triple play", choices: ["Unassisted triple play", "Inside-the-park grand slam", "Immaculate inning", "Hitting for the cycle"] },
+  { q: "Which soccer goalkeeper once scored from his own penalty area?", a: "Asmir Begovic", choices: ["Tim Howard", "Asmir Begovic", "Manuel Neuer", "Ederson"] },
+  { q: "What year was the first Super Bowl played?", a: "1967", choices: ["1965", "1967", "1970", "1960"] },
+  { q: "Which country won the first Olympic basketball gold medal?", a: "United States (1936)", choices: ["United States (1936)", "Soviet Union (1952)", "Argentina (1948)", "Canada (1936)"] },
+  { q: "What is the longest recorded home run in MLB history?", a: "575 feet (Mickey Mantle)", choices: ["502 feet", "535 feet", "575 feet (Mickey Mantle)", "582 feet"] },
+  { q: "Which athlete has won the most Olympic gold medals?", a: "Michael Phelps (23)", choices: ["Usain Bolt (8)", "Michael Phelps (23)", "Carl Lewis (9)", "Paavo Nurmi (9)"] },
+  { q: "What was Wilt Chamberlain's famous single-game scoring record?", a: "100 points", choices: ["81 points", "92 points", "100 points", "73 points"] },
+  { q: "Which sport was removed from the Olympics after 1904, then returned in 2016?", a: "Golf", choices: ["Rugby", "Golf", "Polo", "Cricket"] },
+  { q: "What is the only position in soccer that can handle the ball?", a: "Goalkeeper", choices: ["Goalkeeper", "Sweeper", "Libero", "None"] },
+  { q: "Which NFL team went 0-16 in the 2008 season?", a: "Detroit Lions", choices: ["Cleveland Browns", "Detroit Lions", "Jacksonville Jaguars", "Tampa Bay Buccaneers"] },
+  { q: "How many players are on a water polo team in the pool?", a: "7", choices: ["5", "6", "7", "8"] },
+  { q: "Which baseball player was known as 'The Say Hey Kid'?", a: "Willie Mays", choices: ["Mickey Mantle", "Willie Mays", "Hank Aaron", "Jackie Robinson"] },
+  { q: "What is the only team sport where the ball must be caught with one hand?", a: "Lacrosse", choices: ["Lacrosse", "Water polo", "Handball", "Jai alai"] },
+  { q: "Which horse racing track is known as 'The Run for the Roses'?", a: "Churchill Downs", choices: ["Belmont Park", "Churchill Downs", "Pimlico", "Santa Anita"] },
+  { q: "What is the diameter of a regulation hockey puck in inches?", a: "3 inches", choices: ["2.5 inches", "3 inches", "3.5 inches", "4 inches"] },
+  { q: "Which NBA player was drafted first overall in 1984 alongside Michael Jordan?", a: "Hakeem Olajuwon", choices: ["Sam Bowie", "Hakeem Olajuwon", "Charles Barkley", "Patrick Ewing"] },
+  { q: "In cricket, what is it called when a batsman is out for zero?", a: "A duck", choices: ["A zero", "A duck", "A goose", "A blank"] },
+  { q: "Which country has the most registered soccer players?", a: "China", choices: ["Brazil", "Germany", "China", "United States"] },
+  { q: "What is the oldest trophy in international sport?", a: "America's Cup (1851)", choices: ["The Ashes (1882)", "America's Cup (1851)", "Stanley Cup (1893)", "Davis Cup (1900)"] },
+  { q: "Which boxer retired undefeated with a 49-0 record?", a: "Rocky Marciano", choices: ["Floyd Mayweather", "Rocky Marciano", "Joe Calzaghe", "Lennox Lewis"] },
+  { q: "What sport has the highest average attendance per game worldwide?", a: "NFL Football", choices: ["Soccer (EPL)", "NFL Football", "College Football", "Cricket (IPL)"] },
+];
 
 // Middle Tennessee topography map background (light, optimized for web/mobile)
 const BACKGROUND_IMAGE = 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1920&q=80';
@@ -62,6 +168,225 @@ const NEWS_LINKS = [
   { title: 'WRAP', url: 'https://thewrap.com' },
 ];
 
+// Snake Game - defined outside main component to prevent remounting on clock re-renders
+const SnakeGame = ({ isMobile }) => {
+  const GRID = 15;
+  const CELL = 18;
+  const [snake, setSnake] = useState([{ x: 7, y: 7 }]);
+  const [food, setFood] = useState({ x: 3, y: 3 });
+  const [running, setRunning] = useState(false);
+  const [dead, setDead] = useState(false);
+  const [score, setScore] = useState(0);
+  const [highScore, setHighScore] = useState(() => parseInt(localStorage.getItem('snakeHigh') || '0'));
+  const dirRef = useRef({ x: 1, y: 0 });
+  const touchStartRef = useRef({ x: 0, y: 0 });
+  const canvasRef = useRef(null);
+
+  const spawnFood = useCallback((snakeBody) => {
+    let pos;
+    do {
+      pos = { x: Math.floor(Math.random() * GRID), y: Math.floor(Math.random() * GRID) };
+    } while (snakeBody.some(s => s.x === pos.x && s.y === pos.y));
+    return pos;
+  }, []);
+
+  const resetGame = useCallback(() => {
+    const initial = [{ x: 7, y: 7 }];
+    setSnake(initial);
+    setFood(spawnFood(initial));
+    dirRef.current = { x: 1, y: 0 };
+    setDead(false);
+    setScore(0);
+    setRunning(true);
+  }, [spawnFood]);
+
+  useEffect(() => {
+    if (!running || dead) return;
+    const interval = setInterval(() => {
+      setSnake(prev => {
+        const d = dirRef.current;
+        const head = { x: (prev[0].x + d.x + GRID) % GRID, y: (prev[0].y + d.y + GRID) % GRID };
+        if (prev.some(s => s.x === head.x && s.y === head.y)) {
+          setDead(true);
+          setRunning(false);
+          setScore(sc => {
+            if (sc > parseInt(localStorage.getItem('snakeHigh') || '0')) {
+              setHighScore(sc);
+              localStorage.setItem('snakeHigh', sc.toString());
+            }
+            return sc;
+          });
+          return prev;
+        }
+        const newSnake = [head, ...prev];
+        if (head.x === food.x && head.y === food.y) {
+          setScore(s => s + 1);
+          setFood(spawnFood(newSnake));
+        } else {
+          newSnake.pop();
+        }
+        return newSnake;
+      });
+    }, 130);
+    return () => clearInterval(interval);
+  }, [running, dead, food, spawnFood]);
+
+  useEffect(() => {
+    const handleKey = (e) => {
+      const key = e.key;
+      const d = dirRef.current;
+      if ((key === 'ArrowUp' || key === 'w') && d.y !== 1) dirRef.current = { x: 0, y: -1 };
+      if ((key === 'ArrowDown' || key === 's') && d.y !== -1) dirRef.current = { x: 0, y: 1 };
+      if ((key === 'ArrowLeft' || key === 'a') && d.x !== 1) dirRef.current = { x: -1, y: 0 };
+      if ((key === 'ArrowRight' || key === 'd') && d.x !== -1) dirRef.current = { x: 1, y: 0 };
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) e.preventDefault();
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, []);
+
+  const handleTouchStart = (e) => {
+    touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  };
+  const handleTouchEnd = (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartRef.current.x;
+    const dy = e.changedTouches[0].clientY - touchStartRef.current.y;
+    const d = dirRef.current;
+    if (Math.abs(dx) > Math.abs(dy)) {
+      if (dx > 20 && d.x !== -1) dirRef.current = { x: 1, y: 0 };
+      if (dx < -20 && d.x !== 1) dirRef.current = { x: -1, y: 0 };
+    } else {
+      if (dy > 20 && d.y !== -1) dirRef.current = { x: 0, y: 1 };
+      if (dy < -20 && d.y !== 1) dirRef.current = { x: 0, y: -1 };
+    }
+  };
+
+  const changeDir = (x, y) => {
+    const d = dirRef.current;
+    if (x === 0 && y === -1 && d.y !== 1) dirRef.current = { x: 0, y: -1 };
+    if (x === 0 && y === 1 && d.y !== -1) dirRef.current = { x: 0, y: 1 };
+    if (x === -1 && y === 0 && d.x !== 1) dirRef.current = { x: -1, y: 0 };
+    if (x === 1 && y === 0 && d.x !== -1) dirRef.current = { x: 1, y: 0 };
+  };
+
+  useEffect(() => {
+    const ctx = canvasRef.current?.getContext('2d');
+    if (!ctx) return;
+    const size = GRID * CELL;
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, size, size);
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i <= GRID; i++) {
+      ctx.beginPath(); ctx.moveTo(i * CELL, 0); ctx.lineTo(i * CELL, size); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, i * CELL); ctx.lineTo(size, i * CELL); ctx.stroke();
+    }
+    ctx.fillStyle = '#f97316';
+    ctx.beginPath();
+    ctx.arc(food.x * CELL + CELL / 2, food.y * CELL + CELL / 2, CELL / 2 - 2, 0, Math.PI * 2);
+    ctx.fill();
+    snake.forEach((seg, i) => {
+      ctx.fillStyle = i === 0 ? '#3b82f6' : '#60a5fa';
+      ctx.fillRect(seg.x * CELL + 1, seg.y * CELL + 1, CELL - 2, CELL - 2);
+    });
+  }, [snake, food]);
+
+  return (
+    <div className="w-full">
+      <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-orange-50 border-2 border-black/20">
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="text-sm font-bold text-blue-700 uppercase tracking-wide">Snake</h3>
+          <div className="text-xs text-black/60 space-x-3">
+            <span>Score: <strong className="text-black">{score}</strong></span>
+            <span>Best: <strong className="text-black">{highScore}</strong></span>
+          </div>
+        </div>
+        <div className="mx-auto touch-none" style={{ width: GRID * CELL, height: GRID * CELL }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+          <canvas ref={canvasRef} width={GRID * CELL} height={GRID * CELL} className="rounded-lg border-2 border-black/20" />
+        </div>
+        <div className="mt-3 flex justify-center md:hidden">
+          <div className="grid grid-cols-3 gap-1 w-32">
+            <div />
+            <button onClick={() => changeDir(0, -1)} className="bg-blue-600 text-white rounded p-2 text-center text-lg active:bg-blue-500">^</button>
+            <div />
+            <button onClick={() => changeDir(-1, 0)} className="bg-blue-600 text-white rounded p-2 text-center text-lg active:bg-blue-500">&lt;</button>
+            <div className="bg-blue-100 rounded p-2" />
+            <button onClick={() => changeDir(1, 0)} className="bg-blue-600 text-white rounded p-2 text-center text-lg active:bg-blue-500">&gt;</button>
+            <div />
+            <button onClick={() => changeDir(0, 1)} className="bg-blue-600 text-white rounded p-2 text-center text-lg active:bg-blue-500">v</button>
+            <div />
+          </div>
+        </div>
+        {!running && (
+          <div className="text-center mt-3">
+            <button onClick={resetGame} className="px-4 py-2 bg-gradient-to-r from-blue-600 to-orange-500 text-white font-bold rounded-lg text-sm hover:scale-105 transition-all">
+              {dead ? 'Play Again' : 'Start Game'}
+            </button>
+            <p className="text-xs text-black/50 mt-1">{isMobile ? 'Swipe or use D-pad' : 'Arrow keys or WASD'}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Reaction Time Game - defined outside main component to prevent remounting
+const ReactionGame = () => {
+  const [gameState, setGameState] = useState('waiting');
+  const [reactionTime, setReactionTime] = useState(null);
+  const [bestTime, setBestTime] = useState(() => localStorage.getItem('bestReactionTime') || null);
+  const [startTime, setStartTime] = useState(null);
+  const timeoutRef = useRef(null);
+
+  const start = () => {
+    setGameState('ready');
+    setReactionTime(null);
+    timeoutRef.current = setTimeout(() => {
+      setGameState('go');
+      setStartTime(Date.now());
+    }, Math.random() * 3000 + 1000);
+  };
+
+  const handleClick = () => {
+    if (gameState === 'waiting') { start(); }
+    else if (gameState === 'ready') {
+      clearTimeout(timeoutRef.current);
+      setGameState('waiting');
+      setReactionTime('Too early!');
+    } else if (gameState === 'go') {
+      const time = Date.now() - startTime;
+      setReactionTime(time);
+      setGameState('result');
+      if (!bestTime || time < parseInt(bestTime)) {
+        setBestTime(time.toString());
+        localStorage.setItem('bestReactionTime', time.toString());
+      }
+    } else if (gameState === 'result') { start(); }
+  };
+
+  const bgColor = gameState === 'waiting' ? 'bg-gradient-to-br from-blue-500 to-blue-600'
+    : gameState === 'ready' ? 'bg-gradient-to-br from-red-500 to-red-600'
+    : gameState === 'go' ? 'bg-gradient-to-br from-green-400 to-green-500'
+    : 'bg-gradient-to-br from-blue-500 to-orange-500';
+
+  const msg = gameState === 'waiting' ? 'Tap to Start'
+    : gameState === 'ready' ? 'Wait for green...'
+    : gameState === 'go' ? 'TAP NOW!'
+    : reactionTime === 'Too early!' ? 'Too early! Tap to retry'
+    : `${reactionTime}ms - Tap to play again`;
+
+  return (
+    <button onClick={handleClick} className={`w-full p-6 rounded-2xl border-2 border-black/20 transition-colors active:scale-95 cursor-pointer select-none ${bgColor}`}>
+      <h3 className="text-sm font-bold text-white/80 mb-1 uppercase tracking-wide">Reaction Time</h3>
+      <div className="text-3xl font-black text-white mb-2">
+        {gameState === 'result' && reactionTime !== 'Too early!' ? `${reactionTime}ms` : ''}
+      </div>
+      <p className="text-base text-white/90 font-medium">{msg}</p>
+      {bestTime && <p className="text-sm text-white/70 mt-2">Best: {bestTime}ms</p>}
+    </button>
+  );
+};
+
 const AltTabWebsite = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -71,16 +396,13 @@ const AltTabWebsite = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [golfBall, setGolfBall] = useState({ x: 0, y: 0, visible: false });
   const [currentTime, setCurrentTime] = useState(new Date());
-  // Reaction game state
-  const [gameState, setGameState] = useState('waiting'); // waiting, ready, go, result
-  const [reactionTime, setReactionTime] = useState(null);
-  const [bestTime, setBestTime] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('bestReactionTime') || null;
-    }
-    return null;
-  });
-  const [gameStartTime, setGameStartTime] = useState(null);
+  // Daily trivia state
+  const [triviaAnswered, setTriviaAnswered] = useState(false);
+  const [triviaChoice, setTriviaChoice] = useState(null);
+  const todayTrivia = useMemo(() => {
+    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+    return SPORTS_TRIVIA[dayOfYear % SPORTS_TRIVIA.length];
+  }, []);
   const [letterPositions, setLetterPositions] = useState({
     A: { x: 0, y: 0 },
     L: { x: 0, y: 0 },
@@ -176,42 +498,40 @@ const AltTabWebsite = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Reaction time game timeout ref
-  const gameTimeoutRef = React.useRef(null);
-
-  const startReactionGame = () => {
-    setGameState('ready');
-    setReactionTime(null);
-
-    // Random delay between 1-4 seconds
-    const delay = Math.random() * 3000 + 1000;
-    gameTimeoutRef.current = setTimeout(() => {
-      setGameState('go');
-      setGameStartTime(Date.now());
-    }, delay);
-  };
-
-  const handleGameClick = () => {
-    if (gameState === 'waiting') {
-      startReactionGame();
-    } else if (gameState === 'ready') {
-      // Clicked too early!
-      clearTimeout(gameTimeoutRef.current);
-      setGameState('waiting');
-      setReactionTime('Too early!');
-    } else if (gameState === 'go') {
-      const time = Date.now() - gameStartTime;
-      setReactionTime(time);
-      setGameState('result');
-
-      // Save best time
-      if (!bestTime || time < parseInt(bestTime)) {
-        setBestTime(time.toString());
-        localStorage.setItem('bestReactionTime', time.toString());
-      }
-    } else if (gameState === 'result') {
-      startReactionGame();
-    }
+  // Daily Trivia render function
+  const renderTrivia = () => {
+    const isCorrect = triviaChoice === todayTrivia.a;
+    return (
+      <div className="p-5 rounded-2xl bg-gradient-to-br from-blue-50 to-orange-50 border-2 border-black/20">
+        <h3 className="text-sm font-bold text-blue-700 mb-1 uppercase tracking-wide">Daily Sports Trivia</h3>
+        <p className="text-black font-medium text-sm mb-4">{todayTrivia.q}</p>
+        <div className="grid grid-cols-1 gap-2">
+          {todayTrivia.choices.map((choice) => (
+            <button
+              key={choice}
+              onClick={() => { setTriviaChoice(choice); setTriviaAnswered(true); }}
+              disabled={triviaAnswered}
+              className={`text-left px-3 py-2 rounded-lg text-sm font-medium transition-all border-2 ${
+                triviaAnswered
+                  ? choice === todayTrivia.a
+                    ? 'bg-green-100 border-green-500 text-green-800'
+                    : choice === triviaChoice
+                      ? 'bg-red-100 border-red-500 text-red-800'
+                      : 'bg-gray-50 border-gray-200 text-gray-400'
+                  : 'bg-white border-gray-200 text-black hover:border-blue-400 hover:bg-blue-50 cursor-pointer'
+              }`}
+            >
+              {choice}
+            </button>
+          ))}
+        </div>
+        {triviaAnswered && (
+          <p className={`text-sm font-bold mt-3 ${isCorrect ? 'text-green-700' : 'text-red-700'}`}>
+            {isCorrect ? 'Correct!' : `The answer is: ${todayTrivia.a}`}
+          </p>
+        )}
+      </div>
+    );
   };
 
   const navigateTo = (page) => {
@@ -285,39 +605,6 @@ const AltTabWebsite = () => {
     );
   };
 
-  // Reaction Time Game - rendered as function to prevent remounting on parent re-render
-  const renderGame = () => {
-    const bgColor = gameState === 'waiting' ? 'bg-gradient-to-br from-blue-500 to-blue-600'
-      : gameState === 'ready' ? 'bg-gradient-to-br from-red-500 to-red-600'
-      : gameState === 'go' ? 'bg-gradient-to-br from-green-400 to-green-500'
-      : 'bg-gradient-to-br from-blue-500 to-orange-500';
-
-    const msg = gameState === 'waiting' ? 'Tap to Start'
-      : gameState === 'ready' ? 'Wait for green...'
-      : gameState === 'go' ? 'TAP NOW!'
-      : reactionTime === 'Too early!' ? 'Too early! Tap to retry'
-      : `${reactionTime}ms - Tap to play again`;
-
-    return (
-      <div className="w-full">
-        <button
-          onClick={handleGameClick}
-          className={`w-full p-8 rounded-2xl border-2 border-black/20 transition-colors active:scale-95 cursor-pointer select-none ${bgColor}`}
-        >
-          <h3 className="text-xl font-bold text-white mb-2">Reaction Time</h3>
-          <div className="text-4xl font-black text-white mb-3">
-            {gameState === 'result' && reactionTime !== 'Too early!' ? `${reactionTime}ms` : ''}
-          </div>
-          <p className="text-lg text-white/90 font-medium">{msg}</p>
-          {bestTime && (
-            <p className="text-sm text-white/70 mt-3">
-              Best: {bestTime}ms
-            </p>
-          )}
-        </button>
-      </div>
-    );
-  };
 
   // Drudge-style links component - 2 row layout
   const NewsLinks = () => (
@@ -418,6 +705,7 @@ const AltTabWebsite = () => {
       </div>
 
       {/* Focus Areas */}
+      <Reveal direction="up">
       <div className="border-4 border-black bg-white">
         <div className="bg-gradient-to-r from-blue-600 to-orange-500 text-white px-4 py-3 border-b-4 border-black">
           <h2 className="font-bold text-2xl md:text-3xl uppercase text-center">Areas of Focus</h2>
@@ -499,16 +787,21 @@ const AltTabWebsite = () => {
           ))}
         </div>
       </div>
+      </Reveal>
 
-      {/* News Links + Game section */}
+      {/* News, Trivia, and Game section */}
+      <Reveal direction="up" delay={0.1}>
       <div className="border-4 border-black bg-gradient-to-br from-blue-100 via-blue-50 to-orange-100 p-6 md:p-8">
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
           <NewsLinks />
-          {renderGame()}
+          {renderTrivia()}
+          <SnakeGame isMobile={isMobile} />
         </div>
       </div>
+      </Reveal>
 
       {/* About sections */}
+      <Reveal direction="left" delay={0.1}>
       <div className="border-4 border-black bg-white">
         <div className="bg-gradient-to-r from-blue-600 to-orange-500 text-white px-4 py-3 border-b-4 border-black">
           <h2 className="font-bold text-2xl md:text-3xl uppercase text-center">About Alt-Tab</h2>
@@ -528,8 +821,15 @@ const AltTabWebsite = () => {
           </button>
         </div>
       </div>
+      </Reveal>
+
+      {/* Reaction Time Game */}
+      <Reveal direction="up" delay={0.1}>
+        <ReactionGame />
+      </Reveal>
 
       {/* Walt-tab Link */}
+      <Reveal direction="scale">
       <div className="text-center">
         <a
           href="https://www.walt-tab.com"
@@ -541,8 +841,10 @@ const AltTabWebsite = () => {
           Walt-tab
         </a>
       </div>
+      </Reveal>
 
       {/* Navigation buttons */}
+      <Reveal direction="up" delay={0.15}>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { text: 'ABOUT', color: 'from-blue-600 to-blue-500', page: 'about' },
@@ -560,6 +862,7 @@ const AltTabWebsite = () => {
           </Button>
         ))}
       </div>
+      </Reveal>
 
     </div>
   );
@@ -952,7 +1255,7 @@ const AltTabWebsite = () => {
           </div>
         </div>
 
-        {renderGame()}
+        <SnakeGame isMobile={isMobile} />
       </div>
     );
   };
@@ -981,7 +1284,7 @@ const AltTabWebsite = () => {
         </div>
       </div>
 
-      {renderGame()}
+      <SnakeGame isMobile={isMobile} />
     </div>
   );
 
