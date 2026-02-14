@@ -659,230 +659,245 @@ const AltTabWebsite = () => {
   );
 
   const HomePage = () => (
-    <div className="space-y-8">
-      {/* Retro header with blue/orange gradient */}
-      <div className="text-center space-y-3 py-8 border-4 border-black bg-gradient-to-br from-blue-600 via-blue-500 to-orange-500">
-        <div className="flex items-center justify-center gap-2">
-          <span className="text-xl text-white">★</span>
-          <span className="text-xs uppercase tracking-widest font-bold text-white">Established</span>
-          <span className="text-xl text-white">★</span>
-        </div>
-        <h1
-          className="text-6xl md:text-8xl font-black text-white leading-none select-none"
-          style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
-          onTouchEnd={handleHeaderDoubleTap}
-        >
-          {[
-            { key: 'A', char: 'A' },
-            { key: 'L', char: 'L' },
-            { key: 'T', char: 'T' },
-            { key: '-', char: '-' },
-            { key: 'T2', char: 'T' },
-            { key: 'A2', char: 'A' },
-            { key: 'B', char: 'B' },
-          ].map((letter) => (
-            <span
-              key={letter.key}
-              onMouseDown={(e) => handleLetterMouseDown(letter.key, e)}
-              onTouchStart={() => handleLetterTouch(letter.key)}
-              style={{
-                display: 'inline-block',
-                color: '#ffffff',
-                textShadow: '2px 2px 0px #f97316, 4px 4px 0px #1e40af',
-                cursor: isMobile ? 'pointer' : 'grab',
-                transform: `translate(${letterPositions[letter.key].x}px, ${letterPositions[letter.key].y}px)`,
-                transition: draggingLetter === letter.key ? 'none' : 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                userSelect: 'none',
-              }}
-              className="hover:scale-110 active:cursor-grabbing active:scale-95"
-            >
-              {letter.char}
-            </span>
-          ))}
-        </h1>
-        <p className="text-base md:text-lg text-white font-bold uppercase px-4">
-          ★★ Multi-Disciplinary Think Tank ★★
-        </p>
-        {isMobile && (
-          <p className="text-xs text-white/70 mt-2 animate-pulse">
-            Tap letters to scatter • Double-tap to reset • Shake to shuffle
-          </p>
-        )}
-      </div>
-
-      {/* World Clocks */}
-      <WorldClocks />
-
-      {/* Focus Areas */}
-      <Reveal direction="up">
-      <div className="border-4 border-black bg-white">
-        <div className="bg-gradient-to-r from-blue-600 to-orange-500 text-white px-4 py-3 border-b-4 border-black">
-          <h2 className="font-bold text-2xl md:text-3xl uppercase text-center">Areas of Focus</h2>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-5">
-          {[
-            { name: 'Product Development', icon: (
-              <svg viewBox="0 0 48 48" className="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                {/* Hand-drawn lightbulb */}
-                <path d="M24 4c-1 0-2 .5-2 .5s-6 2-6 12c0 4 2 6 3 8s2 4 2 6v2h6v-2c0-2 1-4 2-6s3-4 3-8c0-10-6-11.5-6-12s-1-.5-2-.5z" strokeDasharray="1 0.5" />
-                <path d="M19 34h10" strokeDasharray="2 1" />
-                <path d="M20 38h8" strokeDasharray="2 1" />
-                <path d="M22 42h4" />
-                {/* Rays */}
-                <path d="M24 0v2" strokeDasharray="1 1" />
-                <path d="M36 6l-2 2" strokeDasharray="1 1" />
-                <path d="M40 18h-3" strokeDasharray="1 1" />
-                <path d="M12 6l2 2" strokeDasharray="1 1" />
-                <path d="M8 18h3" strokeDasharray="1 1" />
-              </svg>
-            )},
-            { name: 'Research', icon: (
-              <svg viewBox="0 0 48 48" className="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                {/* Hand-drawn magnifying glass */}
-                <circle cx="20" cy="20" r="12" strokeDasharray="3 1" />
-                <path d="M29 29l12 12" strokeDasharray="2 1" />
-                <path d="M40 42l2 2" />
-                {/* Lens shine */}
-                <path d="M14 14c2-2 5-3 8-3" strokeDasharray="2 2" />
-              </svg>
-            )},
-            { name: 'Civic', icon: (
-              <svg viewBox="0 0 48 48" className="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                {/* Hand-drawn building with columns */}
-                <path d="M6 42h36" strokeDasharray="2 1" />
-                <path d="M8 42v-22" strokeDasharray="3 1" />
-                <path d="M16 42v-22" strokeDasharray="3 1" />
-                <path d="M24 42v-22" strokeDasharray="3 1" />
-                <path d="M32 42v-22" strokeDasharray="3 1" />
-                <path d="M40 42v-22" strokeDasharray="3 1" />
-                {/* Roof/pediment */}
-                <path d="M4 20h40" strokeDasharray="2 1" />
-                <path d="M8 20l16-14 16 14" strokeDasharray="2 1" />
-              </svg>
-            )},
-            { name: 'Education', icon: (
-              <svg viewBox="0 0 48 48" className="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                {/* Open book */}
-                <path d="M6 12c4-2 8-2 12 0v28c-4-2-8-2-12 0V12z" strokeDasharray="2 1" />
-                <path d="M18 12c4-2 8-2 12 0v28c-4-2-8-2-12 0V12z" strokeDasharray="2 1" />
-                <path d="M30 12c4-2 8-2 12 0v28c-4-2-8-2-12 0V12z" strokeDasharray="2 1" />
-                {/* Page lines */}
-                <path d="M9 18h6" strokeDasharray="1 1" />
-                <path d="M9 24h6" strokeDasharray="1 1" />
-                <path d="M9 30h6" strokeDasharray="1 1" />
-                <path d="M33 18h6" strokeDasharray="1 1" />
-                <path d="M33 24h6" strokeDasharray="1 1" />
-                <path d="M33 30h6" strokeDasharray="1 1" />
-                {/* Spine */}
-                <path d="M24 10v32" strokeDasharray="2 2" />
-              </svg>
-            )},
-            { name: 'Sport', icon: (
-              <svg viewBox="0 0 48 48" className="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                {/* Soccer ball - left */}
-                <circle cx="10" cy="24" r="8" strokeDasharray="2 1" />
-                <path d="M10 18l-2 3h4l-2-3z" strokeDasharray="1 0.5" />
-                {/* Basketball - center top */}
-                <circle cx="24" cy="12" r="7" strokeDasharray="2 1" />
-                <path d="M17 12h14" strokeDasharray="1 1" />
-                <path d="M24 5v14" strokeDasharray="1 1" />
-                <path d="M19 7c2 2 2 8 0 10" strokeDasharray="1 0.5" />
-                <path d="M29 7c-2 2-2 8 0 10" strokeDasharray="1 0.5" />
-                {/* Golf ball and tee - right */}
-                <circle cx="38" cy="26" r="6" strokeDasharray="2 1" />
-                <path d="M38 32v8" strokeDasharray="1 1" />
-                <path d="M35 40h6" strokeDasharray="1 0.5" />
-                {/* Golf dimples */}
-                <circle cx="36" cy="24" r="1" strokeDasharray="0.5 0.5" />
-                <circle cx="40" cy="25" r="1" strokeDasharray="0.5 0.5" />
-                <circle cx="38" cy="28" r="1" strokeDasharray="0.5 0.5" />
-              </svg>
-            )},
-          ].map((area, i) => (
-            <div key={i} className={`border-2 border-black p-6 ${i % 2 === 0 ? 'bg-blue-50' : 'bg-orange-50'} text-center`}>
-              <div className="text-blue-700">{area.icon}</div>
-              <h3 className="font-bold text-black text-sm md:text-base">{area.name}</h3>
+    <div className="-mx-4 md:-mx-6">
+      {/* Hero Banner - Full viewport, bold type */}
+      <div className="relative min-h-[70vh] md:min-h-[85vh] flex flex-col items-center justify-center bg-gradient-to-br from-blue-700 via-blue-600 to-orange-500 px-4 md:px-6">
+        <Reveal direction="scale">
+          <div className="text-center space-y-6 max-w-5xl mx-auto">
+            <div className="flex items-center justify-center gap-3">
+              <span className="text-2xl text-white/80">★</span>
+              <span className="text-sm md:text-base uppercase tracking-[0.3em] font-medium text-white/80">Multi-Disciplinary Think Tank</span>
+              <span className="text-2xl text-white/80">★</span>
             </div>
-          ))}
+            <h1
+              className="text-7xl md:text-9xl lg:text-[10rem] font-black text-white leading-[0.85] select-none tracking-tight"
+              style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+              onTouchEnd={handleHeaderDoubleTap}
+            >
+              {[
+                { key: 'A', char: 'A' },
+                { key: 'L', char: 'L' },
+                { key: 'T', char: 'T' },
+                { key: '-', char: '-' },
+                { key: 'T2', char: 'T' },
+                { key: 'A2', char: 'A' },
+                { key: 'B', char: 'B' },
+              ].map((letter) => (
+                <span
+                  key={letter.key}
+                  onMouseDown={(e) => handleLetterMouseDown(letter.key, e)}
+                  onTouchStart={() => handleLetterTouch(letter.key)}
+                  style={{
+                    display: 'inline-block',
+                    color: '#ffffff',
+                    textShadow: '3px 3px 0px rgba(249,115,22,0.5)',
+                    cursor: isMobile ? 'pointer' : 'grab',
+                    transform: `translate(${letterPositions[letter.key].x}px, ${letterPositions[letter.key].y}px)`,
+                    transition: draggingLetter === letter.key ? 'none' : 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                    userSelect: 'none',
+                  }}
+                  className="hover:scale-110 active:cursor-grabbing active:scale-95"
+                >
+                  {letter.char}
+                </span>
+              ))}
+            </h1>
+            <p className="text-lg md:text-2xl text-white/90 font-light max-w-2xl mx-auto leading-relaxed">
+              We design experiences and products that enhance the quality of human life.
+            </p>
+            {isMobile && (
+              <p className="text-xs text-white/50 mt-4 animate-pulse">
+                Tap letters to scatter · Double-tap to reset · Shake to shuffle
+              </p>
+            )}
+          </div>
+        </Reveal>
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+          <div className="w-6 h-10 rounded-full border-2 border-white/40 flex items-start justify-center p-2">
+            <div className="w-1.5 h-3 bg-white/60 rounded-full" />
+          </div>
         </div>
       </div>
-      </Reveal>
 
-      {/* News, Trivia, and Game section */}
-      <Reveal direction="up" delay={0.1}>
-      <div className="border-4 border-black bg-gradient-to-br from-blue-100 via-blue-50 to-orange-100 p-6 md:p-8">
-        <div className="grid md:grid-cols-3 gap-6">
-          <NewsLinks />
-          {renderTrivia()}
-          <SnakeGame isMobile={isMobile} />
-        </div>
+      {/* World Clocks - full-width dark band */}
+      <div className="bg-blue-950 py-6 px-4">
+        <WorldClocks />
       </div>
-      </Reveal>
 
-      {/* About sections */}
-      <Reveal direction="left" delay={0.1}>
-      <div className="border-4 border-black bg-white">
-        <div className="bg-gradient-to-r from-blue-600 to-orange-500 text-white px-4 py-3 border-b-4 border-black">
-          <h2 className="font-bold text-2xl md:text-3xl uppercase text-center">About Alt-Tab</h2>
-        </div>
-        <div className="grid md:grid-cols-3">
-          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-blue-50 hover:bg-blue-100 transition-colors text-left">
-            <h3 className="font-bold text-black mb-3 underline text-lg">Human-Centric Design</h3>
-            <p className="text-sm text-black">Founded by a library scientist and industrial designer, we blend research with creativity.</p>
-          </button>
-          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-orange-50 hover:bg-orange-100 transition-colors text-left">
-            <h3 className="font-bold text-black mb-3 underline text-lg">Multi-Disciplinary</h3>
-            <p className="text-sm text-black">From digital goods to policy, we create experiences that matter.</p>
-          </button>
-          <button onClick={() => navigateTo('about')} className="border-2 border-black p-6 bg-blue-50 hover:bg-blue-100 transition-colors text-left">
-            <h3 className="font-bold text-black mb-3 underline text-lg">Future-Forward</h3>
-            <p className="text-sm text-black">Bridging nostalgia with innovation, one project at a time.</p>
-          </button>
-        </div>
+      {/* Focus Areas - clean white section */}
+      <div className="bg-white py-16 md:py-24 px-4 md:px-6">
+        <Reveal direction="up">
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-4xl md:text-6xl font-black text-black text-center mb-4 tracking-tight">Areas of Focus</h2>
+            <p className="text-lg text-black/50 text-center mb-12 md:mb-16 max-w-2xl mx-auto">Where research meets creativity across disciplines</p>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-0">
+              {[
+                { name: 'Product Development', icon: (
+                  <svg viewBox="0 0 48 48" className="w-12 h-12 md:w-14 md:h-14 mx-auto mb-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M24 4c-1 0-2 .5-2 .5s-6 2-6 12c0 4 2 6 3 8s2 4 2 6v2h6v-2c0-2 1-4 2-6s3-4 3-8c0-10-6-11.5-6-12s-1-.5-2-.5z" strokeDasharray="1 0.5" />
+                    <path d="M19 34h10" strokeDasharray="2 1" />
+                    <path d="M20 38h8" strokeDasharray="2 1" />
+                    <path d="M22 42h4" />
+                    <path d="M24 0v2" strokeDasharray="1 1" />
+                    <path d="M36 6l-2 2" strokeDasharray="1 1" />
+                    <path d="M40 18h-3" strokeDasharray="1 1" />
+                    <path d="M12 6l2 2" strokeDasharray="1 1" />
+                    <path d="M8 18h3" strokeDasharray="1 1" />
+                  </svg>
+                )},
+                { name: 'Research', icon: (
+                  <svg viewBox="0 0 48 48" className="w-12 h-12 md:w-14 md:h-14 mx-auto mb-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="20" cy="20" r="12" strokeDasharray="3 1" />
+                    <path d="M29 29l12 12" strokeDasharray="2 1" />
+                    <path d="M40 42l2 2" />
+                    <path d="M14 14c2-2 5-3 8-3" strokeDasharray="2 2" />
+                  </svg>
+                )},
+                { name: 'Civic', icon: (
+                  <svg viewBox="0 0 48 48" className="w-12 h-12 md:w-14 md:h-14 mx-auto mb-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 42h36" strokeDasharray="2 1" />
+                    <path d="M8 42v-22" strokeDasharray="3 1" />
+                    <path d="M16 42v-22" strokeDasharray="3 1" />
+                    <path d="M24 42v-22" strokeDasharray="3 1" />
+                    <path d="M32 42v-22" strokeDasharray="3 1" />
+                    <path d="M40 42v-22" strokeDasharray="3 1" />
+                    <path d="M4 20h40" strokeDasharray="2 1" />
+                    <path d="M8 20l16-14 16 14" strokeDasharray="2 1" />
+                  </svg>
+                )},
+                { name: 'Education', icon: (
+                  <svg viewBox="0 0 48 48" className="w-12 h-12 md:w-14 md:h-14 mx-auto mb-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 12c4-2 8-2 12 0v28c-4-2-8-2-12 0V12z" strokeDasharray="2 1" />
+                    <path d="M18 12c4-2 8-2 12 0v28c-4-2-8-2-12 0V12z" strokeDasharray="2 1" />
+                    <path d="M30 12c4-2 8-2 12 0v28c-4-2-8-2-12 0V12z" strokeDasharray="2 1" />
+                    <path d="M9 18h6" strokeDasharray="1 1" />
+                    <path d="M9 24h6" strokeDasharray="1 1" />
+                    <path d="M9 30h6" strokeDasharray="1 1" />
+                    <path d="M33 18h6" strokeDasharray="1 1" />
+                    <path d="M33 24h6" strokeDasharray="1 1" />
+                    <path d="M33 30h6" strokeDasharray="1 1" />
+                    <path d="M24 10v32" strokeDasharray="2 2" />
+                  </svg>
+                )},
+                { name: 'Sport', icon: (
+                  <svg viewBox="0 0 48 48" className="w-12 h-12 md:w-14 md:h-14 mx-auto mb-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="10" cy="24" r="8" strokeDasharray="2 1" />
+                    <path d="M10 18l-2 3h4l-2-3z" strokeDasharray="1 0.5" />
+                    <circle cx="24" cy="12" r="7" strokeDasharray="2 1" />
+                    <path d="M17 12h14" strokeDasharray="1 1" />
+                    <path d="M24 5v14" strokeDasharray="1 1" />
+                    <path d="M19 7c2 2 2 8 0 10" strokeDasharray="1 0.5" />
+                    <path d="M29 7c-2 2-2 8 0 10" strokeDasharray="1 0.5" />
+                    <circle cx="38" cy="26" r="6" strokeDasharray="2 1" />
+                    <path d="M38 32v8" strokeDasharray="1 1" />
+                    <path d="M35 40h6" strokeDasharray="1 0.5" />
+                    <circle cx="36" cy="24" r="1" strokeDasharray="0.5 0.5" />
+                    <circle cx="40" cy="25" r="1" strokeDasharray="0.5 0.5" />
+                    <circle cx="38" cy="28" r="1" strokeDasharray="0.5 0.5" />
+                  </svg>
+                )},
+              ].map((area, i) => (
+                <div key={i} className={`p-8 md:p-10 ${i % 2 === 0 ? 'bg-blue-50' : 'bg-orange-50'} text-center border border-black/10 hover:bg-blue-100 transition-colors`}>
+                  <div className="text-blue-700">{area.icon}</div>
+                  <h3 className="font-bold text-black text-sm md:text-base tracking-wide">{area.name}</h3>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Reveal>
       </div>
-      </Reveal>
 
-      {/* Reaction Time Game */}
-      <Reveal direction="up" delay={0.1}>
-        <ReactionGame />
-      </Reveal>
-
-      {/* Walt-tab Link */}
-      <Reveal direction="scale">
-      <div className="text-center">
-        <a
-          href="https://www.walt-tab.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block px-8 py-3 rounded-full bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-500 text-black font-bold text-lg border-2 border-black hover:scale-105 hover:brightness-110 transition-all animate-pulse hover:animate-none"
-          style={{ boxShadow: '3px 3px 0px black' }}
-        >
-          Walt-tab
-        </a>
+      {/* News, Trivia, and Game - color-blocked section */}
+      <div className="bg-gradient-to-br from-blue-50 via-white to-orange-50 py-16 md:py-24 px-4 md:px-6">
+        <Reveal direction="up" delay={0.1}>
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-4xl md:text-6xl font-black text-black text-center mb-4 tracking-tight">Stay Connected</h2>
+            <p className="text-lg text-black/50 text-center mb-12 md:mb-16 max-w-2xl mx-auto">Headlines, trivia, and games — all in one place</p>
+            <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+              <NewsLinks />
+              {renderTrivia()}
+              <SnakeGame isMobile={isMobile} />
+            </div>
+          </div>
+        </Reveal>
       </div>
-      </Reveal>
 
-      {/* Navigation buttons */}
-      <Reveal direction="up" delay={0.15}>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          { text: 'ABOUT', color: 'from-blue-600 to-blue-500', page: 'about' },
-          { text: 'MOODBOARDS', color: 'from-blue-500 to-orange-500', page: 'moodboards' },
-          { text: 'VIEW PROJECTS', color: 'from-orange-500 to-blue-500', page: 'projects' },
-          { text: 'SHOP', color: 'from-orange-500 to-orange-400', page: 'shop' }
-        ].map((link, i) => (
-          <Button
-            key={i}
-            onClick={() => navigateTo(link.page)}
-            className={`bg-gradient-to-r ${link.color} text-white font-bold py-6 px-3 border-4 border-black hover:brightness-110 text-sm md:text-base active:scale-95 rounded-none h-auto`}
-            style={{ boxShadow: '5px 5px 0px black' }}
-          >
-            {link.text}
-          </Button>
-        ))}
+      {/* About Alt-Tab - dark color block */}
+      <div className="bg-gradient-to-br from-blue-700 to-blue-900 py-16 md:py-24 px-4 md:px-6">
+        <Reveal direction="left" delay={0.1}>
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-4xl md:text-6xl font-black text-white text-center mb-4 tracking-tight">About Alt-Tab</h2>
+            <p className="text-lg text-white/60 text-center mb-12 md:mb-16 max-w-2xl mx-auto">Ideas into reality, one project at a time</p>
+            <div className="grid md:grid-cols-3 gap-0">
+              <button onClick={() => navigateTo('about')} className="p-8 md:p-10 bg-white/10 hover:bg-white/20 transition-colors text-left border border-white/10">
+                <h3 className="font-bold text-white mb-4 text-xl">Human-Centric Design</h3>
+                <p className="text-white/70 leading-relaxed">Founded by a library scientist and industrial designer, we blend research with creativity.</p>
+              </button>
+              <button onClick={() => navigateTo('about')} className="p-8 md:p-10 bg-white/5 hover:bg-white/15 transition-colors text-left border border-white/10">
+                <h3 className="font-bold text-white mb-4 text-xl">Multi-Disciplinary</h3>
+                <p className="text-white/70 leading-relaxed">From digital goods to policy, we create experiences that matter.</p>
+              </button>
+              <button onClick={() => navigateTo('about')} className="p-8 md:p-10 bg-white/10 hover:bg-white/20 transition-colors text-left border border-white/10">
+                <h3 className="font-bold text-white mb-4 text-xl">Future-Forward</h3>
+                <p className="text-white/70 leading-relaxed">Bridging nostalgia with innovation, one project at a time.</p>
+              </button>
+            </div>
+          </div>
+        </Reveal>
       </div>
-      </Reveal>
 
+      {/* Reaction Time Game - light section */}
+      <div className="bg-white py-16 md:py-24 px-4 md:px-6">
+        <Reveal direction="up" delay={0.1}>
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-black text-black text-center mb-8 tracking-tight">Test Your Reflexes</h2>
+            <ReactionGame />
+          </div>
+        </Reveal>
+      </div>
+
+      {/* Walt-tab Link - orange color block */}
+      <div className="bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-500 py-12 md:py-16 px-4 md:px-6">
+        <Reveal direction="scale">
+          <div className="text-center">
+            <p className="text-black/60 text-sm uppercase tracking-widest mb-4">Our Sister Brand</p>
+            <a
+              href="https://www.walt-tab.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block text-4xl md:text-6xl font-black text-black hover:scale-105 transition-transform"
+            >
+              Walt-tab →
+            </a>
+          </div>
+        </Reveal>
+      </div>
+
+      {/* Navigation buttons - bottom CTA section */}
+      <div className="bg-gradient-to-br from-blue-900 to-blue-800 py-16 md:py-24 px-4 md:px-6">
+        <Reveal direction="up" delay={0.15}>
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-black text-white text-center mb-12 tracking-tight">Explore</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              {[
+                { text: 'ABOUT', color: 'from-blue-500 to-blue-400', page: 'about' },
+                { text: 'MOODBOARDS', color: 'from-blue-400 to-orange-500', page: 'moodboards' },
+                { text: 'PROJECTS', color: 'from-orange-500 to-blue-400', page: 'projects' },
+                { text: 'SHOP', color: 'from-orange-500 to-orange-400', page: 'shop' }
+              ].map((link, i) => (
+                <Button
+                  key={i}
+                  onClick={() => navigateTo(link.page)}
+                  className={`bg-gradient-to-r ${link.color} text-white font-bold py-8 px-4 hover:brightness-110 text-base md:text-lg active:scale-95 rounded-xl h-auto border-0 hover:scale-105`}
+                >
+                  {link.text}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+      </div>
     </div>
   );
 
@@ -1350,7 +1365,7 @@ const AltTabWebsite = () => {
         </>
       )}
 
-      <nav className="relative z-50 p-4 md:p-6 border-b-4 border-black bg-gradient-to-r from-blue-700 via-blue-600 to-orange-500">
+      <nav className="relative z-50 p-4 md:p-6 border-b-4 border-black bg-gradient-to-r from-blue-700 via-blue-600 to-orange-500 md:sticky md:top-0">
         <div className="flex justify-between items-center max-w-7xl mx-auto">
           <Link
             to="/"
@@ -1395,13 +1410,13 @@ const AltTabWebsite = () => {
         )}
       </nav>
 
-      <main className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
+      <main className="relative z-10">
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/moodboards" element={<MoodboardsPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/shop" element={<ShopPage />} />
+          <Route path="/projects" element={<div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12"><ProjectsPage /></div>} />
+          <Route path="/moodboards" element={<div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12"><MoodboardsPage /></div>} />
+          <Route path="/about" element={<div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12"><AboutPage /></div>} />
+          <Route path="/shop" element={<div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12"><ShopPage /></div>} />
         </Routes>
       </main>
 
