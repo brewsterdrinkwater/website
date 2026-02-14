@@ -285,41 +285,30 @@ const AltTabWebsite = () => {
     );
   };
 
-  // Reaction Time Game Component
-  const GameSection = () => {
-    const getBackgroundColor = () => {
-      switch (gameState) {
-        case 'waiting': return 'bg-gradient-to-br from-blue-500 to-blue-600';
-        case 'ready': return 'bg-gradient-to-br from-red-500 to-red-600';
-        case 'go': return 'bg-gradient-to-br from-green-400 to-green-500';
-        case 'result': return 'bg-gradient-to-br from-blue-500 to-orange-500';
-        default: return 'bg-gradient-to-br from-blue-500 to-blue-600';
-      }
-    };
+  // Reaction Time Game - rendered as function to prevent remounting on parent re-render
+  const renderGame = () => {
+    const bgColor = gameState === 'waiting' ? 'bg-gradient-to-br from-blue-500 to-blue-600'
+      : gameState === 'ready' ? 'bg-gradient-to-br from-red-500 to-red-600'
+      : gameState === 'go' ? 'bg-gradient-to-br from-green-400 to-green-500'
+      : 'bg-gradient-to-br from-blue-500 to-orange-500';
 
-    const getMessage = () => {
-      switch (gameState) {
-        case 'waiting': return 'Tap to Start';
-        case 'ready': return 'Wait for green...';
-        case 'go': return 'TAP NOW!';
-        case 'result':
-          if (reactionTime === 'Too early!') return 'Too early! Tap to retry';
-          return `${reactionTime}ms - Tap to play again`;
-        default: return 'Tap to Start';
-      }
-    };
+    const msg = gameState === 'waiting' ? 'Tap to Start'
+      : gameState === 'ready' ? 'Wait for green...'
+      : gameState === 'go' ? 'TAP NOW!'
+      : reactionTime === 'Too early!' ? 'Too early! Tap to retry'
+      : `${reactionTime}ms - Tap to play again`;
 
     return (
       <div className="w-full">
         <button
           onClick={handleGameClick}
-          className={`w-full p-8 rounded-2xl border-2 border-black/20 transition-all active:scale-95 cursor-pointer ${getBackgroundColor()}`}
+          className={`w-full p-8 rounded-2xl border-2 border-black/20 transition-colors active:scale-95 cursor-pointer select-none ${bgColor}`}
         >
           <h3 className="text-xl font-bold text-white mb-2">Reaction Time</h3>
           <div className="text-4xl font-black text-white mb-3">
             {gameState === 'result' && reactionTime !== 'Too early!' ? `${reactionTime}ms` : ''}
           </div>
-          <p className="text-lg text-white/90 font-medium">{getMessage()}</p>
+          <p className="text-lg text-white/90 font-medium">{msg}</p>
           {bestTime && (
             <p className="text-sm text-white/70 mt-3">
               Best: {bestTime}ms
@@ -515,7 +504,7 @@ const AltTabWebsite = () => {
       <div className="border-4 border-black bg-gradient-to-br from-blue-100 via-blue-50 to-orange-100 p-6 md:p-8">
         <div className="grid md:grid-cols-2 gap-6">
           <NewsLinks />
-          <GameSection />
+          {renderGame()}
         </div>
       </div>
 
@@ -963,7 +952,7 @@ const AltTabWebsite = () => {
           </div>
         </div>
 
-        <GameSection />
+        {renderGame()}
       </div>
     );
   };
@@ -992,7 +981,7 @@ const AltTabWebsite = () => {
         </div>
       </div>
 
-      <GameSection />
+      {renderGame()}
     </div>
   );
 
