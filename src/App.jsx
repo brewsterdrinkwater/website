@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Sparkles, Grid3x3, Image, BookOpen, ShoppingBag, RefreshCw, Construction, Instagram, Sun, Moon } from 'lucide-react';
+import { Menu, X, Sparkles, Grid3x3, Image, BookOpen, RefreshCw, Construction, Instagram, Sun, Moon } from 'lucide-react';
 import { Button } from './components/ui/button';
 
 // Scroll-reveal hook using IntersectionObserver
@@ -420,6 +420,7 @@ const GolfBallCursor = () => {
 
 // Draggable Hero Letters - manages its own state to prevent parent re-renders
 const DraggableHeroLetters = () => {
+  const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
   const [letterPositions, setLetterPositions] = useState({
     A: { x: 0, y: 0 }, L: { x: 0, y: 0 }, T: { x: 0, y: 0 },
@@ -427,6 +428,7 @@ const DraggableHeroLetters = () => {
   });
   const [draggingLetter, setDraggingLetter] = useState(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [hasDragged, setHasDragged] = useState(false);
   const lastTapRef = useRef(0);
 
   useEffect(() => {
@@ -464,6 +466,11 @@ const DraggableHeroLetters = () => {
 
   const handleLetterTouch = (letter) => {
     if (!isMobile) return;
+    // Secret shop link behind the dash on mobile
+    if (letter === '-') {
+      navigate('/shop');
+      return;
+    }
     setLetterPositions(prev => ({
       ...prev,
       [letter]: { x: (Math.random() - 0.5) * 120, y: (Math.random() - 0.5) * 80 }
@@ -485,6 +492,14 @@ const DraggableHeroLetters = () => {
     e.preventDefault();
     setDraggingLetter(letter);
     setDragStart({ x: e.clientX, y: e.clientY });
+    setHasDragged(false);
+  };
+
+  const handleLetterClick = (letter) => {
+    // Secret shop link behind the dash - only trigger if not dragged
+    if (letter === '-' && !hasDragged) {
+      navigate('/shop');
+    }
   };
 
   useEffect(() => {
@@ -492,6 +507,10 @@ const DraggableHeroLetters = () => {
     const handleMouseMove = (e) => {
       const deltaX = e.clientX - dragStart.x;
       const deltaY = e.clientY - dragStart.y;
+      // Only count as drag if moved more than 5px
+      if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+        setHasDragged(true);
+      }
       setLetterPositions(prev => ({
         ...prev,
         [draggingLetter]: {
@@ -501,7 +520,9 @@ const DraggableHeroLetters = () => {
       }));
       setDragStart({ x: e.clientX, y: e.clientY });
     };
-    const handleMouseUp = () => setDraggingLetter(null);
+    const handleMouseUp = () => {
+      setDraggingLetter(null);
+    };
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
     return () => {
@@ -527,12 +548,13 @@ const DraggableHeroLetters = () => {
           <span
             key={letter.key}
             onMouseDown={(e) => handleLetterMouseDown(letter.key, e)}
+            onMouseUp={() => handleLetterClick(letter.key)}
             onTouchStart={() => handleLetterTouch(letter.key)}
             style={{
               display: 'inline-block',
               color: '#ffffff',
               textShadow: '3px 3px 0px rgba(249,115,22,0.5)',
-              cursor: isMobile ? 'pointer' : 'grab',
+              cursor: isMobile ? 'pointer' : (letter.key === '-' ? 'pointer' : 'grab'),
               transform: `translate(${letterPositions[letter.key].x}px, ${letterPositions[letter.key].y}px)`,
               transition: draggingLetter === letter.key ? 'none' : 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
               userSelect: 'none',
@@ -855,45 +877,35 @@ const AltTabWebsite = () => {
         </Reveal>
       </div>
 
-      {/* Walt-tab Link - orange color block */}
-      <div className="bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-500 py-12 md:py-16 px-4 md:px-6">
-        <Reveal direction="scale">
-          <div className="text-center">
-            <p className="text-black/60 text-sm uppercase tracking-widest mb-4">Our Sister Brand</p>
-            <a
-              href="https://www.walt-tab.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block text-4xl md:text-6xl font-black text-black hover:scale-105 transition-transform"
-            >
-              Walt-tab →
-            </a>
-          </div>
-        </Reveal>
-      </div>
-
-      {/* Navigation buttons - bottom CTA section */}
-      <div className="bg-gradient-to-br from-blue-900 to-blue-800 py-16 md:py-24 px-4 md:px-6">
-        <Reveal direction="up" delay={0.15}>
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-4xl md:text-5xl font-black text-white text-center mb-12 tracking-tight">Explore</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-              {[
-                { text: 'ABOUT', color: 'from-blue-500 to-blue-400', page: 'about' },
-                { text: 'MOODBOARDS', color: 'from-blue-400 to-orange-500', page: 'moodboards' },
-                { text: 'PROJECTS', color: 'from-orange-500 to-blue-400', page: 'projects' },
-                { text: 'SHOP', color: 'from-orange-500 to-orange-400', page: 'shop' }
-              ].map((link, i) => (
-                <Button
-                  key={i}
-                  onClick={() => navigateTo(link.page)}
-                  className={`bg-gradient-to-r ${link.color} text-white font-bold py-8 px-4 hover:brightness-110 text-base md:text-lg active:scale-95 rounded-xl h-auto border-0 hover:scale-105`}
-                >
-                  {link.text}
-                </Button>
-              ))}
+      {/* Sister Brands - two tiles */}
+      <div className="grid md:grid-cols-2">
+        <Reveal direction="left">
+          <a
+            href="https://www.walt-tab.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-500 py-16 md:py-24 px-4 md:px-6 hover:brightness-110 transition-all"
+          >
+            <div className="text-center">
+              <span className="text-4xl md:text-6xl font-black text-black hover:scale-105 transition-transform inline-block">
+                Walt-tab →
+              </span>
             </div>
-          </div>
+          </a>
+        </Reveal>
+        <Reveal direction="right">
+          <a
+            href="https://www.salt-tab.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 py-16 md:py-24 px-4 md:px-6 hover:brightness-110 transition-all"
+          >
+            <div className="text-center">
+              <span className="text-4xl md:text-6xl font-black text-white hover:scale-105 transition-transform inline-block">
+                Salt-tab →
+              </span>
+            </div>
+          </a>
         </Reveal>
       </div>
     </div>
@@ -1361,7 +1373,6 @@ const AltTabWebsite = () => {
             <NavItem icon={BookOpen} label="About" page="about" />
             <NavItem icon={Image} label="Moodboards" page="moodboards" />
             <NavItem icon={Grid3x3} label="Projects" page="projects" />
-            <NavItem icon={ShoppingBag} label="Shop" page="shop" />
           </div>
 
           <div className="flex items-center gap-2">
@@ -1388,7 +1399,6 @@ const AltTabWebsite = () => {
             <NavItem icon={BookOpen} label="About" page="about" />
             <NavItem icon={Image} label="Moodboards" page="moodboards" />
             <NavItem icon={Grid3x3} label="Projects" page="projects" />
-            <NavItem icon={ShoppingBag} label="Shop" page="shop" />
           </div>
         )}
       </nav>
