@@ -418,6 +418,143 @@ const GolfBallCursor = () => {
   );
 };
 
+// Draggable Hero Letters - manages its own state to prevent parent re-renders
+const DraggableHeroLetters = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  const [letterPositions, setLetterPositions] = useState({
+    A: { x: 0, y: 0 }, L: { x: 0, y: 0 }, T: { x: 0, y: 0 },
+    '-': { x: 0, y: 0 }, T2: { x: 0, y: 0 }, A2: { x: 0, y: 0 }, B: { x: 0, y: 0 },
+  });
+  const [draggingLetter, setDraggingLetter] = useState(null);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const lastTapRef = useRef(0);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.matchMedia('(max-width: 768px)').matches);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Shake detection for mobile
+  useEffect(() => {
+    if (!isMobile) return;
+    let lastX = 0, lastY = 0, lastZ = 0;
+    const handleMotion = (e) => {
+      const { x, y, z } = e.accelerationIncludingGravity || {};
+      if (x === null) return;
+      if ((Math.abs(x - lastX) > 15 && Math.abs(y - lastY) > 15) ||
+          (Math.abs(x - lastX) > 15 && Math.abs(z - lastZ) > 15) ||
+          (Math.abs(y - lastY) > 15 && Math.abs(z - lastZ) > 15)) {
+        setLetterPositions({
+          A: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
+          L: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
+          T: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
+          '-': { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
+          T2: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
+          A2: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
+          B: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
+        });
+      }
+      lastX = x; lastY = y; lastZ = z;
+    };
+    window.addEventListener('devicemotion', handleMotion);
+    return () => window.removeEventListener('devicemotion', handleMotion);
+  }, [isMobile]);
+
+  const handleLetterTouch = (letter) => {
+    if (!isMobile) return;
+    setLetterPositions(prev => ({
+      ...prev,
+      [letter]: { x: (Math.random() - 0.5) * 120, y: (Math.random() - 0.5) * 80 }
+    }));
+  };
+
+  const handleHeaderDoubleTap = () => {
+    const now = Date.now();
+    if (now - lastTapRef.current < 300) {
+      setLetterPositions({
+        A: { x: 0, y: 0 }, L: { x: 0, y: 0 }, T: { x: 0, y: 0 },
+        '-': { x: 0, y: 0 }, T2: { x: 0, y: 0 }, A2: { x: 0, y: 0 }, B: { x: 0, y: 0 },
+      });
+    }
+    lastTapRef.current = now;
+  };
+
+  const handleLetterMouseDown = (letter, e) => {
+    e.preventDefault();
+    setDraggingLetter(letter);
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
+  useEffect(() => {
+    if (!draggingLetter) return;
+    const handleMouseMove = (e) => {
+      const deltaX = e.clientX - dragStart.x;
+      const deltaY = e.clientY - dragStart.y;
+      setLetterPositions(prev => ({
+        ...prev,
+        [draggingLetter]: {
+          x: prev[draggingLetter].x + deltaX,
+          y: prev[draggingLetter].y + deltaY,
+        }
+      }));
+      setDragStart({ x: e.clientX, y: e.clientY });
+    };
+    const handleMouseUp = () => setDraggingLetter(null);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [draggingLetter, dragStart]);
+
+  const letters = [
+    { key: 'A', char: 'A' }, { key: 'L', char: 'L' }, { key: 'T', char: 'T' },
+    { key: '-', char: '-' }, { key: 'T2', char: 'T' }, { key: 'A2', char: 'A' }, { key: 'B', char: 'B' },
+  ];
+
+  return (
+    <div className="text-center space-y-6 max-w-5xl mx-auto">
+      <span className="text-sm md:text-base uppercase tracking-[0.3em] font-medium text-white/80">Multi-Disciplinary Think Tank</span>
+      <h1
+        className="text-7xl md:text-9xl lg:text-[10rem] font-black text-white leading-[0.85] select-none tracking-tight"
+        style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+        onTouchEnd={handleHeaderDoubleTap}
+      >
+        {letters.map((letter) => (
+          <span
+            key={letter.key}
+            onMouseDown={(e) => handleLetterMouseDown(letter.key, e)}
+            onTouchStart={() => handleLetterTouch(letter.key)}
+            style={{
+              display: 'inline-block',
+              color: '#ffffff',
+              textShadow: '3px 3px 0px rgba(249,115,22,0.5)',
+              cursor: isMobile ? 'pointer' : 'grab',
+              transform: `translate(${letterPositions[letter.key].x}px, ${letterPositions[letter.key].y}px)`,
+              transition: draggingLetter === letter.key ? 'none' : 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+              userSelect: 'none',
+            }}
+            className="hover:scale-110 active:cursor-grabbing active:scale-95"
+          >
+            {letter.char}
+          </span>
+        ))}
+      </h1>
+      <p className="text-lg md:text-2xl text-white/90 font-light max-w-2xl mx-auto leading-relaxed">
+        We design experiences and products that enhance the quality of human life.
+      </p>
+      {isMobile && (
+        <p className="text-xs text-white/50 mt-4 animate-pulse">
+          Tap letters to scatter · Double-tap to reset · Shake to shuffle
+        </p>
+      )}
+    </div>
+  );
+};
+
 // World Clocks - manages its own time state to prevent parent re-renders
 const WorldClocks = () => {
   const [time, setTime] = useState(new Date());
@@ -460,6 +597,7 @@ const AltTabWebsite = () => {
   const currentPage = location.pathname === '/' ? 'home' : location.pathname.slice(1);
   const [menuOpen, setMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   // Daily trivia state
   const [triviaAnswered, setTriviaAnswered] = useState(false);
   const [triviaChoice, setTriviaChoice] = useState(null);
@@ -467,18 +605,6 @@ const AltTabWebsite = () => {
     const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
     return SPORTS_TRIVIA[dayOfYear % SPORTS_TRIVIA.length];
   }, []);
-  const [letterPositions, setLetterPositions] = useState({
-    A: { x: 0, y: 0 },
-    L: { x: 0, y: 0 },
-    T: { x: 0, y: 0 },
-    '-': { x: 0, y: 0 },
-    T2: { x: 0, y: 0 },
-    A2: { x: 0, y: 0 },
-    B: { x: 0, y: 0 },
-  });
-  const [draggingLetter, setDraggingLetter] = useState(null);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [isMobile, setIsMobile] = useState(false);
 
   // Detect mobile device
   useEffect(() => {
@@ -487,74 +613,6 @@ const AltTabWebsite = () => {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-
-  // Shake detection for mobile - scatter letters
-  useEffect(() => {
-    if (!isMobile) return;
-
-    let lastX = 0, lastY = 0, lastZ = 0;
-    let shakeThreshold = 15;
-
-    const handleMotion = (e) => {
-      const { x, y, z } = e.accelerationIncludingGravity || {};
-      if (x === null) return;
-
-      const deltaX = Math.abs(x - lastX);
-      const deltaY = Math.abs(y - lastY);
-      const deltaZ = Math.abs(z - lastZ);
-
-      if ((deltaX > shakeThreshold && deltaY > shakeThreshold) ||
-          (deltaX > shakeThreshold && deltaZ > shakeThreshold) ||
-          (deltaY > shakeThreshold && deltaZ > shakeThreshold)) {
-        // Scatter letters randomly
-        setLetterPositions({
-          A: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
-          L: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
-          T: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
-          '-': { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
-          T2: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
-          A2: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
-          B: { x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 60 },
-        });
-      }
-
-      lastX = x; lastY = y; lastZ = z;
-    };
-
-    window.addEventListener('devicemotion', handleMotion);
-    return () => window.removeEventListener('devicemotion', handleMotion);
-  }, [isMobile]);
-
-  // Touch to scatter a single letter (mobile)
-  const handleLetterTouch = (letter) => {
-    if (!isMobile) return;
-    setLetterPositions(prev => ({
-      ...prev,
-      [letter]: {
-        x: (Math.random() - 0.5) * 120,
-        y: (Math.random() - 0.5) * 80,
-      }
-    }));
-  };
-
-  // Double tap to reset all letters
-  const [lastTap, setLastTap] = useState(0);
-  const handleHeaderDoubleTap = () => {
-    const now = Date.now();
-    if (now - lastTap < 300) {
-      // Double tap detected - reset all letters
-      setLetterPositions({
-        A: { x: 0, y: 0 },
-        L: { x: 0, y: 0 },
-        T: { x: 0, y: 0 },
-        '-': { x: 0, y: 0 },
-        T2: { x: 0, y: 0 },
-        A2: { x: 0, y: 0 },
-        B: { x: 0, y: 0 },
-      });
-    }
-    setLastTap(now);
-  };
 
   // Daily Trivia render function
   const renderTrivia = () => {
@@ -598,42 +656,6 @@ const AltTabWebsite = () => {
     setMenuOpen(false);
     window.scrollTo(0, 0);
   };
-
-  // Letter dragging handlers
-  const handleLetterMouseDown = (letter, e) => {
-    e.preventDefault();
-    setDraggingLetter(letter);
-    setDragStart({ x: e.clientX, y: e.clientY });
-  };
-
-  useEffect(() => {
-    if (!draggingLetter) return;
-
-    const handleMouseMove = (e) => {
-      const deltaX = e.clientX - dragStart.x;
-      const deltaY = e.clientY - dragStart.y;
-      setLetterPositions(prev => ({
-        ...prev,
-        [draggingLetter]: {
-          x: prev[draggingLetter].x + deltaX,
-          y: prev[draggingLetter].y + deltaY,
-        }
-      }));
-      setDragStart({ x: e.clientX, y: e.clientY });
-    };
-
-    const handleMouseUp = () => {
-      setDraggingLetter(null);
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [draggingLetter, dragStart]);
-
 
   const NavItem = ({ icon: Icon, label, page }) => {
     const path = page === 'home' ? '/' : `/${page}`;
@@ -686,54 +708,7 @@ const AltTabWebsite = () => {
       {/* Hero Banner */}
       <div className="relative min-h-[50vh] md:min-h-[60vh] flex flex-col items-center justify-center bg-gradient-to-br from-blue-700 via-blue-600 to-orange-500 px-4 md:px-6">
         <Reveal direction="scale">
-          <div className="text-center space-y-6 max-w-5xl mx-auto">
-            <div className="flex items-center justify-center gap-3">
-              <span className="text-2xl text-white/80">★</span>
-              <span className="text-sm md:text-base uppercase tracking-[0.3em] font-medium text-white/80">Multi-Disciplinary Think Tank</span>
-              <span className="text-2xl text-white/80">★</span>
-            </div>
-            <h1
-              className="text-7xl md:text-9xl lg:text-[10rem] font-black text-white leading-[0.85] select-none tracking-tight"
-              style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
-              onTouchEnd={handleHeaderDoubleTap}
-            >
-              {[
-                { key: 'A', char: 'A' },
-                { key: 'L', char: 'L' },
-                { key: 'T', char: 'T' },
-                { key: '-', char: '-' },
-                { key: 'T2', char: 'T' },
-                { key: 'A2', char: 'A' },
-                { key: 'B', char: 'B' },
-              ].map((letter) => (
-                <span
-                  key={letter.key}
-                  onMouseDown={(e) => handleLetterMouseDown(letter.key, e)}
-                  onTouchStart={() => handleLetterTouch(letter.key)}
-                  style={{
-                    display: 'inline-block',
-                    color: '#ffffff',
-                    textShadow: '3px 3px 0px rgba(249,115,22,0.5)',
-                    cursor: isMobile ? 'pointer' : 'grab',
-                    transform: `translate(${letterPositions[letter.key].x}px, ${letterPositions[letter.key].y}px)`,
-                    transition: draggingLetter === letter.key ? 'none' : 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                    userSelect: 'none',
-                  }}
-                  className="hover:scale-110 active:cursor-grabbing active:scale-95"
-                >
-                  {letter.char}
-                </span>
-              ))}
-            </h1>
-            <p className="text-lg md:text-2xl text-white/90 font-light max-w-2xl mx-auto leading-relaxed">
-              We design experiences and products that enhance the quality of human life.
-            </p>
-            {isMobile && (
-              <p className="text-xs text-white/50 mt-4 animate-pulse">
-                Tap letters to scatter · Double-tap to reset · Shake to shuffle
-              </p>
-            )}
-          </div>
+          <DraggableHeroLetters />
         </Reveal>
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
