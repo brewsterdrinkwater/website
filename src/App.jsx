@@ -624,26 +624,25 @@ const WorldClocks = () => {
 
 // ===== Y2K COMPONENTS =====
 
-// Mountain Background Scene - stars use seeded positions for stability
+// Mountain Background Scene - realistic mountain photo with Y2K overlays
 const MountainBackground = ({ theme }) => {
   const canvasRef = useRef(null);
   const starsRef = useRef(null);
+  const isDark = theme === 'dark';
 
-  // Generate stable star positions once
-  const generateStars = useCallback((width, height) => {
+  // Generate stable star positions once (for dark mode)
+  const generateStars = useCallback(() => {
     const stars = [];
-    // Use a simple seeded approach - generate 200 stars with fixed relative positions
-    for (let i = 0; i < 200; i++) {
-      // Seeded random using index
+    for (let i = 0; i < 150; i++) {
       const seed1 = Math.sin(i * 12.9898) * 43758.5453;
       const seed2 = Math.sin(i * 78.233) * 43758.5453;
       const seed3 = Math.sin(i * 45.164) * 43758.5453;
       const seed4 = Math.sin(i * 94.673) * 43758.5453;
       stars.push({
         xRatio: (seed1 - Math.floor(seed1)),
-        yRatio: (seed2 - Math.floor(seed2)) * 0.6,
-        r: (seed3 - Math.floor(seed3)) * 1.5,
-        a: (seed4 - Math.floor(seed4)) * 0.8 + 0.2,
+        yRatio: (seed2 - Math.floor(seed2)) * 0.5,
+        r: (seed3 - Math.floor(seed3)) * 1.2 + 0.3,
+        a: (seed4 - Math.floor(seed4)) * 0.6 + 0.2,
       });
     }
     return stars;
@@ -652,24 +651,18 @@ const MountainBackground = ({ theme }) => {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
-    // Generate stars once if not already generated
-    if (!starsRef.current) {
-      starsRef.current = generateStars(window.innerWidth, window.innerHeight);
-    }
+    if (!starsRef.current) starsRef.current = generateStars();
 
     const drawStars = () => {
       const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const isDark = theme === 'dark';
-      const stars = starsRef.current;
-
-      for (const star of stars) {
+      if (!isDark) return;
+      for (const star of starsRef.current) {
         const x = star.xRatio * canvas.width;
         const y = star.yRatio * canvas.height;
         ctx.beginPath();
         ctx.arc(x, y, star.r, 0, Math.PI * 2);
-        ctx.fillStyle = isDark ? `rgba(255,255,255,${star.a})` : `rgba(50,70,120,${star.a * 0.4})`;
+        ctx.fillStyle = `rgba(255,255,255,${star.a})`;
         ctx.fill();
       }
     };
@@ -683,25 +676,47 @@ const MountainBackground = ({ theme }) => {
     resize();
     window.addEventListener('resize', resize);
     return () => window.removeEventListener('resize', resize);
-  }, [theme, generateStars]);
+  }, [isDark, generateStars]);
 
   return (
     <div className="fixed inset-0 z-0 overflow-hidden">
-      <div className="y2k-sky" />
+      {/* Base mountain image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: 'url(https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&q=80)',
+          filter: isDark ? 'brightness(0.3) saturate(0.7)' : 'brightness(1.1) saturate(0.9)',
+        }}
+      />
+      {/* Y2K gradient overlay */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: isDark
+            ? 'linear-gradient(180deg, rgba(4,8,15,0.85) 0%, rgba(10,20,40,0.7) 40%, rgba(15,25,50,0.5) 70%, rgba(10,15,25,0.9) 100%)'
+            : 'linear-gradient(180deg, rgba(168,200,240,0.7) 0%, rgba(200,223,248,0.5) 50%, rgba(180,210,240,0.6) 100%)',
+        }}
+      />
+      {/* Aurora/glow effect */}
       <div className="y2k-aurora" />
-      <canvas ref={canvasRef} className="absolute inset-0" />
-      <svg className="absolute bottom-0 left-0 right-0" viewBox="0 0 1440 400" preserveAspectRatio="none" style={{ height: '55vh' }}>
-        <polygon points="0,400 0,260 80,200 160,230 260,160 360,210 460,140 540,170 640,110 720,150 820,90 900,130 1000,80 1080,120 1180,70 1260,110 1360,60 1440,100 1440,400" fill="var(--mountain2)" opacity="0.9"/>
-        <polygon points="820,90 800,130 840,130" fill="var(--snow)" opacity="0.5"/>
-        <polygon points="1180,70 1160,110 1200,110" fill="var(--snow)" opacity="0.4"/>
-        <polygon points="460,140 440,175 480,175" fill="var(--snow)" opacity="0.4"/>
-        <polygon points="0,400 0,310 60,280 140,300 220,250 320,270 420,220 500,240 600,190 700,215 780,170 860,200 960,155 1040,180 1140,145 1220,165 1320,130 1440,155 1440,400" fill="var(--mountain1)" opacity="0.95"/>
-        <polygon points="600,190 582,220 618,220" fill="var(--snow)" opacity="0.6"/>
-        <polygon points="960,155 942,185 978,185" fill="var(--snow)" opacity="0.55"/>
-        <polygon points="1320,130 1302,162 1338,162" fill="var(--snow)" opacity="0.5"/>
-        <polygon points="0,400 0,350 100,330 200,345 300,310 400,330 520,295 640,320 760,285 880,310 1000,275 1120,300 1240,270 1360,295 1440,275 1440,400" fill="var(--mountain3)" opacity="0.8"/>
-        <rect x="0" y="370" width="1440" height="30" fill="var(--bg2)" opacity="0.9"/>
-      </svg>
+      {/* Stars canvas (dark mode only) */}
+      <canvas ref={canvasRef} className="absolute inset-0" style={{ opacity: isDark ? 1 : 0 }} />
+      {/* Film grain overlay for Y2K authenticity */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+          opacity: isDark ? 0.04 : 0.03,
+          mixBlendMode: 'overlay',
+        }}
+      />
+      {/* Bottom fade to content */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-32"
+        style={{
+          background: `linear-gradient(to top, var(--bg) 0%, transparent 100%)`,
+        }}
+      />
     </div>
   );
 };
@@ -709,19 +724,122 @@ const MountainBackground = ({ theme }) => {
 // Scanlines overlay
 const Scanlines = () => <div className="y2k-scanlines" />;
 
-// Marquee Bar
-const MarqueeBar = () => (
-  <div className="y2k-marquee-bar">
-    <div className="y2k-marquee-label">ALT-TAB.XYZ</div>
-    <div style={{ overflow: 'hidden', flex: 1, height: '100%', display: 'flex', alignItems: 'center' }}>
-      <div className="y2k-marquee-track">
-        {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
-          <span key={i}>{item}</span>
-        ))}
+// Sports Ticker Hook - fetches live scores for Arsenal and Mets
+const useSportsScores = () => {
+  const [scores, setScores] = useState([]);
+
+  useEffect(() => {
+    const fetchScores = async () => {
+      const sportsData = [];
+
+      // Fetch NY Mets data from MLB Stats API (free, no auth)
+      try {
+        const metsId = 121; // NY Mets team ID
+        const today = new Date().toISOString().split('T')[0];
+        const endDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const metsRes = await fetch(
+          `https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId=${metsId}&startDate=${today}&endDate=${endDate}`
+        );
+        if (metsRes.ok) {
+          const metsData = await metsRes.json();
+          const games = metsData.dates?.flatMap(d => d.games) || [];
+          if (games.length > 0) {
+            const game = games[0];
+            const isHome = game.teams.home.team.id === metsId;
+            const opponent = isHome ? game.teams.away.team.name : game.teams.home.team.name;
+            const status = game.status.detailedState;
+            if (status === 'Final') {
+              const metsScore = isHome ? game.teams.home.score : game.teams.away.score;
+              const oppScore = isHome ? game.teams.away.score : game.teams.home.score;
+              const result = metsScore > oppScore ? 'W' : metsScore < oppScore ? 'L' : 'T';
+              sportsData.push(`NY METS ${result} ${metsScore}-${oppScore} vs ${opponent.replace('New York ', 'NY ').toUpperCase()}`);
+            } else if (status === 'In Progress') {
+              const metsScore = isHome ? game.teams.home.score : game.teams.away.score;
+              const oppScore = isHome ? game.teams.away.score : game.teams.home.score;
+              sportsData.push(`NY METS LIVE: ${metsScore}-${oppScore} vs ${opponent.replace('New York ', 'NY ').toUpperCase()}`);
+            } else {
+              const gameDate = new Date(game.gameDate);
+              const dateStr = gameDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+              sportsData.push(`NY METS: ${isHome ? 'vs' : '@'} ${opponent.replace('New York ', 'NY ').toUpperCase()} ${dateStr}`);
+            }
+          }
+        }
+      } catch (e) {
+        sportsData.push('NY METS: Check schedule at mlb.com/mets');
+      }
+
+      // Fetch Arsenal data from free API
+      try {
+        const arsenalRes = await fetch('https://www.thesportsdb.com/api/v1/json/3/eventslast.php?id=133604');
+        if (arsenalRes.ok) {
+          const arsenalData = await arsenalRes.json();
+          const lastGame = arsenalData.results?.[0];
+          if (lastGame) {
+            const isHome = lastGame.idHomeTeam === '133604';
+            const arsenalScore = isHome ? lastGame.intHomeScore : lastGame.intAwayScore;
+            const oppScore = isHome ? lastGame.intAwayScore : lastGame.intHomeScore;
+            const opponent = isHome ? lastGame.strAwayTeam : lastGame.strHomeTeam;
+            const result = parseInt(arsenalScore) > parseInt(oppScore) ? 'W' : parseInt(arsenalScore) < parseInt(oppScore) ? 'L' : 'D';
+            sportsData.push(`ARSENAL ${result} ${arsenalScore}-${oppScore} vs ${opponent.toUpperCase()}`);
+          }
+        }
+      } catch (e) {
+        // Fallback
+      }
+
+      // Try to get next Arsenal fixture
+      try {
+        const nextRes = await fetch('https://www.thesportsdb.com/api/v1/json/3/eventsnext.php?id=133604');
+        if (nextRes.ok) {
+          const nextData = await nextRes.json();
+          const nextGame = nextData.events?.[0];
+          if (nextGame) {
+            const isHome = nextGame.idHomeTeam === '133604';
+            const opponent = isHome ? nextGame.strAwayTeam : nextGame.strHomeTeam;
+            const gameDate = new Date(nextGame.dateEvent);
+            const dateStr = gameDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+            sportsData.push(`ARSENAL NEXT: ${isHome ? 'vs' : '@'} ${opponent.toUpperCase()} ${dateStr}`);
+          }
+        }
+      } catch (e) {
+        // Fallback
+      }
+
+      if (sportsData.length === 0) {
+        sportsData.push('ARSENAL: Live scores at arsenal.com');
+        sportsData.push('NY METS: Live scores at mlb.com/mets');
+      }
+
+      setScores(sportsData);
+    };
+
+    fetchScores();
+    // Refresh every 5 minutes
+    const interval = setInterval(fetchScores, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return scores;
+};
+
+// Marquee Bar with sports scores
+const MarqueeBar = () => {
+  const sportsScores = useSportsScores();
+  const allItems = [...MARQUEE_ITEMS, ...sportsScores];
+
+  return (
+    <div className="y2k-marquee-bar">
+      <div className="y2k-marquee-label">ALT-TAB</div>
+      <div style={{ overflow: 'hidden', flex: 1, height: '100%', display: 'flex', alignItems: 'center' }}>
+        <div className="y2k-marquee-track">
+          {[...allItems, ...allItems].map((item, i) => (
+            <span key={i} style={sportsScores.includes(item) ? { color: 'var(--accent3)' } : {}}>{item}</span>
+          ))}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Toast notification
 const Toast = ({ message, show }) => (
@@ -1462,38 +1580,60 @@ const AltTabWebsite = () => {
     );
   };
 
-  // About Page (Y2K styled but full page)
+  // About Page (Y2K styled with windowed layout)
   const AboutPage = () => (
-    <div className="space-y-8 pb-16">
-      <div className="text-center space-y-4 p-6" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-        <h2 className="text-4xl md:text-5xl font-mono-vt" style={{ color: 'var(--accent)', textShadow: '0 0 20px var(--accent)' }}>PHILOSOPHY</h2>
-        <p className="font-mono-courier" style={{ color: 'var(--text-dim)' }}>Where research meets creativity</p>
-      </div>
+    <div className="pb-16">
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Left Window: Mission & Values */}
+        <div className="flex-1" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+          <div className="px-4 py-2 flex items-center gap-2" style={{ background: 'var(--bg2)', borderBottom: '1px solid var(--border)' }}>
+            <span className="w-3 h-3 rounded-full" style={{ background: '#ff5f57' }} />
+            <span className="w-3 h-3 rounded-full" style={{ background: '#febc2e' }} />
+            <span className="w-3 h-3 rounded-full" style={{ background: '#28c840' }} />
+            <span className="ml-2 font-mono-vt text-xs" style={{ color: 'var(--text-dim)' }}>// about.txt</span>
+          </div>
+          <div className="p-6 space-y-6">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-mono-vt mb-4" style={{ color: 'var(--accent)' }}>MISSION</h2>
+              <p className="font-mono-courier leading-relaxed" style={{ color: 'var(--text)' }}>
+                Alt-Tab exists to bridge the gap between human needs and technological possibility. We are a think tank dedicated to designing experiences and products that enhance the quality of human life.
+              </p>
+            </div>
+            <div className="border-t pt-6" style={{ borderColor: 'var(--border)' }}>
+              <h3 className="text-lg font-mono-vt mb-4" style={{ color: 'var(--accent)' }}>VALUES</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                  { title: 'Human-Centric', text: 'People at the center of every project.' },
+                  { title: 'Research-Driven', text: 'Evidence-based decision making.' },
+                  { title: 'Rapid Prototyping', text: 'Fail fast, learn faster.' },
+                  { title: 'Multi-Disciplinary', text: 'Diverse perspectives from design, tech, and strategy.' },
+                ].map((item, i) => (
+                  <div key={i} className="p-4" style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}>
+                    <h4 className="font-mono-vt text-sm mb-1" style={{ color: 'var(--accent2)' }}>{item.title}</h4>
+                    <p className="font-mono-courier text-xs" style={{ color: 'var(--text-dim)' }}>{item.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <p className="text-sm font-mono-share" style={{ color: 'var(--text-dim)' }}>
+              &gt; cross-pollinating ideas across disciplines_<span className="y2k-blink">█</span>
+            </p>
+          </div>
+        </div>
 
-      <div className="p-6 md:p-8" style={{ background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%)', border: '1px solid var(--border)' }}>
-        <div className="max-w-2xl mx-auto text-center space-y-4">
-          <h3 className="text-2xl font-mono-vt" style={{ color: 'var(--bg)' }}>OUR MISSION</h3>
-          <p className="font-mono-courier" style={{ color: 'var(--bg)' }}>
-            Alt-Tab exists to bridge the gap between human needs and technological possibility. We are a think tank dedicated to designing experiences and products that enhance the quality of human life.
-          </p>
+        {/* Right Window: Snake Game */}
+        <div className="lg:w-[340px]" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+          <div className="px-4 py-2 flex items-center gap-2" style={{ background: 'var(--bg2)', borderBottom: '1px solid var(--border)' }}>
+            <span className="w-3 h-3 rounded-full" style={{ background: '#ff5f57' }} />
+            <span className="w-3 h-3 rounded-full" style={{ background: '#febc2e' }} />
+            <span className="w-3 h-3 rounded-full" style={{ background: '#28c840' }} />
+            <span className="ml-2 font-mono-vt text-xs" style={{ color: 'var(--text-dim)' }}>// game.exe</span>
+          </div>
+          <div className="p-4">
+            <SnakeGame isMobile={isMobile} />
+          </div>
         </div>
       </div>
-
-      <div className="grid md:grid-cols-2 gap-4">
-        {[
-          { title: 'Human-Centric Design', text: 'Our human-centric approach places people at the center of every project.' },
-          { title: 'Research-Driven', text: 'Our process is grounded in systematic research and evidence-based decision making.' },
-          { title: 'Rapid Prototyping', text: 'We believe in learning by making. Fail fast, learn faster.' },
-          { title: 'Multi-Disciplinary', text: 'Complex problems require diverse perspectives from design, tech, and strategy.' },
-        ].map((item, i) => (
-          <div key={i} className="p-6" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-            <h3 className="font-mono-vt text-lg mb-2" style={{ color: 'var(--accent2)' }}>{item.title}</h3>
-            <p className="font-mono-courier text-sm" style={{ color: 'var(--text)' }}>{item.text}</p>
-          </div>
-        ))}
-      </div>
-
-      <SnakeGame isMobile={isMobile} />
     </div>
   );
 
@@ -1533,7 +1673,7 @@ const AltTabWebsite = () => {
 
       {/* Topbar */}
       <div className="y2k-topbar fixed top-0 left-0 right-0 z-[300]">
-        <Link to="/" className="y2k-logo" onClick={() => window.scrollTo(0, 0)}>ALT-TAB.XYZ</Link>
+        <Link to="/" className="y2k-logo" onClick={() => window.scrollTo(0, 0)}>ALT-TAB</Link>
         <div className="y2k-nav-links hidden md:flex">
           <Link to="/about" onClick={() => window.scrollTo(0, 0)}>about</Link>
           <Link to="/moodboards" onClick={() => window.scrollTo(0, 0)}>moodboards</Link>
