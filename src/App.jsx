@@ -624,26 +624,25 @@ const WorldClocks = () => {
 
 // ===== Y2K COMPONENTS =====
 
-// Mountain Background Scene - stars use seeded positions for stability
+// Mountain Background Scene - realistic mountain photo with Y2K overlays
 const MountainBackground = ({ theme }) => {
   const canvasRef = useRef(null);
   const starsRef = useRef(null);
+  const isDark = theme === 'dark';
 
-  // Generate stable star positions once
-  const generateStars = useCallback((width, height) => {
+  // Generate stable star positions once (for dark mode)
+  const generateStars = useCallback(() => {
     const stars = [];
-    // Use a simple seeded approach - generate 200 stars with fixed relative positions
-    for (let i = 0; i < 200; i++) {
-      // Seeded random using index
+    for (let i = 0; i < 150; i++) {
       const seed1 = Math.sin(i * 12.9898) * 43758.5453;
       const seed2 = Math.sin(i * 78.233) * 43758.5453;
       const seed3 = Math.sin(i * 45.164) * 43758.5453;
       const seed4 = Math.sin(i * 94.673) * 43758.5453;
       stars.push({
         xRatio: (seed1 - Math.floor(seed1)),
-        yRatio: (seed2 - Math.floor(seed2)) * 0.6,
-        r: (seed3 - Math.floor(seed3)) * 1.5,
-        a: (seed4 - Math.floor(seed4)) * 0.8 + 0.2,
+        yRatio: (seed2 - Math.floor(seed2)) * 0.5,
+        r: (seed3 - Math.floor(seed3)) * 1.2 + 0.3,
+        a: (seed4 - Math.floor(seed4)) * 0.6 + 0.2,
       });
     }
     return stars;
@@ -652,24 +651,18 @@ const MountainBackground = ({ theme }) => {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
-    // Generate stars once if not already generated
-    if (!starsRef.current) {
-      starsRef.current = generateStars(window.innerWidth, window.innerHeight);
-    }
+    if (!starsRef.current) starsRef.current = generateStars();
 
     const drawStars = () => {
       const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const isDark = theme === 'dark';
-      const stars = starsRef.current;
-
-      for (const star of stars) {
+      if (!isDark) return;
+      for (const star of starsRef.current) {
         const x = star.xRatio * canvas.width;
         const y = star.yRatio * canvas.height;
         ctx.beginPath();
         ctx.arc(x, y, star.r, 0, Math.PI * 2);
-        ctx.fillStyle = isDark ? `rgba(255,255,255,${star.a})` : `rgba(50,70,120,${star.a * 0.4})`;
+        ctx.fillStyle = `rgba(255,255,255,${star.a})`;
         ctx.fill();
       }
     };
@@ -683,25 +676,47 @@ const MountainBackground = ({ theme }) => {
     resize();
     window.addEventListener('resize', resize);
     return () => window.removeEventListener('resize', resize);
-  }, [theme, generateStars]);
+  }, [isDark, generateStars]);
 
   return (
     <div className="fixed inset-0 z-0 overflow-hidden">
-      <div className="y2k-sky" />
+      {/* Base mountain image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: 'url(https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&q=80)',
+          filter: isDark ? 'brightness(0.3) saturate(0.7)' : 'brightness(1.1) saturate(0.9)',
+        }}
+      />
+      {/* Y2K gradient overlay */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: isDark
+            ? 'linear-gradient(180deg, rgba(4,8,15,0.85) 0%, rgba(10,20,40,0.7) 40%, rgba(15,25,50,0.5) 70%, rgba(10,15,25,0.9) 100%)'
+            : 'linear-gradient(180deg, rgba(168,200,240,0.7) 0%, rgba(200,223,248,0.5) 50%, rgba(180,210,240,0.6) 100%)',
+        }}
+      />
+      {/* Aurora/glow effect */}
       <div className="y2k-aurora" />
-      <canvas ref={canvasRef} className="absolute inset-0" />
-      <svg className="absolute bottom-0 left-0 right-0" viewBox="0 0 1440 400" preserveAspectRatio="none" style={{ height: '55vh' }}>
-        <polygon points="0,400 0,260 80,200 160,230 260,160 360,210 460,140 540,170 640,110 720,150 820,90 900,130 1000,80 1080,120 1180,70 1260,110 1360,60 1440,100 1440,400" fill="var(--mountain2)" opacity="0.9"/>
-        <polygon points="820,90 800,130 840,130" fill="var(--snow)" opacity="0.5"/>
-        <polygon points="1180,70 1160,110 1200,110" fill="var(--snow)" opacity="0.4"/>
-        <polygon points="460,140 440,175 480,175" fill="var(--snow)" opacity="0.4"/>
-        <polygon points="0,400 0,310 60,280 140,300 220,250 320,270 420,220 500,240 600,190 700,215 780,170 860,200 960,155 1040,180 1140,145 1220,165 1320,130 1440,155 1440,400" fill="var(--mountain1)" opacity="0.95"/>
-        <polygon points="600,190 582,220 618,220" fill="var(--snow)" opacity="0.6"/>
-        <polygon points="960,155 942,185 978,185" fill="var(--snow)" opacity="0.55"/>
-        <polygon points="1320,130 1302,162 1338,162" fill="var(--snow)" opacity="0.5"/>
-        <polygon points="0,400 0,350 100,330 200,345 300,310 400,330 520,295 640,320 760,285 880,310 1000,275 1120,300 1240,270 1360,295 1440,275 1440,400" fill="var(--mountain3)" opacity="0.8"/>
-        <rect x="0" y="370" width="1440" height="30" fill="var(--bg2)" opacity="0.9"/>
-      </svg>
+      {/* Stars canvas (dark mode only) */}
+      <canvas ref={canvasRef} className="absolute inset-0" style={{ opacity: isDark ? 1 : 0 }} />
+      {/* Film grain overlay for Y2K authenticity */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+          opacity: isDark ? 0.04 : 0.03,
+          mixBlendMode: 'overlay',
+        }}
+      />
+      {/* Bottom fade to content */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-32"
+        style={{
+          background: `linear-gradient(to top, var(--bg) 0%, transparent 100%)`,
+        }}
+      />
     </div>
   );
 };
