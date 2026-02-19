@@ -1462,38 +1462,60 @@ const AltTabWebsite = () => {
     );
   };
 
-  // About Page (Y2K styled but full page)
+  // About Page (Y2K styled with windowed layout)
   const AboutPage = () => (
-    <div className="space-y-8 pb-16">
-      <div className="text-center space-y-4 p-6" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-        <h2 className="text-4xl md:text-5xl font-mono-vt" style={{ color: 'var(--accent)', textShadow: '0 0 20px var(--accent)' }}>PHILOSOPHY</h2>
-        <p className="font-mono-courier" style={{ color: 'var(--text-dim)' }}>Where research meets creativity</p>
-      </div>
+    <div className="pb-16">
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Left Window: Mission & Values */}
+        <div className="flex-1" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+          <div className="px-4 py-2 flex items-center gap-2" style={{ background: 'var(--bg2)', borderBottom: '1px solid var(--border)' }}>
+            <span className="w-3 h-3 rounded-full" style={{ background: '#ff5f57' }} />
+            <span className="w-3 h-3 rounded-full" style={{ background: '#febc2e' }} />
+            <span className="w-3 h-3 rounded-full" style={{ background: '#28c840' }} />
+            <span className="ml-2 font-mono-vt text-xs" style={{ color: 'var(--text-dim)' }}>// about.txt</span>
+          </div>
+          <div className="p-6 space-y-6">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-mono-vt mb-4" style={{ color: 'var(--accent)' }}>MISSION</h2>
+              <p className="font-mono-courier leading-relaxed" style={{ color: 'var(--text)' }}>
+                Alt-Tab exists to bridge the gap between human needs and technological possibility. We are a think tank dedicated to designing experiences and products that enhance the quality of human life.
+              </p>
+            </div>
+            <div className="border-t pt-6" style={{ borderColor: 'var(--border)' }}>
+              <h3 className="text-lg font-mono-vt mb-4" style={{ color: 'var(--accent)' }}>VALUES</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                  { title: 'Human-Centric', text: 'People at the center of every project.' },
+                  { title: 'Research-Driven', text: 'Evidence-based decision making.' },
+                  { title: 'Rapid Prototyping', text: 'Fail fast, learn faster.' },
+                  { title: 'Multi-Disciplinary', text: 'Diverse perspectives from design, tech, and strategy.' },
+                ].map((item, i) => (
+                  <div key={i} className="p-4" style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}>
+                    <h4 className="font-mono-vt text-sm mb-1" style={{ color: 'var(--accent2)' }}>{item.title}</h4>
+                    <p className="font-mono-courier text-xs" style={{ color: 'var(--text-dim)' }}>{item.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <p className="text-sm font-mono-share" style={{ color: 'var(--text-dim)' }}>
+              &gt; cross-pollinating ideas across disciplines_<span className="y2k-blink">█</span>
+            </p>
+          </div>
+        </div>
 
-      <div className="p-6 md:p-8" style={{ background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%)', border: '1px solid var(--border)' }}>
-        <div className="max-w-2xl mx-auto text-center space-y-4">
-          <h3 className="text-2xl font-mono-vt" style={{ color: 'var(--bg)' }}>OUR MISSION</h3>
-          <p className="font-mono-courier" style={{ color: 'var(--bg)' }}>
-            Alt-Tab exists to bridge the gap between human needs and technological possibility. We are a think tank dedicated to designing experiences and products that enhance the quality of human life.
-          </p>
+        {/* Right Window: Snake Game */}
+        <div className="lg:w-[340px]" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+          <div className="px-4 py-2 flex items-center gap-2" style={{ background: 'var(--bg2)', borderBottom: '1px solid var(--border)' }}>
+            <span className="w-3 h-3 rounded-full" style={{ background: '#ff5f57' }} />
+            <span className="w-3 h-3 rounded-full" style={{ background: '#febc2e' }} />
+            <span className="w-3 h-3 rounded-full" style={{ background: '#28c840' }} />
+            <span className="ml-2 font-mono-vt text-xs" style={{ color: 'var(--text-dim)' }}>// game.exe</span>
+          </div>
+          <div className="p-4">
+            <SnakeGame isMobile={isMobile} />
+          </div>
         </div>
       </div>
-
-      <div className="grid md:grid-cols-2 gap-4">
-        {[
-          { title: 'Human-Centric Design', text: 'Our human-centric approach places people at the center of every project.' },
-          { title: 'Research-Driven', text: 'Our process is grounded in systematic research and evidence-based decision making.' },
-          { title: 'Rapid Prototyping', text: 'We believe in learning by making. Fail fast, learn faster.' },
-          { title: 'Multi-Disciplinary', text: 'Complex problems require diverse perspectives from design, tech, and strategy.' },
-        ].map((item, i) => (
-          <div key={i} className="p-6" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-            <h3 className="font-mono-vt text-lg mb-2" style={{ color: 'var(--accent2)' }}>{item.title}</h3>
-            <p className="font-mono-courier text-sm" style={{ color: 'var(--text)' }}>{item.text}</p>
-          </div>
-        ))}
-      </div>
-
-      <SnakeGame isMobile={isMobile} />
     </div>
   );
 
@@ -1533,7 +1555,7 @@ const AltTabWebsite = () => {
 
       {/* Topbar */}
       <div className="y2k-topbar fixed top-0 left-0 right-0 z-[300]">
-        <Link to="/" className="y2k-logo" onClick={() => window.scrollTo(0, 0)}>ALT-TAB.XYZ</Link>
+        <Link to="/" className="y2k-logo" onClick={() => window.scrollTo(0, 0)}>ALT-TAB</Link>
         <div className="y2k-nav-links hidden md:flex">
           <Link to="/about" onClick={() => window.scrollTo(0, 0)}>about</Link>
           <Link to="/moodboards" onClick={() => window.scrollTo(0, 0)}>moodboards</Link>
