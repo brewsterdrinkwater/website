@@ -724,19 +724,122 @@ const MountainBackground = ({ theme }) => {
 // Scanlines overlay
 const Scanlines = () => <div className="y2k-scanlines" />;
 
-// Marquee Bar
-const MarqueeBar = () => (
-  <div className="y2k-marquee-bar">
-    <div className="y2k-marquee-label">ALT-TAB.XYZ</div>
-    <div style={{ overflow: 'hidden', flex: 1, height: '100%', display: 'flex', alignItems: 'center' }}>
-      <div className="y2k-marquee-track">
-        {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
-          <span key={i}>{item}</span>
-        ))}
+// Sports Ticker Hook - fetches live scores for Arsenal and Mets
+const useSportsScores = () => {
+  const [scores, setScores] = useState([]);
+
+  useEffect(() => {
+    const fetchScores = async () => {
+      const sportsData = [];
+
+      // Fetch NY Mets data from MLB Stats API (free, no auth)
+      try {
+        const metsId = 121; // NY Mets team ID
+        const today = new Date().toISOString().split('T')[0];
+        const endDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const metsRes = await fetch(
+          `https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId=${metsId}&startDate=${today}&endDate=${endDate}`
+        );
+        if (metsRes.ok) {
+          const metsData = await metsRes.json();
+          const games = metsData.dates?.flatMap(d => d.games) || [];
+          if (games.length > 0) {
+            const game = games[0];
+            const isHome = game.teams.home.team.id === metsId;
+            const opponent = isHome ? game.teams.away.team.name : game.teams.home.team.name;
+            const status = game.status.detailedState;
+            if (status === 'Final') {
+              const metsScore = isHome ? game.teams.home.score : game.teams.away.score;
+              const oppScore = isHome ? game.teams.away.score : game.teams.home.score;
+              const result = metsScore > oppScore ? 'W' : metsScore < oppScore ? 'L' : 'T';
+              sportsData.push(`NY METS ${result} ${metsScore}-${oppScore} vs ${opponent.replace('New York ', 'NY ').toUpperCase()}`);
+            } else if (status === 'In Progress') {
+              const metsScore = isHome ? game.teams.home.score : game.teams.away.score;
+              const oppScore = isHome ? game.teams.away.score : game.teams.home.score;
+              sportsData.push(`NY METS LIVE: ${metsScore}-${oppScore} vs ${opponent.replace('New York ', 'NY ').toUpperCase()}`);
+            } else {
+              const gameDate = new Date(game.gameDate);
+              const dateStr = gameDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+              sportsData.push(`NY METS: ${isHome ? 'vs' : '@'} ${opponent.replace('New York ', 'NY ').toUpperCase()} ${dateStr}`);
+            }
+          }
+        }
+      } catch (e) {
+        sportsData.push('NY METS: Check schedule at mlb.com/mets');
+      }
+
+      // Fetch Arsenal data from free API
+      try {
+        const arsenalRes = await fetch('https://www.thesportsdb.com/api/v1/json/3/eventslast.php?id=133604');
+        if (arsenalRes.ok) {
+          const arsenalData = await arsenalRes.json();
+          const lastGame = arsenalData.results?.[0];
+          if (lastGame) {
+            const isHome = lastGame.idHomeTeam === '133604';
+            const arsenalScore = isHome ? lastGame.intHomeScore : lastGame.intAwayScore;
+            const oppScore = isHome ? lastGame.intAwayScore : lastGame.intHomeScore;
+            const opponent = isHome ? lastGame.strAwayTeam : lastGame.strHomeTeam;
+            const result = parseInt(arsenalScore) > parseInt(oppScore) ? 'W' : parseInt(arsenalScore) < parseInt(oppScore) ? 'L' : 'D';
+            sportsData.push(`ARSENAL ${result} ${arsenalScore}-${oppScore} vs ${opponent.toUpperCase()}`);
+          }
+        }
+      } catch (e) {
+        // Fallback
+      }
+
+      // Try to get next Arsenal fixture
+      try {
+        const nextRes = await fetch('https://www.thesportsdb.com/api/v1/json/3/eventsnext.php?id=133604');
+        if (nextRes.ok) {
+          const nextData = await nextRes.json();
+          const nextGame = nextData.events?.[0];
+          if (nextGame) {
+            const isHome = nextGame.idHomeTeam === '133604';
+            const opponent = isHome ? nextGame.strAwayTeam : nextGame.strHomeTeam;
+            const gameDate = new Date(nextGame.dateEvent);
+            const dateStr = gameDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+            sportsData.push(`ARSENAL NEXT: ${isHome ? 'vs' : '@'} ${opponent.toUpperCase()} ${dateStr}`);
+          }
+        }
+      } catch (e) {
+        // Fallback
+      }
+
+      if (sportsData.length === 0) {
+        sportsData.push('ARSENAL: Live scores at arsenal.com');
+        sportsData.push('NY METS: Live scores at mlb.com/mets');
+      }
+
+      setScores(sportsData);
+    };
+
+    fetchScores();
+    // Refresh every 5 minutes
+    const interval = setInterval(fetchScores, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return scores;
+};
+
+// Marquee Bar with sports scores
+const MarqueeBar = () => {
+  const sportsScores = useSportsScores();
+  const allItems = [...MARQUEE_ITEMS, ...sportsScores];
+
+  return (
+    <div className="y2k-marquee-bar">
+      <div className="y2k-marquee-label">ALT-TAB</div>
+      <div style={{ overflow: 'hidden', flex: 1, height: '100%', display: 'flex', alignItems: 'center' }}>
+        <div className="y2k-marquee-track">
+          {[...allItems, ...allItems].map((item, i) => (
+            <span key={i} style={sportsScores.includes(item) ? { color: 'var(--accent3)' } : {}}>{item}</span>
+          ))}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Toast notification
 const Toast = ({ message, show }) => (
