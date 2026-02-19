@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Sparkles, Grid3x3, Image, BookOpen, RefreshCw, Construction, Instagram } from 'lucide-react';
-import { Button } from './components/ui/button';
+import { Menu, X, Sparkles, RefreshCw, Construction, Instagram } from 'lucide-react';
 
 // ===== DATA =====
 
@@ -625,13 +624,55 @@ const WorldClocks = () => {
 
 // ===== Y2K COMPONENTS =====
 
-// Mountain Background Scene
+// Mountain Background Scene - stars use seeded positions for stability
 const MountainBackground = ({ theme }) => {
   const canvasRef = useRef(null);
+  const starsRef = useRef(null);
+
+  // Generate stable star positions once
+  const generateStars = useCallback((width, height) => {
+    const stars = [];
+    // Use a simple seeded approach - generate 200 stars with fixed relative positions
+    for (let i = 0; i < 200; i++) {
+      // Seeded random using index
+      const seed1 = Math.sin(i * 12.9898) * 43758.5453;
+      const seed2 = Math.sin(i * 78.233) * 43758.5453;
+      const seed3 = Math.sin(i * 45.164) * 43758.5453;
+      const seed4 = Math.sin(i * 94.673) * 43758.5453;
+      stars.push({
+        xRatio: (seed1 - Math.floor(seed1)),
+        yRatio: (seed2 - Math.floor(seed2)) * 0.6,
+        r: (seed3 - Math.floor(seed3)) * 1.5,
+        a: (seed4 - Math.floor(seed4)) * 0.8 + 0.2,
+      });
+    }
+    return stars;
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    // Generate stars once if not already generated
+    if (!starsRef.current) {
+      starsRef.current = generateStars(window.innerWidth, window.innerHeight);
+    }
+
+    const drawStars = () => {
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const isDark = theme === 'dark';
+      const stars = starsRef.current;
+
+      for (const star of stars) {
+        const x = star.xRatio * canvas.width;
+        const y = star.yRatio * canvas.height;
+        ctx.beginPath();
+        ctx.arc(x, y, star.r, 0, Math.PI * 2);
+        ctx.fillStyle = isDark ? `rgba(255,255,255,${star.a})` : `rgba(50,70,120,${star.a * 0.4})`;
+        ctx.fill();
+      }
+    };
 
     const resize = () => {
       canvas.width = window.innerWidth;
@@ -639,26 +680,10 @@ const MountainBackground = ({ theme }) => {
       drawStars();
     };
 
-    const drawStars = () => {
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const isDark = theme === 'dark';
-      for (let i = 0; i < 200; i++) {
-        const x = Math.random() * canvas.width;
-        const y = Math.random() * canvas.height * 0.6;
-        const r = Math.random() * 1.5;
-        const a = Math.random() * 0.8 + 0.2;
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI * 2);
-        ctx.fillStyle = isDark ? `rgba(255,255,255,${a})` : `rgba(50,70,120,${a * 0.4})`;
-        ctx.fill();
-      }
-    };
-
     resize();
     window.addEventListener('resize', resize);
     return () => window.removeEventListener('resize', resize);
-  }, [theme]);
+  }, [theme, generateStars]);
 
   return (
     <div className="fixed inset-0 z-0 overflow-hidden">
