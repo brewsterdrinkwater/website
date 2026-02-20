@@ -841,6 +841,118 @@ const MarqueeBar = () => {
   );
 };
 
+// Sports Tracker - Arsenal & Mets with last 5, next 5, standings
+const SportsTracker = () => {
+  const [arsenal, setArsenal] = useState({ loading: true, last5: [], next5: [], standing: null });
+  const [mets, setMets] = useState({ loading: true, last5: [], next5: [], standing: null });
+
+  useEffect(() => {
+    const parseGames = (events, teamId) => {
+      if (!events) return { last5: [], next5: [] };
+      const completed = [];
+      const upcoming = [];
+      events.forEach(ev => {
+        const comp = ev.competitions?.[0];
+        if (!comp) return;
+        const done = comp.status?.type?.completed;
+        const team = comp.competitors?.find(c => String(c.team?.id) === String(teamId));
+        const opp = comp.competitors?.find(c => String(c.team?.id) !== String(teamId));
+        if (!team || !opp) return;
+        const entry = {
+          date: new Date(ev.date).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' }),
+          teamScore: team.score || '—',
+          oppScore: opp.score || '—',
+          oppName: opp.team?.abbreviation || opp.team?.shortDisplayName || '?',
+          homeAway: team.homeAway === 'home' ? 'H' : 'A',
+          winner: team.winner,
+        };
+        if (done) completed.push(entry); else upcoming.push(entry);
+      });
+      return { last5: completed.slice(-5), next5: upcoming.slice(0, 5) };
+    };
+
+    // Arsenal schedule
+    fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/teams/359/schedule')
+      .then(r => r.json())
+      .then(data => {
+        const { last5, next5 } = parseGames(data.events, 359);
+        setArsenal(prev => ({ ...prev, loading: false, last5, next5 }));
+      }).catch(() => setArsenal(prev => ({ ...prev, loading: false })));
+
+    // Arsenal standings
+    fetch('https://site.api.espn.com/apis/v2/sports/soccer/eng.1/standings')
+      .then(r => r.json())
+      .then(data => {
+        const entries = data.children?.[0]?.standings?.entries || [];
+        const a = entries.find(e => String(e.team?.id) === '359');
+        if (a) {
+          const getStat = (name) => a.stats?.find(s => s.name === name)?.value;
+          setArsenal(prev => ({ ...prev, standing: { rank: getStat('rank'), points: getStat('points'), wins: getStat('wins'), losses: getStat('losses'), draws: getStat('ties') } }));
+        }
+      }).catch(() => {});
+
+    // Mets schedule
+    fetch('https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/21/schedule')
+      .then(r => r.json())
+      .then(data => {
+        const { last5, next5 } = parseGames(data.events, 21);
+        setMets(prev => ({ ...prev, loading: false, last5, next5 }));
+      }).catch(() => setMets(prev => ({ ...prev, loading: false })));
+
+    // Mets standings
+    fetch('https://site.api.espn.com/apis/v2/sports/baseball/mlb/standings')
+      .then(r => r.json())
+      .then(data => {
+        const groups = data.children || [];
+        for (const group of groups) {
+          const entries = group.standings?.entries || [];
+          const m = entries.find(e => String(e.team?.id) === '21');
+          if (m) {
+            const getStat = (name) => m.stats?.find(s => s.name === name)?.value;
+            setMets(prev => ({ ...prev, standing: { rank: getStat('playoffSeed') || getStat('rank'), wins: getStat('wins'), losses: getStat('losses'), pct: getStat('winPercent') } }));
+            break;
+          }
+        }
+      }).catch(() => {});
+  }, []);
+
+  const GameRow = ({ g }) => (
+    <div className="flex justify-between text-xs font-mono-courier py-0.5" style={{ color: 'var(--text-dim)' }}>
+      <span>{g.date}</span>
+      <span>vs <span style={{ color: 'var(--accent2)' }}>{g.oppName}</span> ({g.homeAway})</span>
+      <span style={{ color: g.winner === true ? '#4af0c8' : g.winner === false ? '#f472b6' : 'var(--text-dim)' }}>
+        {g.teamScore}–{g.oppScore}
+      </span>
+    </div>
+  );
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <h3 className="font-mono-vt text-base tracking-wider mb-2" style={{ color: 'var(--accent)' }}>ARSENAL FC <span className="text-xs" style={{ color: 'var(--text-dim)' }}>Premier League</span></h3>
+        {arsenal.loading ? <p className="text-xs font-mono-courier" style={{ color: 'var(--text-dim)' }}>loading...</p> : (
+          <>
+            {arsenal.last5.length > 0 && (<><p className="text-xs font-mono-vt mb-1" style={{ color: 'var(--accent2)' }}>RECENT</p>{arsenal.last5.map((g, i) => <GameRow key={i} g={g} />)}</>)}
+            {arsenal.next5.length > 0 && (<><p className="text-xs font-mono-vt mt-2 mb-1" style={{ color: 'var(--accent2)' }}>UPCOMING</p>{arsenal.next5.map((g, i) => <GameRow key={i} g={g} />)}</>)}
+            {arsenal.standing && <p className="text-xs font-mono-courier mt-2" style={{ color: 'var(--text-dim)' }}>Standing: {arsenal.standing.rank ? `#${arsenal.standing.rank}` : '—'} | {arsenal.standing.wins ?? '—'}W {arsenal.standing.draws ?? '—'}D {arsenal.standing.losses ?? '—'}L | {arsenal.standing.points ?? '—'}pts</p>}
+          </>
+        )}
+      </div>
+      <div style={{ borderTop: '1px solid var(--border)', paddingTop: '12px' }}>
+        <h3 className="font-mono-vt text-base tracking-wider mb-2" style={{ color: 'var(--accent)' }}>NEW YORK METS <span className="text-xs" style={{ color: 'var(--text-dim)' }}>MLB</span></h3>
+        {mets.loading ? <p className="text-xs font-mono-courier" style={{ color: 'var(--text-dim)' }}>loading...</p> : (
+          <>
+            {mets.last5.length > 0 && (<><p className="text-xs font-mono-vt mb-1" style={{ color: 'var(--accent2)' }}>RECENT</p>{mets.last5.map((g, i) => <GameRow key={i} g={g} />)}</>)}
+            {mets.next5.length > 0 && (<><p className="text-xs font-mono-vt mt-2 mb-1" style={{ color: 'var(--accent2)' }}>UPCOMING</p>{mets.next5.map((g, i) => <GameRow key={i} g={g} />)}</>)}
+            {mets.standing && <p className="text-xs font-mono-courier mt-2" style={{ color: 'var(--text-dim)' }}>Standing: {mets.standing.rank ? `#${mets.standing.rank}` : '—'} | {mets.standing.wins ?? '—'}W {mets.standing.losses ?? '—'}L | {mets.standing.pct ? (mets.standing.pct).toFixed(3) : '—'}</p>}
+            {mets.last5.length === 0 && mets.next5.length === 0 && <p className="text-xs font-mono-courier" style={{ color: 'var(--text-dim)' }}>Season data loading soon...</p>}
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
 // Toast notification
 const Toast = ({ message, show }) => (
   <div className={`y2k-toast ${show ? 'show' : ''}`}>{message}</div>
@@ -864,11 +976,13 @@ const Y2KWindow = ({
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
-  const handleMouseDown = (e) => {
-    if (e.target.closest('.y2k-win-btn')) return;
+  const handleWindowMouseDown = (e) => {
+    // Don't drag from interactive elements
+    const tag = e.target.tagName;
+    if (['BUTTON', 'A', 'INPUT', 'TEXTAREA', 'SELECT', 'CANVAS'].includes(tag) || e.target.closest('button') || e.target.closest('a')) return;
     onFocus?.();
     setIsDragging(true);
-    const rect = e.currentTarget.parentElement.getBoundingClientRect();
+    const rect = e.currentTarget.getBoundingClientRect();
     setDragOffset({ x: e.clientX - rect.left, y: e.clientY - rect.top });
   };
 
@@ -897,9 +1011,9 @@ const Y2KWindow = ({
         width: defaultSize.width,
         zIndex: isActive ? 200 : zIndex,
       }}
-      onMouseDown={onFocus}
+      onMouseDown={handleWindowMouseDown}
     >
-      <div className="y2k-titlebar" onMouseDown={handleMouseDown}>
+      <div className="y2k-titlebar">
         <div className="y2k-win-btns">
           <button className="y2k-win-btn close" onClick={onClose} />
           <button className="y2k-win-btn min" onClick={onMinimize} />
@@ -956,6 +1070,7 @@ const AltTabWebsite = () => {
     snake: { minimized: false, visible: true },
     reaction: { minimized: true, visible: true },
     about: { minimized: false, visible: true },
+    sports: { minimized: false, visible: true },
   });
   const [activeWindow, setActiveWindow] = useState('clocks');
 
@@ -1009,6 +1124,7 @@ const AltTabWebsite = () => {
             snake: { minimized: false, visible: true },
             reaction: { minimized: false, visible: true },
             about: { minimized: false, visible: true },
+            sports: { minimized: false, visible: true },
           });
           konamiPos = 0;
         }
@@ -1054,15 +1170,17 @@ const AltTabWebsite = () => {
     window.scrollTo(0, 0);
   };
 
-  // Window positions for desktop
+  // Window positions for desktop - spread to edges like a real desktop
+  const vw = typeof window !== 'undefined' ? window.innerWidth : 1440;
   const windowPositions = {
-    clocks: { x: 40, y: 120 },
-    services: { x: 380, y: 100 },
-    news: { x: 720, y: 80 },
-    trivia: { x: 60, y: 380 },
-    snake: { x: 400, y: 340 },
-    reaction: { x: 750, y: 400 },
-    about: { x: 1050, y: 120 },
+    clocks: { x: 20, y: 100 },
+    services: { x: 20, y: 340 },
+    about: { x: 20, y: 560 },
+    news: { x: vw - 340, y: 80 },
+    sports: { x: vw - 420, y: 360 },
+    trivia: { x: vw - 300, y: 640 },
+    snake: { x: Math.floor(vw / 2) - 160, y: 450 },
+    reaction: { x: Math.floor(vw / 2) - 140, y: 650 },
   };
 
   // Trivia component
@@ -1178,11 +1296,6 @@ const AltTabWebsite = () => {
           icon="🧂"
           label="SALT-TAB"
           onClick={() => window.open('https://www.salt-tab.com', '_blank')}
-        />
-        <DesktopIcon
-          icon="🛒"
-          label="SHOP"
-          onClick={() => navigateTo('shop')}
         />
       </div>
 
@@ -1314,6 +1427,22 @@ const AltTabWebsite = () => {
           <AboutContent />
         </Y2KWindow>
       )}
+
+      {windows.sports.visible && (
+        <Y2KWindow
+          id="sports"
+          title="scores.exe"
+          defaultPosition={windowPositions.sports}
+          defaultSize={{ width: 380, height: 'auto' }}
+          isMinimized={windows.sports.minimized}
+          isActive={activeWindow === 'sports'}
+          onClose={() => closeWindow('sports')}
+          onMinimize={() => toggleWindow('sports')}
+          onFocus={() => focusWindow('sports')}
+        >
+          <SportsTracker />
+        </Y2KWindow>
+      )}
     </div>
   );
 
@@ -1355,6 +1484,10 @@ const AltTabWebsite = () => {
           <div className="y2k-app-img">📂</div>
           <span className="y2k-app-label">About</span>
         </div>
+        <div className="y2k-app-icon" onClick={() => setMobileModal('sports')}>
+          <div className="y2k-app-img">⚽</div>
+          <span className="y2k-app-label">Sports</span>
+        </div>
         <a className="y2k-app-icon" href="https://www.walt-tab.com" target="_blank" rel="noopener noreferrer">
           <div className="y2k-app-img">🌊</div>
           <span className="y2k-app-label">Walt-tab</span>
@@ -1363,10 +1496,6 @@ const AltTabWebsite = () => {
           <div className="y2k-app-img">🧂</div>
           <span className="y2k-app-label">Salt-tab</span>
         </a>
-        <div className="y2k-app-icon" onClick={() => navigateTo('shop')}>
-          <div className="y2k-app-img">🛒</div>
-          <span className="y2k-app-label">Shop</span>
-        </div>
       </div>
 
       {/* Mobile Modals */}
@@ -1403,6 +1532,11 @@ const AltTabWebsite = () => {
       {mobileModal === 'about' && (
         <MobileModal title="ABOUT" onClose={() => setMobileModal(null)}>
           <AboutContent />
+        </MobileModal>
+      )}
+      {mobileModal === 'sports' && (
+        <MobileModal title="MY TEAMS" onClose={() => setMobileModal(null)}>
+          <SportsTracker />
         </MobileModal>
       )}
     </div>
