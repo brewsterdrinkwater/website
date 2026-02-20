@@ -1134,7 +1134,7 @@ const AltTabWebsite = () => {
         ))}
       </div>
       <p className="mt-4 text-sm" style={{ color: 'var(--text-dim)' }}>
-        &gt; cross-pollinating ideas across disciplines_<span className="y2k-blink">█</span>
+        &gt; Sometimes we make for us; "Style Matters"_<span className="y2k-blink">█</span>
       </p>
     </div>
   );
@@ -1603,10 +1603,10 @@ const AltTabWebsite = () => {
               <h3 className="text-lg font-mono-vt mb-4" style={{ color: 'var(--accent)' }}>VALUES</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
-                  { title: 'Human-Centric', text: 'People at the center of every project.' },
-                  { title: 'Research-Driven', text: 'Evidence-based decision making.' },
-                  { title: 'Rapid Prototyping', text: 'Fail fast, learn faster.' },
-                  { title: 'Multi-Disciplinary', text: 'Diverse perspectives from design, tech, and strategy.' },
+                  { title: 'Human-Centric', text: 'Alt-Tab is all about building a better world for humans, so people are the priority. User experience and empathy for the human are foundational to how we think about work.' },
+                  { title: 'Research-Driven', text: 'Research is vital to our process. All projects begin with a research phase.' },
+                  { title: 'Rapid Prototyping', text: 'Making is fun, and a great source of information during any development process.' },
+                  { title: 'Multi-Disciplinary', text: 'The team is passionate about library science, industrial design, engineering, fashion, philosophy and art.' },
                 ].map((item, i) => (
                   <div key={i} className="p-4" style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}>
                     <h4 className="font-mono-vt text-sm mb-1" style={{ color: 'var(--accent2)' }}>{item.title}</h4>
@@ -1616,7 +1616,7 @@ const AltTabWebsite = () => {
               </div>
             </div>
             <p className="text-sm font-mono-share" style={{ color: 'var(--text-dim)' }}>
-              &gt; cross-pollinating ideas across disciplines_<span className="y2k-blink">█</span>
+              &gt; Sometimes we make for us; "Style Matters"_<span className="y2k-blink">█</span>
             </p>
           </div>
         </div>
