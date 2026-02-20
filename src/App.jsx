@@ -1300,7 +1300,7 @@ const AltTabWebsite = () => {
     <div className="space-y-8">
       <WinPanel title="philosophy.txt">
         <h2>PHILOSOPHY</h2>
-        <p style={{ color: 'var(--text-dim)' }}>Where research meets creativity, and ideas become reality</p>
+        <p style={{ color: 'var(--text-dim)' }}>Sometimes we make for us; "Style Matters"</p>
       </WinPanel>
 
       <WinPanel title="mission.txt">
@@ -1322,7 +1322,7 @@ const AltTabWebsite = () => {
 
         <WinPanel title="research.txt">
           <h3>RESEARCH-DRIVEN PROCESS</h3>
-          <p>Research is vital to our process. All projects begin with a research phase — combining qualitative and quantitative methods to build a comprehensive understanding of complex challenges.</p>
+          <p>Research is vital to our process. All projects begin with a research phase.</p>
           <div className="mt-3 flex flex-wrap gap-1">
             <span className="tag">RESEARCH</span><span className="tag">DATA</span><span className="tag">INSIGHTS</span>
           </div>
@@ -1330,7 +1330,7 @@ const AltTabWebsite = () => {
 
         <WinPanel title="prototyping.txt">
           <h3>RAPID PROTOTYPING</h3>
-          <p>Making is fun, and a great source of information during any development process. By creating tangible artifacts early, we reduce risk and accelerate innovation.</p>
+          <p>Making is fun, and a great source of information during any development process.</p>
           <div className="mt-3 flex flex-wrap gap-1">
             <span className="tag">PROTOTYPING</span><span className="tag">ITERATION</span><span className="tag">MAKING</span>
           </div>
@@ -1338,7 +1338,7 @@ const AltTabWebsite = () => {
 
         <WinPanel title="disciplines.txt">
           <h3>MULTI-DISCIPLINARY</h3>
-          <p>The team is passionate about library science, industrial design, engineering, fashion, philosophy, and art. This cross-pollination of disciplines enables us to approach challenges from multiple angles.</p>
+          <p>The team is passionate about library science, industrial design, engineering, fashion, philosophy and art.</p>
           <div className="mt-3 flex flex-wrap gap-1">
             <span className="tag">LIBRARY SCIENCE</span><span className="tag">INDUSTRIAL DESIGN</span><span className="tag">ENGINEERING</span><span className="tag">FASHION</span><span className="tag">PHILOSOPHY</span><span className="tag">ART</span>
           </div>
