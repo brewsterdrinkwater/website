@@ -625,9 +625,11 @@ const WorldClocks = () => {
 // ===== Y2K COMPONENTS =====
 
 // Mountain Background Scene - realistic mountain photo with Y2K overlays
+// Mountain Background Scene - CSS gradient mountains with optional photo enhancement
 const MountainBackground = ({ theme }) => {
   const canvasRef = useRef(null);
   const starsRef = useRef(null);
+  const [imgLoaded, setImgLoaded] = useState(false);
   const isDark = theme === 'dark';
 
   // Generate stable star positions once (for dark mode)
@@ -678,38 +680,44 @@ const MountainBackground = ({ theme }) => {
     return () => window.removeEventListener('resize', resize);
   }, [isDark, generateStars]);
 
+  // Lazy-load Unsplash image
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => setImgLoaded(true);
+    img.src = 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&q=80';
+  }, []);
+
   return (
     <div className="fixed inset-0 z-0 overflow-hidden">
-      {/* Base mountain image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: 'url(https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&q=80)',
-          filter: isDark ? 'brightness(0.3) saturate(0.7)' : 'brightness(1.1) saturate(0.9)',
-        }}
-      />
-      {/* Y2K gradient overlay */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: isDark
-            ? 'linear-gradient(180deg, rgba(4,8,15,0.85) 0%, rgba(10,20,40,0.7) 40%, rgba(15,25,50,0.5) 70%, rgba(10,15,25,0.9) 100%)'
-            : 'linear-gradient(180deg, rgba(168,200,240,0.7) 0%, rgba(200,223,248,0.5) 50%, rgba(180,210,240,0.6) 100%)',
-        }}
-      />
+      {/* Sky gradient - renders instantly */}
+      <div className="y2k-sky" />
+      {/* SVG mountain silhouettes - renders instantly */}
+      <svg className="absolute bottom-0 left-0 right-0" viewBox="0 0 1440 500" preserveAspectRatio="none" style={{ height: '60vh', width: '100%' }}>
+        <polygon points="0,500 0,300 80,240 160,270 260,200 360,250 460,180 540,210 640,150 720,190 820,130 900,170 1000,120 1080,160 1180,100 1260,150 1360,90 1440,140 1440,500" fill="var(--mountain2)" opacity="0.9"/>
+        <polygon points="820,130 800,170 840,170" fill="var(--snow)" opacity="0.4"/>
+        <polygon points="1180,100 1160,140 1200,140" fill="var(--snow)" opacity="0.35"/>
+        <polygon points="460,180 440,215 480,215" fill="var(--snow)" opacity="0.35"/>
+        <polygon points="0,500 0,350 60,320 140,340 220,290 320,310 420,260 500,280 600,230 700,255 780,210 860,240 960,195 1040,220 1140,185 1220,205 1320,170 1440,195 1440,500" fill="var(--mountain1)" opacity="0.95"/>
+        <polygon points="600,230 582,260 618,260" fill="var(--snow)" opacity="0.5"/>
+        <polygon points="960,195 942,225 978,225" fill="var(--snow)" opacity="0.45"/>
+        <polygon points="0,500 0,400 100,380 200,395 300,360 400,380 520,345 640,370 760,335 880,360 1000,325 1120,350 1240,320 1360,345 1440,325 1440,500" fill="var(--mountain3)" opacity="0.8"/>
+        <rect x="0" y="470" width="1440" height="30" fill="var(--bg2)" opacity="0.9"/>
+      </svg>
+      {/* Unsplash photo - fades in when loaded */}
+      {imgLoaded && (
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000"
+          style={{
+            backgroundImage: 'url(https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&q=80)',
+            filter: isDark ? 'brightness(0.4) saturate(0.8)' : 'brightness(1.1) saturate(0.9)',
+            opacity: 0.6,
+          }}
+        />
+      )}
       {/* Aurora/glow effect */}
       <div className="y2k-aurora" />
       {/* Stars canvas (dark mode only) */}
       <canvas ref={canvasRef} className="absolute inset-0" style={{ opacity: isDark ? 1 : 0 }} />
-      {/* Film grain overlay for Y2K authenticity */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-          opacity: isDark ? 0.04 : 0.03,
-          mixBlendMode: 'overlay',
-        }}
-      />
       {/* Bottom fade to content */}
       <div
         className="absolute bottom-0 left-0 right-0 h-32"
