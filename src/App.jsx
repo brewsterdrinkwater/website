@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Sparkles, Grid3x3, Image, BookOpen, RefreshCw, Construction, Instagram, Sun, Moon } from 'lucide-react';
+import { Menu, X, RefreshCw, Construction } from 'lucide-react';
 import { Button } from './components/ui/button';
 
 // Scroll-reveal hook using IntersectionObserver
@@ -109,8 +109,16 @@ const SPORTS_TRIVIA = [
   { q: "What sport has the highest average attendance per game worldwide?", a: "NFL Football", choices: ["Soccer (EPL)", "NFL Football", "College Football", "Cricket (IPL)"] },
 ];
 
-// Middle Tennessee topography map background (light, optimized for web/mobile)
-const BACKGROUND_IMAGE = 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1920&q=80';
+// Marquee ticker items
+const MARQUEE_ITEMS = [
+  "Multi-Disciplinary Think Tank",
+  "Design × Strategy × Technology",
+  "Alt-Tab on conventional thinking",
+  "Cross-pollinating ideas since day one",
+  "Systems thinking for complex problems",
+  "Connecting dots across disciplines",
+  "Part studio. Part lab. Part consultancy.",
+];
 
 // Drudge-style news links
 const NEWS_LINKS = [
@@ -273,56 +281,56 @@ const SnakeGame = ({ isMobile }) => {
     const ctx = canvasRef.current?.getContext('2d');
     if (!ctx) return;
     const size = GRID * CELL;
-    ctx.fillStyle = '#0f172a';
+    ctx.fillStyle = '#0a0d14';
     ctx.fillRect(0, 0, size, size);
-    ctx.strokeStyle = '#1e293b';
+    ctx.strokeStyle = '#1a2540';
     ctx.lineWidth = 0.5;
     for (let i = 0; i <= GRID; i++) {
       ctx.beginPath(); ctx.moveTo(i * CELL, 0); ctx.lineTo(i * CELL, size); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(0, i * CELL); ctx.lineTo(size, i * CELL); ctx.stroke();
     }
-    ctx.fillStyle = '#f97316';
+    ctx.fillStyle = '#f472b6';
     ctx.beginPath();
     ctx.arc(food.x * CELL + CELL / 2, food.y * CELL + CELL / 2, CELL / 2 - 2, 0, Math.PI * 2);
     ctx.fill();
     snake.forEach((seg, i) => {
-      ctx.fillStyle = i === 0 ? '#3b82f6' : '#60a5fa';
+      ctx.fillStyle = i === 0 ? '#4af0c8' : '#2dd4a8';
       ctx.fillRect(seg.x * CELL + 1, seg.y * CELL + 1, CELL - 2, CELL - 2);
     });
   }, [snake, food]);
 
   return (
     <div className="w-full">
-      <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-orange-50 border-2 border-black/20">
+      <div className="p-4" style={{ background: 'var(--bg2)', border: '1px solid var(--border)' }}>
         <div className="flex justify-between items-center mb-3">
-          <h3 className="text-sm font-bold text-blue-700 uppercase tracking-wide">Snake</h3>
-          <div className="text-xs text-black/60 space-x-3">
-            <span>Score: <strong className="text-black">{score}</strong></span>
-            <span>Best: <strong className="text-black">{highScore}</strong></span>
+          <h3 className="text-sm font-vt tracking-wider" style={{ color: 'var(--accent)' }}>SNAKE</h3>
+          <div className="text-xs font-tech space-x-3" style={{ color: 'var(--text-dim)' }}>
+            <span>Score: <strong style={{ color: 'var(--accent)' }}>{score}</strong></span>
+            <span>Best: <strong style={{ color: 'var(--accent3)' }}>{highScore}</strong></span>
           </div>
         </div>
         <div className="mx-auto touch-none" style={{ width: GRID * CELL, height: GRID * CELL }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-          <canvas ref={canvasRef} width={GRID * CELL} height={GRID * CELL} className="rounded-lg border-2 border-black/20" />
+          <canvas ref={canvasRef} width={GRID * CELL} height={GRID * CELL} style={{ border: '1px solid var(--border)' }} />
         </div>
         <div className="mt-3 flex justify-center md:hidden">
           <div className="grid grid-cols-3 gap-1 w-32">
             <div />
-            <button onClick={() => changeDir(0, -1)} className="bg-blue-600 text-white rounded p-2 text-center text-lg active:bg-blue-500">^</button>
+            <button onClick={() => changeDir(0, -1)} className="p-2 text-center text-lg font-vt" style={{ background: 'var(--title-bar)', color: 'var(--accent)', border: '1px solid var(--border)' }}>^</button>
             <div />
-            <button onClick={() => changeDir(-1, 0)} className="bg-blue-600 text-white rounded p-2 text-center text-lg active:bg-blue-500">&lt;</button>
-            <div className="bg-blue-100 rounded p-2" />
-            <button onClick={() => changeDir(1, 0)} className="bg-blue-600 text-white rounded p-2 text-center text-lg active:bg-blue-500">&gt;</button>
+            <button onClick={() => changeDir(-1, 0)} className="p-2 text-center text-lg font-vt" style={{ background: 'var(--title-bar)', color: 'var(--accent)', border: '1px solid var(--border)' }}>&lt;</button>
+            <div style={{ background: 'var(--bg)' }} className="p-2" />
+            <button onClick={() => changeDir(1, 0)} className="p-2 text-center text-lg font-vt" style={{ background: 'var(--title-bar)', color: 'var(--accent)', border: '1px solid var(--border)' }}>&gt;</button>
             <div />
-            <button onClick={() => changeDir(0, 1)} className="bg-blue-600 text-white rounded p-2 text-center text-lg active:bg-blue-500">v</button>
+            <button onClick={() => changeDir(0, 1)} className="p-2 text-center text-lg font-vt" style={{ background: 'var(--title-bar)', color: 'var(--accent)', border: '1px solid var(--border)' }}>v</button>
             <div />
           </div>
         </div>
         {!running && (
           <div className="text-center mt-3">
-            <button onClick={resetGame} className="px-4 py-2 bg-gradient-to-r from-blue-600 to-orange-500 text-white font-bold rounded-lg text-sm hover:scale-105 transition-all">
-              {dead ? 'Play Again' : 'Start Game'}
+            <button onClick={resetGame} className="px-4 py-2 font-vt tracking-wider text-sm transition-all hover:shadow-lg" style={{ background: 'var(--accent)', color: 'var(--bg)', border: '1px solid var(--accent)' }}>
+              {dead ? 'PLAY AGAIN' : 'START GAME'}
             </button>
-            <p className="text-xs text-black/50 mt-1">{isMobile ? 'Swipe or use D-pad' : 'Arrow keys or WASD'}</p>
+            <p className="text-xs font-tech mt-1" style={{ color: 'var(--text-dim)' }}>{isMobile ? 'Swipe or use D-pad' : 'Arrow keys or WASD'}</p>
           </div>
         )}
       </div>
@@ -364,59 +372,152 @@ const ReactionGame = () => {
     } else if (gameState === 'result') { start(); }
   };
 
-  const bgColor = gameState === 'waiting' ? 'bg-gradient-to-br from-blue-500 to-blue-600'
-    : gameState === 'ready' ? 'bg-gradient-to-br from-red-500 to-red-600'
-    : gameState === 'go' ? 'bg-gradient-to-br from-green-400 to-green-500'
-    : 'bg-gradient-to-br from-blue-500 to-orange-500';
+  const bgStyle = gameState === 'waiting' ? { background: 'var(--title-bar)' }
+    : gameState === 'ready' ? { background: '#7f1d1d' }
+    : gameState === 'go' ? { background: '#065f46' }
+    : { background: 'var(--title-bar)' };
 
-  const msg = gameState === 'waiting' ? 'Tap to Start'
-    : gameState === 'ready' ? 'Wait for green...'
-    : gameState === 'go' ? 'TAP NOW!'
-    : reactionTime === 'Too early!' ? 'Too early! Tap to retry'
-    : `${reactionTime}ms - Tap to play again`;
+  const msg = gameState === 'waiting' ? '> tap to start_'
+    : gameState === 'ready' ? '> wait for green...'
+    : gameState === 'go' ? '> TAP NOW!'
+    : reactionTime === 'Too early!' ? '> too early! tap to retry'
+    : `> ${reactionTime}ms — tap to play again`;
 
   return (
-    <button onClick={handleClick} className={`w-full p-6 rounded-2xl border-2 border-black/20 transition-colors active:scale-95 cursor-pointer select-none ${bgColor}`}>
-      <h3 className="text-sm font-bold text-white/80 mb-1 uppercase tracking-wide">Reaction Time</h3>
-      <div className="text-3xl font-black text-white mb-2">
+    <button onClick={handleClick} className="w-full p-6 transition-colors active:scale-95 select-none" style={{ ...bgStyle, border: '1px solid var(--border)' }}>
+      <h3 className="text-sm font-vt tracking-wider mb-1" style={{ color: 'var(--accent2)' }}>REACTION TIME</h3>
+      <div className="text-3xl font-vt mb-2" style={{ color: 'var(--accent)', textShadow: '0 0 10px var(--accent)' }}>
         {gameState === 'result' && reactionTime !== 'Too early!' ? `${reactionTime}ms` : ''}
       </div>
-      <p className="text-base text-white/90 font-medium">{msg}</p>
-      {bestTime && <p className="text-sm text-white/70 mt-2">Best: {bestTime}ms</p>}
+      <p className="text-base font-tech" style={{ color: 'var(--text)' }}>{msg}<span className="blink">█</span></p>
+      {bestTime && <p className="text-sm font-tech mt-2" style={{ color: 'var(--text-dim)' }}>best: {bestTime}ms</p>}
     </button>
   );
 };
 
-// Golf Ball Cursor - manages its own state to prevent parent re-renders
-const GolfBallCursor = () => {
-  const [position, setPosition] = useState({ x: 0, y: 0, visible: false });
+// Hacker Cursor - neon dot with color-cycling trail
+const HackerCursor = () => {
+  const cursorRef = useRef(null);
+  const trailsRef = useRef([]);
+  const mousePos = useRef({ x: 0, y: 0 });
+  const frameRef = useRef(0);
+  const animRef = useRef(null);
 
   useEffect(() => {
-    const handleMouseMove = (e) => {
-      setPosition({ x: e.clientX, y: e.clientY, visible: true });
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+    const trailColors = ['#4af0c8', '#a78bfa', '#f472b6', '#60a5fa'];
+    const trails = [];
+    for (let i = 0; i < 12; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'trail-dot';
+      const size = Math.max(3, 10 - i * 0.7);
+      dot.style.width = size + 'px';
+      dot.style.height = size + 'px';
+      dot.style.opacity = ((12 - i) / 12 * 0.6).toString();
+      document.body.appendChild(dot);
+      trails.push({ el: dot, x: 0, y: 0 });
+    }
+    trailsRef.current = trails;
+
+    const onMove = (e) => {
+      mousePos.current = { x: e.clientX, y: e.clientY };
+      if (cursorRef.current) {
+        cursorRef.current.style.left = e.clientX + 'px';
+        cursorRef.current.style.top = e.clientY + 'px';
+      }
     };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    const animate = () => {
+      const t = trailsRef.current;
+      const color = trailColors[Math.floor(frameRef.current / 20) % trailColors.length];
+      if (t.length) {
+        t[0].x += (mousePos.current.x - t[0].x) * 0.4;
+        t[0].y += (mousePos.current.y - t[0].y) * 0.4;
+        t[0].el.style.left = t[0].x + 'px';
+        t[0].el.style.top = t[0].y + 'px';
+        t[0].el.style.background = color;
+        for (let i = 1; i < t.length; i++) {
+          t[i].x += (t[i - 1].x - t[i].x) * 0.35;
+          t[i].y += (t[i - 1].y - t[i].y) * 0.35;
+          t[i].el.style.left = t[i].x + 'px';
+          t[i].el.style.top = t[i].y + 'px';
+          t[i].el.style.background = color;
+        }
+      }
+      frameRef.current++;
+      animRef.current = requestAnimationFrame(animate);
+    };
+    window.addEventListener('mousemove', onMove);
+    animRef.current = requestAnimationFrame(animate);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      cancelAnimationFrame(animRef.current);
+      trailsRef.current.forEach(t => t.el.remove());
+    };
   }, []);
 
-  if (!position.visible) return null;
+  if (typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches) return null;
+  return <div ref={cursorRef} className="cursor-dot" />;
+};
+
+// Scene Background - mountains, aurora, stars
+const SceneBackground = ({ theme }) => {
+  const canvasRef = useRef(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const draw = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const isDark = theme === 'dark';
+      for (let i = 0; i < 200; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height * 0.6;
+        const r = Math.random() * 1.5;
+        const a = Math.random() * 0.8 + 0.2;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fillStyle = isDark ? `rgba(255,255,255,${a})` : `rgba(50,70,120,${a * 0.4})`;
+        ctx.fill();
+      }
+    };
+    draw();
+    window.addEventListener('resize', draw);
+    return () => window.removeEventListener('resize', draw);
+  }, [theme]);
 
   return (
-    <div
-      className="fixed w-6 h-6 rounded-full pointer-events-none z-[100] shadow-lg"
-      style={{
-        left: position.x - 12,
-        top: position.y - 12,
-        background: 'radial-gradient(circle at 30% 30%, #ffffff, #e0e0e0, #a0a0a0)',
-        boxShadow: 'inset -2px -2px 4px rgba(0,0,0,0.3), 2px 2px 8px rgba(0,0,0,0.4)',
-      }}
-    >
-      <div className="absolute inset-1 rounded-full opacity-30" style={{
-        background: 'repeating-radial-gradient(circle at 50% 50%, transparent 0px, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 3px)'
-      }} />
+    <div className="fixed inset-0 z-0 overflow-hidden">
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 60%, var(--mountain1) 100%)' }} />
+      <div className="aurora" />
+      <canvas ref={canvasRef} className="absolute inset-0" />
+      <svg className="absolute bottom-0 left-0 right-0" viewBox="0 0 1440 400" preserveAspectRatio="none" style={{ height: '55vh' }}>
+        <polygon points="0,400 0,260 80,200 160,230 260,160 360,210 460,140 540,170 640,110 720,150 820,90 900,130 1000,80 1080,120 1180,70 1260,110 1360,60 1440,100 1440,400" fill="var(--mountain2)" opacity="0.9"/>
+        <polygon points="820,90 800,130 840,130" fill="var(--snow)" opacity="0.5"/>
+        <polygon points="1180,70 1160,110 1200,110" fill="var(--snow)" opacity="0.4"/>
+        <polygon points="460,140 440,175 480,175" fill="var(--snow)" opacity="0.4"/>
+        <polygon points="0,400 0,310 60,280 140,300 220,250 320,270 420,220 500,240 600,190 700,215 780,170 860,200 960,155 1040,180 1140,145 1220,165 1320,130 1440,155 1440,400" fill="var(--mountain1)" opacity="0.95"/>
+        <polygon points="600,190 582,220 618,220" fill="var(--snow)" opacity="0.6"/>
+        <polygon points="960,155 942,185 978,185" fill="var(--snow)" opacity="0.55"/>
+        <polygon points="1320,130 1302,162 1338,162" fill="var(--snow)" opacity="0.5"/>
+        <polygon points="0,400 0,350 100,330 200,345 300,310 400,330 520,295 640,320 760,285 880,310 1000,275 1120,300 1240,270 1360,295 1440,275 1440,400" fill="var(--mountain3)" opacity="0.8"/>
+        <rect x="0" y="370" width="1440" height="30" fill="var(--bg2)" opacity="0.9"/>
+      </svg>
     </div>
   );
 };
+
+// Reusable Window Panel
+const WinPanel = ({ title, children, className = '', style = {} }) => (
+  <div className={`win ${className}`} style={style}>
+    <div className="win-titlebar">
+      <div className="win-btns"><span className="win-btn close" /><span className="win-btn min" /><span className="win-btn max" /></div>
+      <div className="win-title">// {title}</div>
+    </div>
+    <div className="win-body">{children}</div>
+  </div>
+);
 
 // Draggable Hero Letters - manages its own state to prevent parent re-renders
 const DraggableHeroLetters = () => {
@@ -537,11 +638,11 @@ const DraggableHeroLetters = () => {
   ];
 
   return (
-    <div className="text-center space-y-6 max-w-5xl mx-auto">
-      <span className="text-sm md:text-base uppercase tracking-[0.3em] font-medium text-white/80">Multi-Disciplinary Think Tank</span>
+    <div className="text-center space-y-4 max-w-5xl mx-auto">
+      <span className="text-sm md:text-base uppercase tracking-[0.3em] font-tech" style={{ color: 'var(--text-dim)' }}>Multi-Disciplinary Think Tank</span>
       <h1
-        className="text-7xl md:text-9xl lg:text-[10rem] font-black text-white leading-[0.85] select-none tracking-tight"
-        style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}
+        className="text-7xl md:text-9xl lg:text-[10rem] font-black leading-[0.85] select-none tracking-tight"
+        style={{ fontFamily: "'VT323', monospace" }}
         onTouchEnd={handleHeaderDoubleTap}
       >
         {letters.map((letter) => (
@@ -552,8 +653,8 @@ const DraggableHeroLetters = () => {
             onTouchStart={() => handleLetterTouch(letter.key)}
             style={{
               display: 'inline-block',
-              color: '#ffffff',
-              textShadow: '3px 3px 0px rgba(249,115,22,0.5)',
+              color: 'var(--accent)',
+              textShadow: '0 0 30px var(--accent), 0 0 60px rgba(74,240,200,0.3)',
               cursor: isMobile ? 'pointer' : (letter.key === '-' ? 'pointer' : 'grab'),
               transform: `translate(${letterPositions[letter.key].x}px, ${letterPositions[letter.key].y}px)`,
               transition: draggingLetter === letter.key ? 'none' : 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
@@ -565,11 +666,11 @@ const DraggableHeroLetters = () => {
           </span>
         ))}
       </h1>
-      <p className="text-lg md:text-2xl text-white/90 font-light max-w-2xl mx-auto leading-relaxed">
+      <p className="text-base md:text-xl font-tech max-w-2xl mx-auto leading-relaxed" style={{ color: 'var(--text-dim)' }}>
         We design experiences and products that enhance the quality of human life.
       </p>
       {isMobile && (
-        <p className="text-xs text-white/50 mt-4 animate-pulse">
+        <p className="text-xs mt-4 animate-pulse font-tech" style={{ color: 'var(--text-dim)' }}>
           Tap letters to scatter · Double-tap to reset · Shake to shuffle
         </p>
       )}
@@ -598,8 +699,8 @@ const WorldClocks = () => {
   return (
     <div className="flex flex-wrap justify-center gap-3 text-xs">
       {clocks.map((clock) => (
-        <div key={clock.city} className="bg-blue-900 text-orange-400 px-3 py-2 border-2 border-orange-400 font-mono rounded">
-          <span className="text-blue-300">{clock.city}:</span>{' '}
+        <div key={clock.city} className="px-3 py-2 font-tech" style={{ background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--accent)' }}>
+          <span style={{ color: 'var(--text-dim)' }}>{clock.city}:</span>{' '}
           {time.toLocaleTimeString('en-US', {
             timeZone: clock.tz,
             hour: '2-digit',
@@ -612,25 +713,211 @@ const WorldClocks = () => {
   );
 };
 
+// Sports Tracker - Arsenal & Mets via ESPN API
+const SportsTracker = () => {
+  const [arsenal, setArsenal] = useState({ loading: true, last5: [], next5: [], standing: null });
+  const [mets, setMets] = useState({ loading: true, last5: [], next5: [], standing: null });
+
+  useEffect(() => {
+    const parseGames = (events, teamId) => {
+      if (!events) return { last5: [], next5: [] };
+      const completed = [];
+      const upcoming = [];
+      events.forEach(ev => {
+        const comp = ev.competitions?.[0];
+        if (!comp) return;
+        const done = comp.status?.type?.completed;
+        const team = comp.competitors?.find(c => String(c.team?.id) === String(teamId));
+        const opp = comp.competitors?.find(c => String(c.team?.id) !== String(teamId));
+        if (!team || !opp) return;
+        const entry = {
+          date: new Date(ev.date).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' }),
+          teamScore: team.score || '—',
+          oppScore: opp.score || '—',
+          oppName: opp.team?.abbreviation || opp.team?.shortDisplayName || '?',
+          homeAway: team.homeAway === 'home' ? 'H' : 'A',
+          winner: team.winner,
+        };
+        if (done) completed.push(entry); else upcoming.push(entry);
+      });
+      return { last5: completed.slice(-5), next5: upcoming.slice(0, 5) };
+    };
+
+    fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/teams/359/schedule')
+      .then(r => r.json())
+      .then(data => {
+        const { last5, next5 } = parseGames(data.events, 359);
+        setArsenal(prev => ({ ...prev, loading: false, last5, next5 }));
+      }).catch(() => setArsenal(prev => ({ ...prev, loading: false })));
+
+    fetch('https://site.api.espn.com/apis/v2/sports/soccer/eng.1/standings')
+      .then(r => r.json())
+      .then(data => {
+        const entries = data.children?.[0]?.standings?.entries || [];
+        const a = entries.find(e => String(e.team?.id) === '359');
+        if (a) {
+          const getStat = (name) => a.stats?.find(s => s.name === name)?.value;
+          setArsenal(prev => ({ ...prev, standing: { rank: getStat('rank'), points: getStat('points'), wins: getStat('wins'), losses: getStat('losses'), draws: getStat('ties') } }));
+        }
+      }).catch(() => {});
+
+    fetch('https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/21/schedule')
+      .then(r => r.json())
+      .then(data => {
+        const { last5, next5 } = parseGames(data.events, 21);
+        setMets(prev => ({ ...prev, loading: false, last5, next5 }));
+      }).catch(() => setMets(prev => ({ ...prev, loading: false })));
+
+    fetch('https://site.api.espn.com/apis/v2/sports/baseball/mlb/standings')
+      .then(r => r.json())
+      .then(data => {
+        const groups = data.children || [];
+        for (const group of groups) {
+          const entries = group.standings?.entries || [];
+          const m = entries.find(e => String(e.team?.id) === '21');
+          if (m) {
+            const getStat = (name) => m.stats?.find(s => s.name === name)?.value;
+            setMets(prev => ({ ...prev, standing: { rank: getStat('playoffSeed') || getStat('rank'), wins: getStat('wins'), losses: getStat('losses'), pct: getStat('winPercent') } }));
+            break;
+          }
+        }
+      }).catch(() => {});
+  }, []);
+
+  const GameRow = ({ g }) => (
+    <div className="flex justify-between text-xs font-tech py-0.5" style={{ color: 'var(--text-dim)' }}>
+      <span>{g.date}</span>
+      <span>vs <span style={{ color: 'var(--accent2)' }}>{g.oppName}</span> ({g.homeAway})</span>
+      <span style={{ color: g.winner === true ? '#4af0c8' : g.winner === false ? '#f472b6' : 'var(--text-dim)' }}>
+        {g.teamScore}–{g.oppScore}
+      </span>
+    </div>
+  );
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <h3 className="font-vt text-lg tracking-wider mb-2" style={{ color: 'var(--accent)' }}>ARSENAL FC <span style={{ color: 'var(--text-dim)' }}>⚽ Premier League</span></h3>
+        {arsenal.loading ? <p className="text-xs font-tech" style={{ color: 'var(--text-dim)' }}>loading...</p> : (
+          <>
+            {arsenal.last5.length > 0 && (<><p className="text-xs font-vt mb-1" style={{ color: 'var(--accent2)' }}>RECENT</p>{arsenal.last5.map((g, i) => <GameRow key={i} g={g} />)}</>)}
+            {arsenal.next5.length > 0 && (<><p className="text-xs font-vt mt-2 mb-1" style={{ color: 'var(--accent2)' }}>UPCOMING</p>{arsenal.next5.map((g, i) => <GameRow key={i} g={g} />)}</>)}
+            {arsenal.standing && <p className="text-xs font-tech mt-2" style={{ color: 'var(--text-dim)' }}>Standing: {arsenal.standing.rank ? `#${arsenal.standing.rank}` : '—'} | {arsenal.standing.wins ?? '—'}W {arsenal.standing.draws ?? '—'}D {arsenal.standing.losses ?? '—'}L | {arsenal.standing.points ?? '—'}pts</p>}
+          </>
+        )}
+      </div>
+      <div style={{ borderTop: '1px solid var(--border)', paddingTop: '12px' }}>
+        <h3 className="font-vt text-lg tracking-wider mb-2" style={{ color: 'var(--accent)' }}>NEW YORK METS <span style={{ color: 'var(--text-dim)' }}>⚾ MLB</span></h3>
+        {mets.loading ? <p className="text-xs font-tech" style={{ color: 'var(--text-dim)' }}>loading...</p> : (
+          <>
+            {mets.last5.length > 0 && (<><p className="text-xs font-vt mb-1" style={{ color: 'var(--accent2)' }}>RECENT</p>{mets.last5.map((g, i) => <GameRow key={i} g={g} />)}</>)}
+            {mets.next5.length > 0 && (<><p className="text-xs font-vt mt-2 mb-1" style={{ color: 'var(--accent2)' }}>UPCOMING</p>{mets.next5.map((g, i) => <GameRow key={i} g={g} />)}</>)}
+            {mets.standing && <p className="text-xs font-tech mt-2" style={{ color: 'var(--text-dim)' }}>Standing: {mets.standing.rank ? `#${mets.standing.rank}` : '—'} | {mets.standing.wins ?? '—'}W {mets.standing.losses ?? '—'}L | {mets.standing.pct ? (mets.standing.pct).toFixed(3) : '—'}</p>}
+            {mets.last5.length === 0 && mets.next5.length === 0 && <p className="text-xs font-tech" style={{ color: 'var(--text-dim)' }}>Season data loading soon...</p>}
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const AltTabWebsite = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  // Derive currentPage from the URL path
   const currentPage = location.pathname === '/' ? 'home' : location.pathname.slice(1);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [theme, setTheme] = useState('dark');
   const [isMobile, setIsMobile] = useState(false);
-  // Daily trivia state
   const [triviaAnswered, setTriviaAnswered] = useState(false);
   const [triviaChoice, setTriviaChoice] = useState(null);
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastVisible, setToastVisible] = useState(false);
+  const toastTimer = useRef(null);
   const todayTrivia = useMemo(() => {
     const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
     return SPORTS_TRIVIA[dayOfYear % SPORTS_TRIVIA.length];
   }, []);
 
+  // Window dragging system - drag from ANY spot on window
+  const zCounter = useRef(300);
+  const dragRef = useRef(null);
+  const calcInitialPositions = useCallback(() => {
+    const vw = typeof window !== 'undefined' ? window.innerWidth : 1440;
+    if (vw < 1024) return {}; // mobile: no absolute positioning
+    return {
+      'win-about': { x: 15, y: 60 },
+      'win-focus': { x: 15, y: 370 },
+      'win-clocks': { x: vw - 370, y: 60 },
+      'win-news': { x: vw - 350, y: 250 },
+      'win-contact': { x: Math.floor(vw * 0.35), y: 520 },
+      'win-now': { x: Math.floor(vw * 0.35), y: 340 },
+      'win-sports': { x: vw - 420, y: 400 },
+      'win-trivia': { x: vw - 280, y: 620 },
+    };
+  }, []);
+  const [winPos, setWinPos] = useState(calcInitialPositions);
+  const [winZ, setWinZ] = useState({});
+  const [winVisible, setWinVisible] = useState({
+    'win-about': true, 'win-focus': true, 'win-clocks': true, 'win-news': true,
+    'win-contact': true, 'win-now': true, 'win-sports': true, 'win-trivia': true,
+  });
+
+  const bringToFront = useCallback((id) => {
+    zCounter.current += 1;
+    setWinZ(prev => ({ ...prev, [id]: zCounter.current }));
+  }, []);
+
+  const handleWinMouseDown = useCallback((id, e) => {
+    // Don't drag if clicking interactive elements inside the window
+    const tag = e.target.tagName;
+    if (['BUTTON', 'A', 'INPUT', 'TEXTAREA', 'SELECT'].includes(tag) || e.target.closest('button') || e.target.closest('a')) return;
+    bringToFront(id);
+    const el = e.currentTarget;
+    const rect = el.getBoundingClientRect();
+    dragRef.current = { id, offsetX: e.clientX - rect.left, offsetY: e.clientY - rect.top };
+    e.preventDefault();
+  }, [bringToFront]);
+
+  useEffect(() => {
+    const onMove = (e) => {
+      if (!dragRef.current) return;
+      const { id, offsetX, offsetY } = dragRef.current;
+      setWinPos(prev => ({ ...prev, [id]: { x: e.clientX - offsetX, y: e.clientY - offsetY } }));
+    };
+    const onUp = () => { dragRef.current = null; };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+  }, []);
+
+  const closeWin = useCallback((id) => {
+    setWinVisible(prev => ({ ...prev, [id]: false }));
+  }, []);
+
+  const showWin = useCallback((id) => {
+    setWinVisible(prev => ({ ...prev, [id]: true }));
+    bringToFront(id);
+    showToast(id.replace('win-', '') + ' opened');
+  }, [bringToFront]);
+
+  // Theme toggle
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(t => t === 'dark' ? 'light' : 'dark');
+
+  // Toast
+  const showToast = useCallback((msg) => {
+    setToastMsg('✦ ' + msg);
+    setToastVisible(true);
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToastVisible(false), 2000);
+  }, []);
+
   // Detect mobile device
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.matchMedia('(max-width: 768px)').matches);
+    const checkMobile = () => setIsMobile(window.matchMedia('(max-width: 1024px)').matches);
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -640,32 +927,32 @@ const AltTabWebsite = () => {
   const renderTrivia = () => {
     const isCorrect = triviaChoice === todayTrivia.a;
     return (
-      <div className="p-5 rounded-2xl bg-gradient-to-br from-blue-50 to-orange-50 border-2 border-black/20">
-        <h3 className="text-sm font-bold text-blue-700 mb-1 uppercase tracking-wide">Daily Sports Trivia</h3>
-        <p className="text-black font-medium text-sm mb-4">{todayTrivia.q}</p>
-        <div className="grid grid-cols-1 gap-2">
+      <div>
+        <p className="font-mono text-xs mb-3" style={{ color: 'var(--text)' }}>{todayTrivia.q}</p>
+        <div className="grid grid-cols-1 gap-1">
           {todayTrivia.choices.map((choice) => (
             <button
               key={choice}
               onClick={() => { setTriviaChoice(choice); setTriviaAnswered(true); }}
               disabled={triviaAnswered}
-              className={`text-left px-3 py-2 rounded-lg text-sm font-medium transition-all border-2 ${
-                triviaAnswered
-                  ? choice === todayTrivia.a
-                    ? 'bg-green-100 border-green-500 text-green-800'
-                    : choice === triviaChoice
-                      ? 'bg-red-100 border-red-500 text-red-800'
-                      : 'bg-gray-50 border-gray-200 text-gray-400'
-                  : 'bg-white border-gray-200 text-black hover:border-blue-400 hover:bg-blue-50 cursor-pointer'
-              }`}
+              className="text-left px-2 py-1 text-xs font-tech transition-all"
+              style={{
+                border: '1px solid ' + (triviaAnswered
+                  ? choice === todayTrivia.a ? '#4af0c8' : choice === triviaChoice ? '#f472b6' : 'var(--border)'
+                  : 'var(--border)'),
+                color: triviaAnswered
+                  ? choice === todayTrivia.a ? '#4af0c8' : choice === triviaChoice ? '#f472b6' : 'var(--text-dim)'
+                  : 'var(--text)',
+                background: triviaAnswered && choice === todayTrivia.a ? 'rgba(74,240,200,0.1)' : 'transparent',
+              }}
             >
               {choice}
             </button>
           ))}
         </div>
         {triviaAnswered && (
-          <p className={`text-sm font-bold mt-3 ${isCorrect ? 'text-green-700' : 'text-red-700'}`}>
-            {isCorrect ? 'Correct!' : `The answer is: ${todayTrivia.a}`}
+          <p className="text-xs font-vt mt-2" style={{ color: isCorrect ? '#4af0c8' : '#f472b6' }}>
+            {isCorrect ? '> correct!' : `> answer: ${todayTrivia.a}`}
           </p>
         )}
       </div>
@@ -679,245 +966,183 @@ const AltTabWebsite = () => {
     window.scrollTo(0, 0);
   };
 
-  const NavItem = ({ icon: Icon, label, page }) => {
-    const path = page === 'home' ? '/' : `/${page}`;
-    return (
-      <Link
-        to={path}
-        onClick={() => {
-          setMenuOpen(false);
-          window.scrollTo(0, 0);
-        }}
-        className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
-          currentPage === page
-            ? 'bg-white/30 text-white shadow-lg scale-105'
-            : 'hover:bg-white/20 text-white/80 hover:text-white'
-        }`}
-      >
-        <Icon size={20} />
-        <span className="font-medium">{label}</span>
-      </Link>
-    );
-  };
-
-
-  // Drudge-style links component - 2 row layout
+  // News links component - hacker styled
   const NewsLinks = () => (
-    <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-orange-50 border-2 border-black/20">
-      <h3 className="text-center font-bold text-blue-700 text-lg mb-3 border-b border-black/20 pb-2">
-        HEADLINES
-      </h3>
-      <div className="max-h-80 overflow-y-auto pr-2 scrollbar-thin">
-        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-          {NEWS_LINKS.map((link, i) => (
-            <a
-              key={i}
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block text-xs text-black hover:text-blue-600 hover:bg-blue-100 px-2 py-1 rounded transition-colors truncate"
-            >
-              {link.title}
-            </a>
-          ))}
-        </div>
+    <div className="max-h-72 overflow-y-auto pr-1">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+        {NEWS_LINKS.map((link, i) => (
+          <a key={i} href={link.url} target="_blank" rel="noopener noreferrer"
+            className="block text-xs font-tech px-1 py-0.5 truncate transition-colors"
+            style={{ color: 'var(--text-dim)' }}
+            onMouseEnter={e => { e.target.style.color = 'var(--accent)'; }}
+            onMouseLeave={e => { e.target.style.color = 'var(--text-dim)'; }}
+          >{link.title}</a>
+        ))}
       </div>
     </div>
   );
 
+  // Desktop icon component
+  const DesktopIcon = ({ emoji, label, onClick }) => (
+    <button onClick={onClick} className="flex flex-col items-center gap-1 opacity-70 hover:opacity-100 transition-opacity py-1">
+      <div className="w-10 h-10 flex items-center justify-center text-xl" style={{ background: 'var(--title-bar)', border: '1px solid var(--border)' }}>{emoji}</div>
+      <span className="font-vt text-xs" style={{ color: 'var(--text)', textShadow: '1px 1px 3px var(--bg)' }}>{label}</span>
+    </button>
+  );
+
+  // Desktop draggable window wrapper
+  const DeskWin = ({ id, title, width, children }) => {
+    if (!winVisible[id]) return null;
+    const pos = winPos[id] || { x: 0, y: 0 };
+    const z = winZ[id] || 100;
+    if (isMobile) {
+      return (
+        <WinPanel title={title} className="mb-4">
+          {children}
+        </WinPanel>
+      );
+    }
+    return (
+      <div
+        className="win"
+        style={{ position: 'absolute', left: pos.x, top: pos.y, width: width || 340, zIndex: z, userSelect: 'none' }}
+        onMouseDown={(e) => handleWinMouseDown(id, e)}
+      >
+        <div className="win-titlebar">
+          <div className="win-btns">
+            <button className="win-btn close" onClick={() => closeWin(id)} />
+            <span className="win-btn min" />
+            <span className="win-btn max" />
+          </div>
+          <div className="win-title">// {title}</div>
+        </div>
+        <div className="win-body">{children}</div>
+      </div>
+    );
+  };
+
   const HomePage = () => (
-    <div className="-mx-4 md:-mx-6">
-      {/* Hero Banner */}
-      <div className="relative min-h-[50vh] md:min-h-[60vh] flex flex-col items-center justify-center bg-gradient-to-br from-blue-700 via-blue-600 to-orange-500 px-4 md:px-6">
-        <Reveal direction="scale">
-          <DraggableHeroLetters />
-        </Reveal>
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 rounded-full border-2 border-white/40 flex items-start justify-center p-2">
-            <div className="w-1.5 h-3 bg-white/60 rounded-full" />
+    <div className="relative" style={{ minHeight: isMobile ? 'auto' : 'calc(100vh - 70px)' }}>
+      {/* Hero Letters - centered in open space */}
+      {!isMobile && (
+        <div className="absolute inset-0 flex items-center justify-center z-[50] pointer-events-none">
+          <div className="pointer-events-auto">
+            <DraggableHeroLetters />
           </div>
         </div>
-      </div>
+      )}
 
-      {/* World Clocks - full-width dark band */}
-      <div className="bg-blue-950 py-6 px-4">
-        <WorldClocks />
-      </div>
+      {isMobile && (
+        <div className="py-12 px-4">
+          <DraggableHeroLetters />
+        </div>
+      )}
 
-      {/* Focus Areas - clean white section */}
-      <div className="bg-white py-16 md:py-24 px-4 md:px-6">
-        <Reveal direction="up">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-4xl md:text-6xl font-black text-black text-center mb-4 tracking-tight">Areas of Focus</h2>
-            <p className="text-lg text-black/50 text-center mb-12 md:mb-16 max-w-2xl mx-auto">Where research meets creativity across disciplines</p>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-0">
-              {[
-                { name: 'Product Development', icon: (
-                  <svg viewBox="0 0 48 48" className="w-12 h-12 md:w-14 md:h-14 mx-auto mb-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M24 4c-1 0-2 .5-2 .5s-6 2-6 12c0 4 2 6 3 8s2 4 2 6v2h6v-2c0-2 1-4 2-6s3-4 3-8c0-10-6-11.5-6-12s-1-.5-2-.5z" strokeDasharray="1 0.5" />
-                    <path d="M19 34h10" strokeDasharray="2 1" />
-                    <path d="M20 38h8" strokeDasharray="2 1" />
-                    <path d="M22 42h4" />
-                    <path d="M24 0v2" strokeDasharray="1 1" />
-                    <path d="M36 6l-2 2" strokeDasharray="1 1" />
-                    <path d="M40 18h-3" strokeDasharray="1 1" />
-                    <path d="M12 6l2 2" strokeDasharray="1 1" />
-                    <path d="M8 18h3" strokeDasharray="1 1" />
-                  </svg>
-                )},
-                { name: 'Research', icon: (
-                  <svg viewBox="0 0 48 48" className="w-12 h-12 md:w-14 md:h-14 mx-auto mb-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="20" cy="20" r="12" strokeDasharray="3 1" />
-                    <path d="M29 29l12 12" strokeDasharray="2 1" />
-                    <path d="M40 42l2 2" />
-                    <path d="M14 14c2-2 5-3 8-3" strokeDasharray="2 2" />
-                  </svg>
-                )},
-                { name: 'Civic', icon: (
-                  <svg viewBox="0 0 48 48" className="w-12 h-12 md:w-14 md:h-14 mx-auto mb-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M6 42h36" strokeDasharray="2 1" />
-                    <path d="M8 42v-22" strokeDasharray="3 1" />
-                    <path d="M16 42v-22" strokeDasharray="3 1" />
-                    <path d="M24 42v-22" strokeDasharray="3 1" />
-                    <path d="M32 42v-22" strokeDasharray="3 1" />
-                    <path d="M40 42v-22" strokeDasharray="3 1" />
-                    <path d="M4 20h40" strokeDasharray="2 1" />
-                    <path d="M8 20l16-14 16 14" strokeDasharray="2 1" />
-                  </svg>
-                )},
-                { name: 'Education', icon: (
-                  <svg viewBox="0 0 48 48" className="w-12 h-12 md:w-14 md:h-14 mx-auto mb-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M6 12c4-2 8-2 12 0v28c-4-2-8-2-12 0V12z" strokeDasharray="2 1" />
-                    <path d="M18 12c4-2 8-2 12 0v28c-4-2-8-2-12 0V12z" strokeDasharray="2 1" />
-                    <path d="M30 12c4-2 8-2 12 0v28c-4-2-8-2-12 0V12z" strokeDasharray="2 1" />
-                    <path d="M9 18h6" strokeDasharray="1 1" />
-                    <path d="M9 24h6" strokeDasharray="1 1" />
-                    <path d="M9 30h6" strokeDasharray="1 1" />
-                    <path d="M33 18h6" strokeDasharray="1 1" />
-                    <path d="M33 24h6" strokeDasharray="1 1" />
-                    <path d="M33 30h6" strokeDasharray="1 1" />
-                    <path d="M24 10v32" strokeDasharray="2 2" />
-                  </svg>
-                )},
-                { name: 'Sport', icon: (
-                  <svg viewBox="0 0 48 48" className="w-12 h-12 md:w-14 md:h-14 mx-auto mb-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="10" cy="24" r="8" strokeDasharray="2 1" />
-                    <path d="M10 18l-2 3h4l-2-3z" strokeDasharray="1 0.5" />
-                    <circle cx="24" cy="12" r="7" strokeDasharray="2 1" />
-                    <path d="M17 12h14" strokeDasharray="1 1" />
-                    <path d="M24 5v14" strokeDasharray="1 1" />
-                    <path d="M19 7c2 2 2 8 0 10" strokeDasharray="1 0.5" />
-                    <path d="M29 7c-2 2-2 8 0 10" strokeDasharray="1 0.5" />
-                    <circle cx="38" cy="26" r="6" strokeDasharray="2 1" />
-                    <path d="M38 32v8" strokeDasharray="1 1" />
-                    <path d="M35 40h6" strokeDasharray="1 0.5" />
-                    <circle cx="36" cy="24" r="1" strokeDasharray="0.5 0.5" />
-                    <circle cx="40" cy="25" r="1" strokeDasharray="0.5 0.5" />
-                    <circle cx="38" cy="28" r="1" strokeDasharray="0.5 0.5" />
-                  </svg>
-                )},
-              ].map((area, i) => (
-                <div key={i} className={`p-8 md:p-10 ${i % 2 === 0 ? 'bg-blue-50' : 'bg-orange-50'} text-center border border-black/10 hover:bg-blue-100 transition-colors`}>
-                  <div className="text-blue-700">{area.icon}</div>
-                  <h3 className="font-bold text-black text-sm md:text-base tracking-wide">{area.name}</h3>
+      {/* Desktop Icons - left side */}
+      {!isMobile && (
+        <div className="fixed left-4 top-16 z-[60] flex flex-col gap-3 pt-4">
+          <DesktopIcon emoji="📂" label="ABOUT" onClick={() => showWin('win-about')} />
+          <DesktopIcon emoji="⚙️" label="FOCUS" onClick={() => showWin('win-focus')} />
+          <DesktopIcon emoji="🕐" label="CLOCKS" onClick={() => showWin('win-clocks')} />
+          <DesktopIcon emoji="📰" label="NEWS" onClick={() => showWin('win-news')} />
+          <DesktopIcon emoji="✉️" label="CONTACT" onClick={() => showWin('win-contact')} />
+          <DesktopIcon emoji="📡" label="NOW" onClick={() => showWin('win-now')} />
+          <DesktopIcon emoji="⚽" label="SPORTS" onClick={() => showWin('win-sports')} />
+          <DesktopIcon emoji="🎲" label="TRIVIA" onClick={() => showWin('win-trivia')} />
+        </div>
+      )}
+
+      {/* Draggable Windows (desktop) / Stacked panels (mobile) */}
+      {isMobile ? (
+        <div className="px-4 space-y-4 pb-12">
+          <WinPanel title="about.txt"><h2>WHO WE ARE</h2><p>Alt-Tab is a multi-disciplinary think tank at the intersection of design, strategy, and emerging technology.</p><p>We believe the best solutions come from looking sideways — pressing alt-tab on conventional thinking.</p><h3>APPROACH</h3><p>Sometimes we make for us; "Style Matters"</p></WinPanel>
+          <WinPanel title="focus_areas.txt">
+            <h2>AREAS OF FOCUS</h2>
+            {['Product Development', 'Research', 'Civic', 'Education', 'Sport'].map(a => (
+              <span key={a} className="tag mr-1 mb-1">{a.toUpperCase()}</span>
+            ))}
+            <p className="mt-3">Where research meets creativity across disciplines</p>
+          </WinPanel>
+          <WinPanel title="world_clocks"><WorldClocks /></WinPanel>
+          <WinPanel title="front_page_news"><h2>FRONT PAGE NEWS</h2><NewsLinks /></WinPanel>
+          <WinPanel title="contact.txt"><h2>SAY HI</h2><p>Got a project, a question, or a weird idea?</p><p style={{ marginTop: 10 }}><a href="mailto:hello@alt-tab.xyz" style={{ color: 'var(--accent)', borderBottom: '1px dotted var(--accent)' }}>hello@alt-tab.xyz</a></p></WinPanel>
+          <WinPanel title="now.log"><h2>CURRENTLY</h2><ul><li>Building tools for collective thinking</li><li>Researching emergence &amp; complexity</li><li>Collaborating with a handful of bold clients</li><li>Always reading too many things at once</li></ul></WinPanel>
+          <WinPanel title="scores.exe"><h2>MY TEAMS</h2><SportsTracker /></WinPanel>
+          <WinPanel title="trivia.log"><h2>DAILY TRIVIA</h2>{renderTrivia()}</WinPanel>
+        </div>
+      ) : (
+        <>
+          {/* ABOUT - large, top-left */}
+          <DeskWin id="win-about" title="about.txt" width={430}>
+            <h2>WHO WE ARE</h2>
+            <p>Alt-Tab is a multi-disciplinary think tank at the intersection of design, strategy, and emerging technology.</p>
+            <p>We believe the best solutions come from looking sideways — pressing alt-tab on conventional thinking.</p>
+            <h3>APPROACH</h3>
+            <p>Sometimes we make for us; "Style Matters"</p>
+          </DeskWin>
+
+          {/* AREAS OF FOCUS - large, bottom-left */}
+          <DeskWin id="win-focus" title="focus_areas.txt" width={450}>
+            <h2>AREAS OF FOCUS</h2>
+            <p style={{ color: 'var(--text-dim)', marginBottom: 8, fontSize: 12, fontFamily: "'Share Tech Mono', monospace" }}>Where research meets creativity across disciplines</p>
+            <div className="grid grid-cols-5 gap-0">
+              {['Product Development', 'Research', 'Civic', 'Education', 'Sport'].map((area, i) => (
+                <div key={i} className="py-4 px-2 text-center transition-colors" style={{ border: '1px solid var(--border)', background: i % 2 === 0 ? 'rgba(74,240,200,0.05)' : 'rgba(167,139,250,0.05)' }}>
+                  <h3 className="font-vt text-sm tracking-wider" style={{ color: 'var(--accent)' }}>{area}</h3>
                 </div>
               ))}
             </div>
-          </div>
-        </Reveal>
-      </div>
+          </DeskWin>
 
-      {/* News, Trivia, and Game - color-blocked section */}
-      <div className="bg-gradient-to-br from-blue-50 via-white to-orange-50 py-16 md:py-24 px-4 md:px-6">
-        <Reveal direction="up" delay={0.1}>
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-4xl md:text-6xl font-black text-black text-center mb-4 tracking-tight">Supporting and Challenging the World</h2>
-            <p className="text-lg text-black/50 text-center mb-12 md:mb-16 max-w-2xl mx-auto">Headlines, trivia, and games — all in one place</p>
-            <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-              <NewsLinks />
-              {renderTrivia()}
-              <SnakeGame isMobile={isMobile} />
-            </div>
-          </div>
-        </Reveal>
-      </div>
+          {/* WORLD CLOCKS - top-right */}
+          <DeskWin id="win-clocks" title="world_clocks" width={340}>
+            <WorldClocks />
+          </DeskWin>
 
-      {/* About Alt-Tab - dark color block */}
-      <div className="bg-gradient-to-br from-blue-700 to-blue-900 py-16 md:py-24 px-4 md:px-6">
-        <Reveal direction="left" delay={0.1}>
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-4xl md:text-6xl font-black text-white text-center mb-4 tracking-tight">About Alt-Tab</h2>
-            <p className="text-lg text-white/60 text-center mb-12 md:mb-16 max-w-2xl mx-auto">Ideas into reality, one project at a time</p>
-            <div className="grid md:grid-cols-3 gap-0">
-              <button onClick={() => navigateTo('about')} className="p-8 md:p-10 bg-white/10 hover:bg-white/20 transition-colors text-left border border-white/10">
-                <h3 className="font-bold text-white mb-4 text-xl">Human-Centric Design</h3>
-                <p className="text-white/70 leading-relaxed">Founded by a library scientist and industrial designer, we blend research with creativity.</p>
-              </button>
-              <button onClick={() => navigateTo('about')} className="p-8 md:p-10 bg-white/5 hover:bg-white/15 transition-colors text-left border border-white/10">
-                <h3 className="font-bold text-white mb-4 text-xl">Multi-Disciplinary</h3>
-                <p className="text-white/70 leading-relaxed">From digital goods to policy, we create experiences that matter.</p>
-              </button>
-              <button onClick={() => navigateTo('about')} className="p-8 md:p-10 bg-white/10 hover:bg-white/20 transition-colors text-left border border-white/10">
-                <h3 className="font-bold text-white mb-4 text-xl">Future-Forward</h3>
-                <p className="text-white/70 leading-relaxed">Bridging nostalgia with innovation, one project at a time.</p>
-              </button>
-            </div>
-          </div>
-        </Reveal>
-      </div>
+          {/* FRONT PAGE NEWS - right */}
+          <DeskWin id="win-news" title="front_page_news" width={310}>
+            <h2>FRONT PAGE NEWS</h2>
+            <NewsLinks />
+          </DeskWin>
 
-      {/* Reaction Time Game - light section */}
-      <div className="bg-white py-16 md:py-24 px-4 md:px-6">
-        <Reveal direction="up" delay={0.1}>
-          <div className="max-w-2xl mx-auto">
-            <h2 className="text-4xl md:text-5xl font-black text-black text-center mb-8 tracking-tight">Test Your Reflexes</h2>
-            <ReactionGame />
-          </div>
-        </Reveal>
-      </div>
+          {/* CONTACT - bottom center */}
+          <DeskWin id="win-contact" title="contact.txt" width={280}>
+            <h2>SAY HI</h2>
+            <p>Got a project, a question, or a weird idea?</p>
+            <p style={{ marginTop: 10 }}><a href="mailto:hello@alt-tab.xyz">hello@alt-tab.xyz</a></p>
+            <p className="font-tech text-xs mt-3" style={{ color: 'var(--text-dim)' }}>&gt; response time: 24–48hrs_<span className="blink">█</span></p>
+          </DeskWin>
 
-      {/* Sister Brands - two tiles */}
-      <div className="grid md:grid-cols-2">
-        <Reveal direction="left">
-          <a
-            href="https://www.walt-tab.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-500 py-16 md:py-24 px-4 md:px-6 hover:brightness-110 transition-all"
-          >
-            <div className="text-center">
-              <span className="text-4xl md:text-6xl font-black text-black hover:scale-105 transition-transform inline-block">
-                Walt-tab →
-              </span>
-            </div>
-          </a>
-        </Reveal>
-        <Reveal direction="right">
-          <a
-            href="https://www.salt-tab.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 py-16 md:py-24 px-4 md:px-6 hover:brightness-110 transition-all"
-          >
-            <div className="text-center">
-              <span className="text-4xl md:text-6xl font-black text-white hover:scale-105 transition-transform inline-block">
-                Salt-tab →
-              </span>
-            </div>
-          </a>
-        </Reveal>
-      </div>
+          {/* NOW - center-right */}
+          <DeskWin id="win-now" title="now.log" width={300}>
+            <h2>CURRENTLY</h2>
+            <ul>
+              <li>Building tools for collective thinking</li>
+              <li>Researching emergence &amp; complexity</li>
+              <li>Collaborating with a handful of bold clients</li>
+              <li>Always reading too many things at once</li>
+            </ul>
+            <p className="font-tech text-xs mt-3" style={{ color: 'var(--text-dim)' }}>last updated: 2025.02_</p>
+          </DeskWin>
+
+          {/* SPORTS - right */}
+          <DeskWin id="win-sports" title="scores.exe" width={390}>
+            <h2>MY TEAMS</h2>
+            <SportsTracker />
+          </DeskWin>
+
+          {/* DAILY TRIVIA - smallest, bottom-right */}
+          <DeskWin id="win-trivia" title="trivia.log" width={250}>
+            <h3 style={{ fontSize: 16 }}>DAILY TRIVIA</h3>
+            {renderTrivia()}
+          </DeskWin>
+        </>
+      )}
     </div>
   );
 
   const ProjectsPage = () => {
-    const [formData, setFormData] = useState({
-      name: '',
-      email: '',
-      company: '',
-      message: ''
-    });
+    const [formData, setFormData] = useState({ name: '', email: '', company: '', message: '' });
     const [formSubmitted, setFormSubmitted] = useState(false);
 
     const handleSubmit = (e) => {
@@ -926,10 +1151,7 @@ const AltTabWebsite = () => {
       const body = `Name: ${formData.name}\nEmail: ${formData.email}\nCompany: ${formData.company || 'Not provided'}\n\nMessage:\n${formData.message}`;
       window.location.href = `mailto:ty@alt-tab.xyz?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
       setFormSubmitted(true);
-      setTimeout(() => {
-        setFormSubmitted(false);
-        setFormData({ name: '', email: '', company: '', message: '' });
-      }, 3000);
+      setTimeout(() => { setFormSubmitted(false); setFormData({ name: '', email: '', company: '', message: '' }); }, 3000);
     };
 
     const projects = [
@@ -945,281 +1167,127 @@ const AltTabWebsite = () => {
 
     return (
       <div className="space-y-8">
-        <div className="text-center space-y-4 bg-white/90 backdrop-blur-sm rounded-2xl p-6 md:p-8 border-2 border-black">
-          <h2 className="text-5xl md:text-6xl font-black text-black drop-shadow-lg">Supportive Partners</h2>
-          <p className="text-lg text-black/80 italic max-w-2xl mx-auto">
-            "Sometimes we do work for us; sometimes we do work with you."
-          </p>
-          <p className="text-base text-black/70 max-w-3xl mx-auto leading-relaxed">
-            The organizations featured here represent collaborations where we were able to share our work publicly. Much of what the Alt-Tab team builds is protected under NDA, as we often embed directly within our clients' internal teams. As a result, this page showcases only a portion of our portfolio.
-          </p>
-        </div>
+        <WinPanel title="partners.txt">
+          <h2>SUPPORTIVE PARTNERS</h2>
+          <p className="font-tech text-xs" style={{ color: 'var(--accent3)', fontStyle: 'italic' }}>"Sometimes we do work for us; sometimes we do work with you."</p>
+          <p className="mt-2" style={{ color: 'var(--text-dim)' }}>The organizations featured here represent collaborations where we were able to share our work publicly. Much of what the Alt-Tab team builds is protected under NDA, as we often embed directly within our clients' internal teams.</p>
+        </WinPanel>
 
-        {/* Projects Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {projects.map((project, i) => {
             const CardWrapper = project.link ? 'a' : 'div';
             const linkProps = project.link ? { href: project.link, target: '_blank', rel: 'noopener noreferrer' } : {};
             return (
-              <CardWrapper
-                key={i}
-                {...linkProps}
-                className="group bg-white rounded-lg p-4 hover:scale-105 transition-all duration-300 cursor-pointer border-2 border-black hover:shadow-lg hover:border-orange-500 block"
+              <CardWrapper key={i} {...linkProps} className="group block p-4 transition-all hover:scale-105"
+                style={{ background: 'var(--window-bg)', border: '1px solid var(--border)' }}
+                onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent)'}
+                onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
               >
                 <div className="h-16 flex items-center justify-center mb-2">
                   {project.logoText ? (
-                    <span className="text-2xl md:text-3xl font-black text-black tracking-tight" style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>
-                      {project.logoText}
-                    </span>
+                    <span className="text-2xl md:text-3xl font-vt tracking-wider" style={{ color: 'var(--accent)' }}>{project.logoText}</span>
                   ) : (
-                    <img
-                      src={project.logo}
-                      alt={project.name}
-                      loading="lazy"
-                      className="max-h-full max-w-full object-contain"
-                    />
+                    <img src={project.logo} alt={project.name} loading="lazy" className="max-h-full max-w-full object-contain" />
                   )}
                 </div>
-                <h3 className="font-bold text-black text-center text-sm">{project.name}</h3>
-                <p className="text-xs text-gray-600 text-center mt-1">{project.description}</p>
+                <h3 className="font-vt text-center text-sm tracking-wider" style={{ color: 'var(--text)' }}>{project.name}</h3>
+                <p className="text-xs text-center mt-1 font-tech" style={{ color: 'var(--text-dim)' }}>{project.description}</p>
               </CardWrapper>
             );
           })}
         </div>
 
-        <div className="max-w-4xl mx-auto pt-12">
-          <div className="bg-white/95 backdrop-blur-md border-2 border-black rounded-2xl p-8 md:p-12">
-            <div className="text-center mb-8">
-              <h3 className="text-3xl md:text-4xl font-black text-black mb-3">Work With Us</h3>
-              <p className="text-black/70 text-lg">
-                Have a project in mind? Let's create something amazing together.
-              </p>
+        <WinPanel title="inquiry.exe">
+          <h2>WORK WITH US</h2>
+          <p style={{ color: 'var(--text-dim)' }}>Have a project in mind? Let's create something together.</p>
+          {formSubmitted ? (
+            <div className="text-center py-8">
+              <h3 className="font-vt text-2xl" style={{ color: 'var(--accent)' }}>TRANSMISSION SENT</h3>
+              <p className="font-tech text-sm mt-2" style={{ color: 'var(--text-dim)' }}>We will be in touch soon.</p>
             </div>
-
-            {formSubmitted ? (
-              <div className="text-center py-12">
-                <div className="w-20 h-20 mx-auto mb-4 bg-green-500 rounded-full flex items-center justify-center">
-                  <Sparkles size={40} className="text-white" />
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-tech text-xs mb-1" style={{ color: 'var(--accent2)' }}>NAME *</label>
+                  <input type="text" required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="hacker-input" placeholder="Your name" />
                 </div>
-                <h4 className="text-2xl font-bold text-black mb-2">Thank You!</h4>
-                <p className="text-black/70">We will be in touch soon.</p>
+                <div>
+                  <label className="block font-tech text-xs mb-1" style={{ color: 'var(--accent2)' }}>EMAIL *</label>
+                  <input type="email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="hacker-input" placeholder="your@email.com" />
+                </div>
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-black font-medium mb-2">Name *</label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      className="w-full px-4 py-3 rounded-lg bg-gray-100 border-2 border-gray-300 text-black placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
-                      placeholder="Your name"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-black font-medium mb-2">Email *</label>
-                    <input
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      className="w-full px-4 py-3 rounded-lg bg-gray-100 border-2 border-gray-300 text-black placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
-                      placeholder="your@email.com"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-black font-medium mb-2">Company / Organization</label>
-                  <input
-                    type="text"
-                    value={formData.company}
-                    onChange={(e) => setFormData({...formData, company: e.target.value})}
-                    className="w-full px-4 py-3 rounded-lg bg-gray-100 border-2 border-gray-300 text-black placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
-                    placeholder="Optional"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-black font-medium mb-2">Tell us about your project *</label>
-                  <textarea
-                    required
-                    value={formData.message}
-                    onChange={(e) => setFormData({...formData, message: e.target.value})}
-                    rows={6}
-                    className="w-full px-4 py-3 rounded-lg bg-gray-100 border-2 border-gray-300 text-black placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors resize-none"
-                    placeholder="What are you looking to create? What challenges are you facing?"
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  size="xl"
-                  className="w-full md:w-auto"
-                >
-                  Send Inquiry
-                </Button>
-              </form>
-            )}
-          </div>
-        </div>
+              <div>
+                <label className="block font-tech text-xs mb-1" style={{ color: 'var(--accent2)' }}>COMPANY</label>
+                <input type="text" value={formData.company} onChange={(e) => setFormData({...formData, company: e.target.value})} className="hacker-input" placeholder="Optional" />
+              </div>
+              <div>
+                <label className="block font-tech text-xs mb-1" style={{ color: 'var(--accent2)' }}>PROJECT DETAILS *</label>
+                <textarea required value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} rows={5} className="hacker-input" style={{ resize: 'none' }} placeholder="What are you looking to create?" />
+              </div>
+              <Button type="submit" size="lg">SEND INQUIRY</Button>
+            </form>
+          )}
+        </WinPanel>
       </div>
     );
   };
 
   const MoodboardsPage = () => {
     const [activeVideo, setActiveVideo] = useState(null);
-
-    // Video collection - easy to add new videos: just add 'VIDEO_ID'
-    const videos = useMemo(() => [
-      '7IdoDJCssNk',
-      'M_0do0LP2tk',
-      'XTomk3L1R5I',
-      'cFwytlpCJ9U',
-      'l126-q8Ne5I',
-      '0JpVNPH6cl8',
-      'P_QJKaKD-i8',
-      'mBjo4Dmsmok',
-      'sKE1nLc5P_c',
-      '0zIVTDbve7k',
-      'ZYAzo5OdqHM',
-      'tnFPQ57l0Dg',
-      'RqQGUJK7Na4',
-      'pYdkiWIPp-s',
-      'vtBoQuAtX3I',
-    ], []);
-
-    // Generate shuffled videos with random sizes
+    const videos = useMemo(() => ['7IdoDJCssNk','M_0do0LP2tk','XTomk3L1R5I','cFwytlpCJ9U','l126-q8Ne5I','0JpVNPH6cl8','P_QJKaKD-i8','mBjo4Dmsmok','sKE1nLc5P_c','0zIVTDbve7k','ZYAzo5OdqHM','tnFPQ57l0Dg','RqQGUJK7Na4','pYdkiWIPp-s','vtBoQuAtX3I'], []);
     const generateShuffledVideos = useCallback(() => {
-      const getRandomSize = () => {
-        const rand = Math.random();
-        if (rand < 0.35) return 'small';
-        if (rand < 0.7) return 'medium';
-        return 'large';
-      };
-      const shuffled = [...videos].sort(() => Math.random() - 0.5);
-      return shuffled.map((id) => ({
-        id,
-        size: getRandomSize()
-      }));
+      const sizes = ['small','medium','large'];
+      return [...videos].sort(() => Math.random() - 0.5).map(id => ({ id, size: sizes[Math.floor(Math.random() * 3)] }));
     }, [videos]);
-
-    // Initialize displayVideos once on mount - stable reference
-    const [displayVideos, setDisplayVideos] = useState(() => {
-      const getRandomSize = () => {
-        const rand = Math.random();
-        if (rand < 0.35) return 'small';
-        if (rand < 0.7) return 'medium';
-        return 'large';
-      };
-      const videoIds = [
-        '7IdoDJCssNk', 'M_0do0LP2tk', 'XTomk3L1R5I', 'cFwytlpCJ9U',
-        'l126-q8Ne5I', '0JpVNPH6cl8', 'P_QJKaKD-i8', 'mBjo4Dmsmok',
-        'sKE1nLc5P_c', '0zIVTDbve7k', 'ZYAzo5OdqHM', 'tnFPQ57l0Dg',
-        'RqQGUJK7Na4', 'pYdkiWIPp-s', 'vtBoQuAtX3I',
-      ];
-      const shuffled = [...videoIds].sort(() => Math.random() - 0.5);
-      return shuffled.map((id) => ({ id, size: getRandomSize() }));
-    });
-
-    const handleShuffle = useCallback(() => {
-      setDisplayVideos(generateShuffledVideos());
-    }, [generateShuffledVideos]);
-
-    // Get YouTube thumbnail URL
-    const getThumbnail = (videoId) => `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-
-    // Size classes for varied tile sizes
-    const getSizeClasses = (size) => {
-      switch (size) {
-        case 'large':
-          return 'col-span-2 row-span-2';
-        case 'medium':
-          return 'col-span-2 md:col-span-1 row-span-1';
-        default:
-          return 'col-span-1 row-span-1';
-      }
-    };
+    const [displayVideos, setDisplayVideos] = useState(() => generateShuffledVideos());
+    const getSizeClasses = (s) => s === 'large' ? 'col-span-2 row-span-2' : s === 'medium' ? 'col-span-2 md:col-span-1' : 'col-span-1';
 
     return (
       <div className="space-y-8">
-        <div className="text-center space-y-4">
-          <h2 className="text-5xl md:text-6xl font-black text-black drop-shadow-lg">Moodboards</h2>
-          <p className="text-lg text-black/70 max-w-2xl mx-auto">
-            Video inspiration from skate culture and contemporary design
-          </p>
-          {/* Shuffle button */}
-          <Button onClick={handleShuffle} size="lg" className="rounded-full">
-            <RefreshCw size={18} />
-            Shuffle
+        <WinPanel title="moodboards.exe">
+          <h2>MOODBOARDS</h2>
+          <p style={{ color: 'var(--text-dim)' }}>Video inspiration from skate culture and contemporary design</p>
+          <Button onClick={() => setDisplayVideos(generateShuffledVideos())} variant="outline" size="sm" className="mt-3">
+            <RefreshCw size={14} /> SHUFFLE
           </Button>
-        </div>
+        </WinPanel>
 
-        {/* Video Thumbnail Grid - Masonry-like with varied sizes */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 auto-rows-[120px] md:auto-rows-[150px] -mx-4 md:mx-0">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 auto-rows-[120px] md:auto-rows-[150px]">
           {displayVideos.map(({ id, size }, idx) => (
-            <button
-              key={`${id}-${idx}`}
-              onClick={() => setActiveVideo(id)}
-              className={`group relative bg-black/40 overflow-hidden border border-black/20 hover:border-orange-500 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl md:rounded-lg ${getSizeClasses(size)}`}
+            <button key={`${id}-${idx}`} onClick={() => setActiveVideo(id)}
+              className={`group relative overflow-hidden transition-all duration-300 hover:scale-[1.02] ${getSizeClasses(size)}`}
+              style={{ border: '1px solid var(--border)' }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent)'}
+              onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
             >
-              {/* Thumbnail */}
-              <img
-                src={getThumbnail(id)}
-                alt=""
-                loading="lazy"
-                className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
-              />
-              {/* Play button overlay */}
+              <img src={`https://img.youtube.com/vi/${id}/hqdefault.jpg`} alt="" loading="lazy" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="w-14 h-14 md:w-16 md:h-16 bg-black/70 group-hover:bg-orange-500 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110">
-                  <svg className="w-6 h-6 md:w-7 md:h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
+                <div className="w-14 h-14 flex items-center justify-center" style={{ background: 'var(--accent)', borderRadius: '50%' }}>
+                  <svg className="w-6 h-6 ml-1" fill="var(--bg)" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
                 </div>
               </div>
             </button>
           ))}
         </div>
 
-        {/* Quartersnacks Channel Link */}
         <div className="text-center pt-4">
-          <a
-            href="https://www.youtube.com/@quartersnacksdotcom"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block px-6 py-3 bg-black/80 text-white font-bold text-sm md:text-base rounded-lg border-2 border-black/20 hover:border-orange-500 hover:bg-black transition-all"
-          >
-            QUARTERSNACKS →
-          </a>
+          <a href="https://www.youtube.com/@quartersnacksdotcom" target="_blank" rel="noopener noreferrer"
+            className="inline-block px-6 py-3 font-vt tracking-wider text-sm transition-all"
+            style={{ background: 'var(--title-bar)', color: 'var(--accent)', border: '1px solid var(--border)' }}
+            onMouseEnter={e => e.target.style.borderColor = 'var(--accent)'}
+            onMouseLeave={e => e.target.style.borderColor = 'var(--border)'}
+          >QUARTERSNACKS →</a>
         </div>
 
-        {/* Video Modal */}
         {activeVideo && (
-          <div
-            className="fixed inset-0 z-[200] bg-black/95 flex items-center justify-center p-4"
-            onClick={() => setActiveVideo(null)}
-          >
+          <div className="fixed inset-0 z-[200] bg-black/95 flex items-center justify-center p-4" onClick={() => setActiveVideo(null)}>
             <div className="relative w-full max-w-5xl" onClick={(e) => e.stopPropagation()}>
-              {/* Close button */}
-              <button
-                onClick={() => setActiveVideo(null)}
-                className="absolute -top-12 right-0 text-white/70 hover:text-white text-sm flex items-center gap-2 transition-colors"
-              >
-                <span>Close</span>
-                <X size={20} />
+              <button onClick={() => setActiveVideo(null)} className="absolute -top-10 right-0 flex items-center gap-2 font-vt tracking-wider" style={{ color: 'var(--text-dim)' }}>
+                CLOSE <X size={18} />
               </button>
-              {/* Video player */}
-              <div className="aspect-video bg-black rounded-lg overflow-hidden">
-                <iframe
-                  src={`https://www.youtube.com/embed/${activeVideo}?autoplay=1&rel=0`}
-                  title="Video"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full"
-                />
+              <div className="aspect-video" style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}>
+                <iframe src={`https://www.youtube.com/embed/${activeVideo}?autoplay=1&rel=0`} title="Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full" />
               </div>
             </div>
           </div>
@@ -1228,229 +1296,159 @@ const AltTabWebsite = () => {
     );
   };
 
-  const AboutPage = () => {
-    return (
-      <div className="space-y-12">
-        <div className="text-center space-y-4 bg-white/90 backdrop-blur-sm rounded-2xl p-6 md:p-8 border-2 border-black">
-          <h2 className="text-5xl md:text-6xl font-black text-black drop-shadow-lg">Philosophy</h2>
-          <p className="text-xl text-black/70 max-w-2xl mx-auto">
-            Where research meets creativity, and ideas become reality
-          </p>
-        </div>
+  const AboutPage = () => (
+    <div className="space-y-8">
+      <WinPanel title="philosophy.txt">
+        <h2>PHILOSOPHY</h2>
+        <p style={{ color: 'var(--text-dim)' }}>Where research meets creativity, and ideas become reality</p>
+      </WinPanel>
 
-        {/* Mission - First and foremost */}
-        <div className="p-8 md:p-12 rounded-2xl bg-gradient-to-br from-blue-600 to-orange-500 border-2 border-black">
-          <div className="max-w-3xl mx-auto text-center">
-            <h3 className="text-3xl font-bold text-white mb-6">Our Mission</h3>
-            <p className="text-xl text-white leading-relaxed mb-6">
-              Alt-Tab exists to bridge the gap between human needs and technological possibility. We are a think tank dedicated to designing experiences and products that enhance the quality of human life.
-            </p>
-            <p className="text-lg text-white/90 leading-relaxed mb-6">
-              Whether developing digital platforms, physical products, policy frameworks, or immersive experiences, we maintain an unwavering commitment to thoughtful, intentional design that serves people first.
-            </p>
-            <p className="text-lg text-white/90 leading-relaxed mb-6">
-              Our team is led by real humans who prefer working in the shadows. We're not chasing clout or followers—we'd rather meet you for coffee, shake your hand, and have a real conversation. We believe the best ideas emerge from genuine connection, not comment sections.
-            </p>
-            <p className="text-base text-white/80 italic">
-              Yes, we're actually human. We have coffee addictions, strong opinions about fonts, and we occasionally forget to unmute ourselves on video calls. No AI wrote this. (We checked.)
-            </p>
+      <WinPanel title="mission.txt">
+        <h2>OUR MISSION</h2>
+        <p>Alt-Tab exists to bridge the gap between human needs and technological possibility. We are a think tank dedicated to designing experiences and products that enhance the quality of human life.</p>
+        <p>Whether developing digital platforms, physical products, policy frameworks, or immersive experiences, we maintain an unwavering commitment to thoughtful, intentional design that serves people first.</p>
+        <p>Our team is led by real humans who prefer working in the shadows. We're not chasing clout or followers—we'd rather meet you for coffee, shake your hand, and have a real conversation. We believe the best ideas emerge from genuine connection, not comment sections.</p>
+        <p className="font-tech text-xs mt-4" style={{ color: 'var(--text-dim)', fontStyle: 'italic' }}>Yes, we're actually human. We have coffee addictions, strong opinions about fonts, and we occasionally forget to unmute ourselves on video calls. No AI wrote this. (We checked.)</p>
+      </WinPanel>
+
+      <div className="grid md:grid-cols-[3fr_2fr] gap-6">
+        <WinPanel title="human_centric.txt">
+          <h3>HUMAN-CENTRIC DESIGN</h3>
+          <p>Alt-Tab is all about building a better world for humans, so people are the priority. User experience and empathy for the human are foundational to how we think about work.</p>
+          <div className="mt-3 flex flex-wrap gap-1">
+            <span className="tag">UX DESIGN</span><span className="tag">EMPATHY</span><span className="tag">HUMAN-CENTERED</span>
           </div>
-        </div>
+        </WinPanel>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          <div className="p-8 rounded-2xl bg-white/95 backdrop-blur-md border-2 border-black">
-            <h3 className="text-2xl font-bold text-black mb-4">Human-Centric Design</h3>
-            <p className="text-black/80 leading-relaxed mb-4">
-              At Alt-Tab, we believe that exceptional design begins with deep understanding. Our human-centric approach places people at the center of every project, ensuring that the products and experiences we create genuinely improve lives.
-            </p>
-            <p className="text-black/70 leading-relaxed">
-              Through rigorous user research and empathy-driven methodologies, we uncover insights that inform meaningful solutions. We don't design for users—we design with them.
-            </p>
+        <WinPanel title="research.txt">
+          <h3>RESEARCH-DRIVEN PROCESS</h3>
+          <p>Research is vital to our process. All projects begin with a research phase — combining qualitative and quantitative methods to build a comprehensive understanding of complex challenges.</p>
+          <div className="mt-3 flex flex-wrap gap-1">
+            <span className="tag">RESEARCH</span><span className="tag">DATA</span><span className="tag">INSIGHTS</span>
           </div>
+        </WinPanel>
 
-          <div className="p-8 rounded-2xl bg-white/95 backdrop-blur-md border-2 border-black">
-            <h3 className="text-2xl font-bold text-black mb-4">Research-Driven Process</h3>
-            <p className="text-black/80 leading-relaxed mb-4">
-              Our process is grounded in systematic research and evidence-based decision making. We combine qualitative and quantitative methods to build a comprehensive understanding of complex challenges.
-            </p>
-            <p className="text-black/70 leading-relaxed">
-              From ethnographic studies to data analysis, our research practice ensures that every design decision is informed by real-world insights rather than assumptions.
-            </p>
+        <WinPanel title="prototyping.txt">
+          <h3>RAPID PROTOTYPING</h3>
+          <p>Making is fun, and a great source of information during any development process. By creating tangible artifacts early, we reduce risk and accelerate innovation.</p>
+          <div className="mt-3 flex flex-wrap gap-1">
+            <span className="tag">PROTOTYPING</span><span className="tag">ITERATION</span><span className="tag">MAKING</span>
           </div>
+        </WinPanel>
 
-          <div className="p-8 rounded-2xl bg-white/95 backdrop-blur-md border-2 border-black">
-            <h3 className="text-2xl font-bold text-black mb-4">Rapid Prototyping</h3>
-            <p className="text-black/80 leading-relaxed mb-4">
-              We believe in learning by making. Our rapid prototyping approach allows us to quickly test ideas, gather feedback, and iterate toward optimal solutions.
-            </p>
-            <p className="text-black/70 leading-relaxed">
-              By creating tangible artifacts early in the process, we reduce risk and accelerate innovation. Fail fast, learn faster—that's the Alt-Tab way.
-            </p>
+        <WinPanel title="disciplines.txt">
+          <h3>MULTI-DISCIPLINARY</h3>
+          <p>The team is passionate about library science, industrial design, engineering, fashion, philosophy, and art. This cross-pollination of disciplines enables us to approach challenges from multiple angles.</p>
+          <div className="mt-3 flex flex-wrap gap-1">
+            <span className="tag">LIBRARY SCIENCE</span><span className="tag">INDUSTRIAL DESIGN</span><span className="tag">ENGINEERING</span><span className="tag">FASHION</span><span className="tag">PHILOSOPHY</span><span className="tag">ART</span>
           </div>
-
-          <div className="p-8 rounded-2xl bg-white/95 backdrop-blur-md border-2 border-black">
-            <h3 className="text-2xl font-bold text-black mb-4">Multi-Disciplinary Collaboration</h3>
-            <p className="text-black/80 leading-relaxed mb-4">
-              Complex problems require diverse perspectives. Our team brings together expertise from industrial design, library science, technology, and strategic consulting.
-            </p>
-            <p className="text-black/70 leading-relaxed">
-              This cross-pollination of disciplines enables us to approach challenges from multiple angles and deliver holistic solutions that address both immediate needs and long-term impact.
-            </p>
-          </div>
-        </div>
-
-        <SnakeGame isMobile={isMobile} />
+        </WinPanel>
       </div>
-    );
-  };
+
+      <WinPanel title="snake.exe">
+        <SnakeGame isMobile={isMobile} />
+      </WinPanel>
+    </div>
+  );
 
   const ShopPage = () => (
     <div className="space-y-8">
-      <div className="text-center space-y-4 bg-white/90 backdrop-blur-sm rounded-2xl p-6 md:p-8 border-2 border-black">
-        <h2 className="text-5xl md:text-6xl font-black text-black drop-shadow-lg">Shop</h2>
-        <p className="text-xl text-black/70 max-w-2xl mx-auto">
-          Curated goods from Alt-Tab
-        </p>
-      </div>
-
-      {/* Under Construction Notice */}
+      <WinPanel title="shop.exe">
+        <h2>SHOP</h2>
+        <p style={{ color: 'var(--text-dim)' }}>Curated goods from Alt-Tab</p>
+      </WinPanel>
       <div className="max-w-2xl mx-auto">
-        <div className="p-8 md:p-12 rounded-2xl bg-gradient-to-br from-orange-400 to-yellow-400 border-4 border-black text-center">
-          <Construction size={64} className="mx-auto text-black mb-4" />
-          <h3 className="text-3xl font-black text-black mb-4">Under Construction</h3>
-          <p className="text-lg text-black/80 mb-6">
-            We're working on something special. Our shop will feature limited edition goods,
-            digital zines, and exclusive Alt-Tab merchandise.
-          </p>
-          <p className="text-sm text-black/60 font-mono">
-            Check back soon for updates.
-          </p>
-        </div>
+        <WinPanel title="construction.log">
+          <div className="text-center py-6">
+            <Construction size={48} style={{ color: 'var(--accent)', margin: '0 auto 16px' }} />
+            <h3 className="font-vt text-2xl tracking-wider mb-3" style={{ color: 'var(--accent)', textShadow: '0 0 10px var(--accent)' }}>UNDER CONSTRUCTION</h3>
+            <p style={{ color: 'var(--text-dim)' }}>We're working on something special. Limited edition goods, digital zines, and exclusive Alt-Tab merchandise.</p>
+            <p className="font-tech text-xs mt-4" style={{ color: 'var(--text-dim)' }}>&gt; check back soon_<span className="blink">█</span></p>
+          </div>
+        </WinPanel>
       </div>
-
-      <SnakeGame isMobile={isMobile} />
+      <WinPanel title="snake.exe">
+        <SnakeGame isMobile={isMobile} />
+      </WinPanel>
     </div>
   );
 
   return (
-    <div className={`min-h-screen overflow-x-hidden cursor-none ${darkMode ? 'bg-gray-100 text-gray-900' : 'text-white'}`}>
-      {/* Golf Ball Cursor */}
-      <GolfBallCursor />
+    <div className="min-h-screen overflow-x-hidden" data-theme={theme}>
+      <HackerCursor />
+      <SceneBackground theme={theme} />
+      <div className="scanlines" />
 
-      {/* Background - Light or Dark mode */}
-      {darkMode ? (
-        <>
-          <div
-            className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url(${BACKGROUND_IMAGE})`,
-            }}
-          />
-          <div className="fixed inset-0 bg-yellow-300/40" />
-        </>
-      ) : (
-        <>
-          <div
-            className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url(${BACKGROUND_IMAGE})`,
-            }}
-          />
-          <div className="fixed inset-0 bg-black/60" />
-        </>
-      )}
+      {/* Toast */}
+      <div className={`toast ${toastVisible ? 'show' : ''}`}>{toastMsg}</div>
 
-      <nav className="relative z-50 p-4 md:p-6 border-b-4 border-black bg-gradient-to-r from-blue-700 via-blue-600 to-orange-500 md:fixed md:top-0 md:left-0 md:right-0">
-        <div className="flex justify-between items-center max-w-7xl mx-auto">
-          <Link
-            to="/"
-            className="text-2xl md:text-3xl font-black hover:scale-110 transition-transform text-white drop-shadow-sm"
-          >
-            ALT-TAB
-          </Link>
-
-          <div className="hidden md:flex items-center gap-2">
-            <NavItem icon={BookOpen} label="About" page="about" />
-            <NavItem icon={Image} label="Moodboards" page="moodboards" />
-            <NavItem icon={Grid3x3} label="Projects" page="projects" />
+      {/* Content layer */}
+      <div className="relative z-10 min-h-screen" style={{ paddingBottom: 40 }}>
+        {/* Topbar */}
+        <nav className="topbar relative z-50 mx-4 mt-4 mb-6">
+          <div className="flex items-center gap-5">
+            <Link to="/" onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }} className="logo" style={{ fontSize: 22 }}>ALT-TAB.XYZ</Link>
+            <div className="nav-links hidden md:flex">
+              <Link to="/about" onClick={() => window.scrollTo(0, 0)} className={currentPage === 'about' ? 'active' : ''}>about</Link>
+              <Link to="/moodboards" onClick={() => window.scrollTo(0, 0)} className={currentPage === 'moodboards' ? 'active' : ''}>moodboards</Link>
+              <Link to="/projects" onClick={() => window.scrollTo(0, 0)} className={currentPage === 'projects' ? 'active' : ''}>projects</Link>
+            </div>
           </div>
-
-          <div className="flex items-center gap-2">
-            {/* Theme Toggle */}
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="p-2 rounded-full transition-all bg-white/20 hover:bg-white/30 text-white"
-              title={darkMode ? 'Switch to dark mode' : 'Switch to light mode'}
-            >
-              {darkMode ? <Moon size={20} /> : <Sun size={20} />}
-            </button>
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden p-2 rounded-lg transition-colors hover:bg-white/20 text-white"
-            >
-              {menuOpen ? <X size={24} /> : <Menu size={24} />}
+          <div className="flex items-center gap-3">
+            <button className="theme-toggle" onClick={toggleTheme}>[ ☀ / ☾ ]</button>
+            <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden" style={{ color: 'var(--text)', fontFamily: "'VT323', monospace", fontSize: 22 }}>
+              {menuOpen ? '✕' : '☰'}
             </button>
           </div>
-        </div>
+          {menuOpen && (
+            <div className="md:hidden absolute top-full left-0 right-0 p-4 space-y-2" style={{ background: 'var(--surface)', border: '1px solid var(--border)', backdropFilter: 'blur(12px)' }}>
+              {['home','about','moodboards','projects'].map(p => (
+                <Link key={p} to={p === 'home' ? '/' : `/${p}`} onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }}
+                  className="block py-2 px-3 font-vt tracking-wider transition-colors"
+                  style={{ color: currentPage === p ? 'var(--accent)' : 'var(--text-dim)' }}
+                >{p.toUpperCase()}</Link>
+              ))}
+            </div>
+          )}
+        </nav>
 
-        {menuOpen && (
-          <div className="md:hidden absolute top-full left-0 right-0 bg-gradient-to-r from-blue-700 via-blue-600 to-orange-500 p-4 space-y-2 border-b-4 border-black">
-            <NavItem icon={Sparkles} label="Home" page="home" />
-            <NavItem icon={BookOpen} label="About" page="about" />
-            <NavItem icon={Image} label="Moodboards" page="moodboards" />
-            <NavItem icon={Grid3x3} label="Projects" page="projects" />
-          </div>
-        )}
-      </nav>
+        {/* Routes */}
+        <main className="relative z-10">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/projects" element={<div className="max-w-7xl mx-auto px-4 md:px-6 py-8"><ProjectsPage /></div>} />
+            <Route path="/moodboards" element={<div className="max-w-7xl mx-auto px-4 md:px-6 py-8"><MoodboardsPage /></div>} />
+            <Route path="/about" element={<div className="max-w-7xl mx-auto px-4 md:px-6 py-8"><AboutPage /></div>} />
+            <Route path="/shop" element={<div className="max-w-7xl mx-auto px-4 md:px-6 py-8"><ShopPage /></div>} />
+          </Routes>
+        </main>
 
-      <main className="relative z-10 md:pt-[76px]">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/projects" element={<div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12"><ProjectsPage /></div>} />
-          <Route path="/moodboards" element={<div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12"><MoodboardsPage /></div>} />
-          <Route path="/about" element={<div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12"><AboutPage /></div>} />
-          <Route path="/shop" element={<div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12"><ShopPage /></div>} />
-        </Routes>
-      </main>
-
-      <footer className="relative z-10 py-8 text-sm bg-gradient-to-r from-blue-900 to-blue-800 border-t-4 border-black">
-        {/* World Clocks - shown on all pages except homepage */}
+        {/* Footer - non-home pages */}
         {currentPage !== 'home' && (
-          <div className="mb-6 px-4">
-            <WorldClocks />
-          </div>
+          <footer className="relative z-10 py-6 mt-8 mx-4" style={{ borderTop: '1px solid var(--border)' }}>
+            <div className="mb-4 px-4"><WorldClocks /></div>
+            <div className="flex flex-wrap items-center justify-center gap-4 mb-3 px-4">
+              <Link to="/about" onClick={() => window.scrollTo(0, 0)} className="font-vt tracking-wider px-3 py-1 transition-all" style={{ color: 'var(--text-dim)', border: '1px solid var(--border)' }}>ABOUT</Link>
+              <a href="https://www.instagram.com/alttab.xyz/#" target="_blank" rel="noopener noreferrer" className="font-vt tracking-wider px-3 py-1 transition-all" style={{ color: 'var(--text-dim)', border: '1px solid var(--border)' }}>@ALTTAB</a>
+              <a href="https://www.walt-tab.com/" target="_blank" rel="noopener noreferrer" className="font-vt tracking-wider px-3 py-1 transition-all" style={{ background: 'linear-gradient(to right, #fb923c, #facc15)', color: '#000', fontWeight: 'bold' }}>WALT-TAB</a>
+              <a href="https://www.salt-tab.com/" target="_blank" rel="noopener noreferrer" className="font-vt tracking-wider px-3 py-1 transition-all" style={{ color: 'var(--accent)', border: '1px solid var(--accent)' }}>SALT-TAB</a>
+            </div>
+            <p className="text-center font-tech text-xs" style={{ color: 'var(--text-dim)' }}>© {new Date().getFullYear()} Alt-Tab Think Tank · Multi-Disciplinary</p>
+          </footer>
         )}
+      </div>
 
-        {/* Footer Links */}
-        <div className="flex flex-wrap items-center justify-center gap-4 mb-4 px-4">
-          <Link
-            to="/about"
-            onClick={() => window.scrollTo(0, 0)}
-            className="flex items-center gap-2 px-4 py-2 rounded-full transition-all hover:scale-105 bg-white/10 hover:bg-white/20 text-white"
-          >
-            <BookOpen size={18} />
-            <span className="font-medium">About</span>
-          </Link>
-          <a
-            href="https://www.instagram.com/alttab.xyz/#"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 rounded-full transition-all hover:scale-105 bg-white/10 hover:bg-white/20 text-white"
-          >
-            <Instagram size={18} />
-            <span className="font-medium">@alttab</span>
-          </a>
-          <a
-            href="https://www.walt-tab.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-4 py-2 bg-gradient-to-r from-orange-400 to-yellow-400 text-black font-bold rounded-full hover:scale-105 transition-all"
-          >
-            Walt-tab
-          </a>
+      {/* Marquee Bar */}
+      <div className="marquee-bar">
+        <div className="marquee-label">ALT-TAB.XYZ</div>
+        <div style={{ overflow: 'hidden', flex: 1, height: '100%', display: 'flex', alignItems: 'center' }}>
+          <div className="marquee-track">
+            {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
+              <span key={i}>{item}</span>
+            ))}
+          </div>
         </div>
-        <p className="text-white/60 text-center">© {new Date().getFullYear()} Alt-Tab Think Tank · Multi-Disciplinary</p>
-      </footer>
+      </div>
     </div>
   );
 };
