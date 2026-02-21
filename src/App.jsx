@@ -415,7 +415,7 @@ const GolfBallCursor = () => {
 
   return (
     <div
-      className="fixed w-6 h-6 rounded-full pointer-events-none z-[100] shadow-lg hidden md:block"
+      className="fixed w-6 h-6 rounded-full pointer-events-none z-[100] shadow-lg hidden lg:block"
       style={{
         left: position.x - 12,
         top: position.y - 12,
@@ -444,7 +444,7 @@ const DraggableHeroLetters = () => {
   const lastTapRef = useRef(0);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.matchMedia('(max-width: 768px)').matches);
+    const checkMobile = () => setIsMobile(window.matchMedia('(max-width: 1023px)').matches);
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -1103,9 +1103,9 @@ const AltTabWebsite = () => {
     return SPORTS_TRIVIA[dayOfYear % SPORTS_TRIVIA.length];
   }, []);
 
-  // Detect mobile
+  // Detect mobile/tablet — use app-grid layout for anything under 1024px
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.matchMedia('(max-width: 768px)').matches);
+    const checkMobile = () => setIsMobile(window.matchMedia('(max-width: 1023px)').matches);
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -1822,16 +1822,16 @@ const AltTabWebsite = () => {
       {/* Topbar */}
       <div className="y2k-topbar fixed top-0 left-0 right-0 z-[300]">
         <Link to="/" className="y2k-logo" onClick={() => window.scrollTo(0, 0)}>ALT-TAB</Link>
-        <div className="y2k-nav-links hidden md:flex">
+        <div className="y2k-nav-links hidden lg:flex">
           <Link to="/about" onClick={() => window.scrollTo(0, 0)}>about</Link>
           <Link to="/moodboards" onClick={() => window.scrollTo(0, 0)}>moodboards</Link>
           <Link to="/projects" onClick={() => window.scrollTo(0, 0)}>projects</Link>
         </div>
         <div className="flex items-center gap-2">
           <button className="y2k-theme-toggle" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
-            [ {theme === 'dark' ? '☀' : '☾'} ]
+            {theme === 'dark' ? '☀' : '☾'}
           </button>
-          <button className="md:hidden p-2" style={{ color: 'var(--text)' }} onClick={() => setMenuOpen(!menuOpen)}>
+          <button className="lg:hidden p-2" style={{ color: 'var(--text)' }} onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
@@ -1839,7 +1839,7 @@ const AltTabWebsite = () => {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="fixed top-12 left-0 right-0 z-[299] p-4 space-y-2 md:hidden" style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
+        <div className="fixed top-12 left-0 right-0 z-[299] p-4 space-y-2 lg:hidden" style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
           <Link to="/" onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }} className="block py-2 font-mono-vt" style={{ color: 'var(--accent)' }}>HOME</Link>
           <Link to="/about" onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }} className="block py-2 font-mono-vt" style={{ color: 'var(--text)' }}>ABOUT</Link>
           <Link to="/moodboards" onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }} className="block py-2 font-mono-vt" style={{ color: 'var(--text)' }}>MOODBOARDS</Link>

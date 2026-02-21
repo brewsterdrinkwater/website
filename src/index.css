@@ -311,10 +311,12 @@ body {
   color: var(--text);
   font-family: 'VT323', monospace;
   font-size: 16px;
-  padding: 2px 12px;
+  padding: 2px 10px;
   cursor: pointer;
   letter-spacing: 1px;
   transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .y2k-theme-toggle:hover {
@@ -326,7 +328,7 @@ body {
 .y2k-scanlines {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 250;
   pointer-events: none;
   background: repeating-linear-gradient(
     0deg,
@@ -452,6 +454,22 @@ body {
   padding: 20px;
 }
 
+@media (min-width: 640px) and (max-width: 1023px) {
+  .y2k-app-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    padding: 24px 32px;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .y2k-app-img {
+    width: 64px;
+    height: 64px;
+    font-size: 32px;
+  }
+}
+
 .y2k-app-icon {
   display: flex;
   flex-direction: column;
@@ -488,7 +506,7 @@ body {
   position: fixed;
   inset: 0;
   z-index: 500;
-  background: var(--bg);
+  background: var(--bg2);
   overflow-y: auto;
   animation: slideUp 0.3s ease-out;
 }
@@ -511,9 +529,9 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
+  padding: 14px 16px;
   background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--accent);
   backdrop-filter: blur(12px);
 }
 
