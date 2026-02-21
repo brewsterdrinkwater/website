@@ -1,6 +1,26 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef, Component } from 'react';
 import { Routes, Route, Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Sparkles, RefreshCw, Construction, Instagram } from 'lucide-react';
+
+// Per-section error boundary — isolates crashes so the rest of the page renders
+class SafeSection extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error, info) {
+    console.error(`[SafeSection:${this.props.name || 'unknown'}]`, error, info);
+  }
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || null;
+    }
+    return this.props.children;
+  }
+}
 
 // ===== DATA =====
 
@@ -1250,7 +1270,9 @@ const AltTabWebsite = () => {
     <div className="relative min-h-screen pb-8">
       {/* Hero section on the desktop background */}
       <div className="flex items-center justify-center pt-20 pb-16">
-        <DraggableHeroLetters />
+        <SafeSection name="hero">
+          <DraggableHeroLetters />
+        </SafeSection>
       </div>
 
       {/* Desktop Icons */}
@@ -1419,7 +1441,9 @@ const AltTabWebsite = () => {
     <div className="min-h-screen pb-16">
       {/* Hero */}
       <div className="pt-8 pb-12 px-4">
-        <DraggableHeroLetters />
+        <SafeSection name="hero-mobile">
+          <DraggableHeroLetters />
+        </SafeSection>
       </div>
 
       {/* App Grid */}
@@ -1762,10 +1786,14 @@ const AltTabWebsite = () => {
   return (
     <div className="min-h-screen overflow-x-hidden">
       {/* Background */}
-      <MountainBackground theme={theme} />
+      <SafeSection name="background">
+        <MountainBackground theme={theme} />
+      </SafeSection>
 
       {/* Golf Ball Cursor */}
-      <GolfBallCursor />
+      <SafeSection name="cursor">
+        <GolfBallCursor />
+      </SafeSection>
 
       {/* Scanlines */}
       <Scanlines />
@@ -1803,18 +1831,30 @@ const AltTabWebsite = () => {
 
       {/* Main Content */}
       <main className="relative z-10 pt-14">
-        <Routes>
-          <Route path="/" element={isMobile ? <MobileHomePage /> : <DesktopHomePage />} />
-          <Route path="/projects" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><ProjectsPage /></div>} />
-          <Route path="/moodboards" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><MoodboardsPage /></div>} />
-          <Route path="/about" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><AboutPage /></div>} />
-          <Route path="/shop" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><ShopPage /></div>} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <SafeSection name="routes" fallback={
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center p-8" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+              <h2 className="text-2xl font-mono-vt mb-4" style={{ color: 'var(--accent)' }}>ALT-TAB</h2>
+              <p className="font-mono-courier mb-4" style={{ color: 'var(--text)' }}>Page failed to load.</p>
+              <button onClick={() => window.location.reload()} className="px-4 py-2 font-mono-vt" style={{ background: 'var(--accent)', color: 'var(--bg)', border: 'none', cursor: 'pointer' }}>[ RELOAD ]</button>
+            </div>
+          </div>
+        }>
+          <Routes>
+            <Route path="/" element={isMobile ? <MobileHomePage /> : <DesktopHomePage />} />
+            <Route path="/projects" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><ProjectsPage /></div>} />
+            <Route path="/moodboards" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><MoodboardsPage /></div>} />
+            <Route path="/about" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><AboutPage /></div>} />
+            <Route path="/shop" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><ShopPage /></div>} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </SafeSection>
       </main>
 
       {/* Marquee Bar */}
-      <MarqueeBar />
+      <SafeSection name="marquee">
+        <MarqueeBar />
+      </SafeSection>
 
       {/* Footer for inner pages */}
       {currentPage !== 'home' && (
