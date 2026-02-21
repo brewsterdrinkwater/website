@@ -7,7 +7,7 @@
   /* Dark theme (default) */
   --bg: #0a0d14;
   --bg2: #111622;
-  --surface: rgba(15,20,35,0.92);
+  --surface: #0f1423;
   --border: #2a3a5c;
   --accent: #4af0c8;
   --accent2: #a78bfa;
@@ -25,7 +25,7 @@
   --sky-mid: #0a1428;
   --aurora1: rgba(74,240,200,0.15);
   --aurora2: rgba(167,139,250,0.12);
-  --window-bg: rgba(10,15,25,0.96);
+  --window-bg: #0a0f19;
   --marquee-bg: #0f1828;
   --glow: 0 0 20px rgba(74,240,200,0.3);
 }
@@ -33,7 +33,7 @@
 [data-theme="light"] {
   --bg: #d4e0f0;
   --bg2: #c8d8ec;
-  --surface: rgba(240,248,255,0.94);
+  --surface: #f0f8ff;
   --border: #8aaad8;
   --accent: #1a5fa8;
   --accent2: #7c3aed;
@@ -51,7 +51,7 @@
   --sky-mid: #c8dff8;
   --aurora1: rgba(26,95,168,0.12);
   --aurora2: rgba(124,58,237,0.1);
-  --window-bg: rgba(240,248,255,0.97);
+  --window-bg: #f0f8ff;
   --marquee-bg: #8aaad8;
   --glow: 0 0 20px rgba(26,95,168,0.2);
 }
@@ -433,7 +433,7 @@ body {
   font-family: 'VT323', monospace;
   font-size: 16px;
   color: var(--accent);
-  z-index: 9000;
+  z-index: 400;
   opacity: 0;
   transform: translateY(10px);
   transition: opacity 0.3s, transform 0.3s;
