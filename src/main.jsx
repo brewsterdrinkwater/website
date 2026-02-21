@@ -7,11 +7,15 @@ import App from './App.jsx'
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { hasError: false }
+    this.state = { hasError: false, error: null }
   }
 
-  static getDerivedStateFromError() {
-    return { hasError: true }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error }
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('[ErrorBoundary]', error, errorInfo)
   }
 
   render() {
@@ -31,8 +35,13 @@ class ErrorBoundary extends React.Component {
         }}>
           <h1 style={{ fontSize: '48px', marginBottom: '16px', letterSpacing: '4px' }}>ALT-TAB</h1>
           <p style={{ fontSize: '20px', color: '#c8d8f0', marginBottom: '24px' }}>Something went wrong.</p>
+          {this.state.error && (
+            <p style={{ fontSize: '14px', color: '#f472b6', marginBottom: '24px', maxWidth: '600px', wordBreak: 'break-word', fontFamily: "'Courier New', monospace" }}>
+              {this.state.error.toString()}
+            </p>
+          )}
           <button
-            onClick={() => { this.setState({ hasError: false }); window.location.href = '/'; }}
+            onClick={() => { this.setState({ hasError: false, error: null }); window.location.href = '/'; }}
             style={{
               background: '#4af0c8',
               color: '#0a0d14',
