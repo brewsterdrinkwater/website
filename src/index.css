@@ -62,7 +62,7 @@
 }
 
 body {
-  font-family: 'Courier Prime', monospace;
+  font-family: 'Courier Prime', 'Courier New', Courier, monospace;
   background: var(--bg);
   color: var(--text);
   overflow-x: hidden;
@@ -71,15 +71,15 @@ body {
 
 /* ===== TYPOGRAPHY ===== */
 .font-mono-vt {
-  font-family: 'VT323', monospace;
+  font-family: 'VT323', 'Courier New', monospace;
 }
 
 .font-mono-share {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
 }
 
 .font-mono-courier {
-  font-family: 'Courier Prime', monospace;
+  font-family: 'Courier Prime', 'Courier New', Courier, monospace;
 }
 
 /* ===== Y2K WINDOW COMPONENT ===== */
@@ -420,28 +420,6 @@ body {
   100% { transform: translateX(-50%); }
 }
 
-/* ===== CURSOR TRAIL ===== */
-.y2k-cursor {
-  position: fixed;
-  width: 12px;
-  height: 12px;
-  background: var(--accent);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 99999;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent);
-  transition: background 0.2s;
-}
-
-.y2k-trail-dot {
-  position: fixed;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 99998;
-  transform: translate(-50%, -50%);
-}
-
 /* ===== TOAST NOTIFICATION ===== */
 .y2k-toast {
   position: fixed;
@@ -647,36 +625,4 @@ body {
   background: var(--accent);
 }
 
-/* ===== RESIZE HANDLE ===== */
-.y2k-resize-handle {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 16px;
-  height: 16px;
-  cursor: nwse-resize;
-  background: linear-gradient(
-    135deg,
-    transparent 50%,
-    var(--border) 50%,
-    var(--border) 60%,
-    transparent 60%,
-    transparent 70%,
-    var(--border) 70%,
-    var(--border) 80%,
-    transparent 80%
-  );
-  opacity: 0.6;
-}
 
-.y2k-resize-handle:hover {
-  opacity: 1;
-}
-
-/* ===== HIDE DEFAULT CURSOR ON DESKTOP ===== */
-@media (min-width: 768px) {
-  body.y2k-cursor-hidden,
-  body.y2k-cursor-hidden * {
-    cursor: none !important;
-  }
-}

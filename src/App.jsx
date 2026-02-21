@@ -680,11 +680,14 @@ const MountainBackground = ({ theme }) => {
     return () => window.removeEventListener('resize', resize);
   }, [isDark, generateStars]);
 
-  // Lazy-load Unsplash image
+  // Lazy-load Unsplash image with timeout
   useEffect(() => {
     const img = new Image();
-    img.onload = () => setImgLoaded(true);
+    const timeout = setTimeout(() => { img.src = ''; }, 5000); // give up after 5s
+    img.onload = () => { clearTimeout(timeout); setImgLoaded(true); };
+    img.onerror = () => { clearTimeout(timeout); };
     img.src = 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&q=80';
+    return () => clearTimeout(timeout);
   }, []);
 
   return (
@@ -745,8 +748,11 @@ const useSportsScores = () => {
         const metsId = 121; // NY Mets team ID
         const today = new Date().toISOString().split('T')[0];
         const endDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const metsCtrl = new AbortController();
+        setTimeout(() => metsCtrl.abort(), 5000);
         const metsRes = await fetch(
-          `https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId=${metsId}&startDate=${today}&endDate=${endDate}`
+          `https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId=${metsId}&startDate=${today}&endDate=${endDate}`,
+          { signal: metsCtrl.signal }
         );
         if (metsRes.ok) {
           const metsData = await metsRes.json();
@@ -778,7 +784,9 @@ const useSportsScores = () => {
 
       // Fetch Arsenal data from free API
       try {
-        const arsenalRes = await fetch('https://www.thesportsdb.com/api/v1/json/3/eventslast.php?id=133604');
+        const arsenalCtrl = new AbortController();
+        setTimeout(() => arsenalCtrl.abort(), 5000);
+        const arsenalRes = await fetch('https://www.thesportsdb.com/api/v1/json/3/eventslast.php?id=133604', { signal: arsenalCtrl.signal });
         if (arsenalRes.ok) {
           const arsenalData = await arsenalRes.json();
           const lastGame = arsenalData.results?.[0];
@@ -797,7 +805,9 @@ const useSportsScores = () => {
 
       // Try to get next Arsenal fixture
       try {
-        const nextRes = await fetch('https://www.thesportsdb.com/api/v1/json/3/eventsnext.php?id=133604');
+        const nextCtrl = new AbortController();
+        setTimeout(() => nextCtrl.abort(), 5000);
+        const nextRes = await fetch('https://www.thesportsdb.com/api/v1/json/3/eventsnext.php?id=133604', { signal: nextCtrl.signal });
         if (nextRes.ok) {
           const nextData = await nextRes.json();
           const nextGame = nextData.events?.[0];
@@ -1106,14 +1116,10 @@ const AltTabWebsite = () => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
-  // Hide cursor on desktop
+  // Clean up cursor class on unmount (cursor hiding removed — confusing for users)
   useEffect(() => {
-    if (!isMobile) {
-      document.body.classList.add('y2k-cursor-hidden');
-    } else {
-      document.body.classList.remove('y2k-cursor-hidden');
-    }
-  }, [isMobile]);
+    document.body.classList.remove('y2k-cursor-hidden');
+  }, []);
 
   // Konami code easter egg
   useEffect(() => {
