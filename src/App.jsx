@@ -595,105 +595,28 @@ const WorldClocks = () => {
 // Mountain Background Scene - realistic mountain photo with Y2K overlays
 // Mountain Background Scene - CSS gradient mountains with optional photo enhancement
 const MountainBackground = ({ theme }) => {
-  const canvasRef = useRef(null);
-  const starsRef = useRef(null);
-  const [imgLoaded, setImgLoaded] = useState(false);
   const isDark = theme === 'dark';
-
-  // Generate stable star positions once (for dark mode)
-  const generateStars = useCallback(() => {
-    const stars = [];
-    for (let i = 0; i < 150; i++) {
-      const seed1 = Math.sin(i * 12.9898) * 43758.5453;
-      const seed2 = Math.sin(i * 78.233) * 43758.5453;
-      const seed3 = Math.sin(i * 45.164) * 43758.5453;
-      const seed4 = Math.sin(i * 94.673) * 43758.5453;
-      stars.push({
-        xRatio: (seed1 - Math.floor(seed1)),
-        yRatio: (seed2 - Math.floor(seed2)) * 0.5,
-        r: (seed3 - Math.floor(seed3)) * 1.2 + 0.3,
-        a: (seed4 - Math.floor(seed4)) * 0.6 + 0.2,
-      });
-    }
-    return stars;
-  }, []);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    if (!starsRef.current) starsRef.current = generateStars();
-
-    const drawStars = () => {
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      if (!isDark) return;
-      for (const star of starsRef.current) {
-        const x = star.xRatio * canvas.width;
-        const y = star.yRatio * canvas.height;
-        ctx.beginPath();
-        ctx.arc(x, y, star.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${star.a})`;
-        ctx.fill();
-      }
-    };
-
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      drawStars();
-    };
-
-    resize();
-    window.addEventListener('resize', resize);
-    return () => window.removeEventListener('resize', resize);
-  }, [isDark, generateStars]);
-
-  // Lazy-load Unsplash image with timeout
-  useEffect(() => {
-    const img = new Image();
-    const timeout = setTimeout(() => { img.src = ''; }, 5000); // give up after 5s
-    img.onload = () => { clearTimeout(timeout); setImgLoaded(true); };
-    img.onerror = () => { clearTimeout(timeout); };
-    img.src = 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&q=80';
-    return () => clearTimeout(timeout);
-  }, []);
 
   return (
     <div className="fixed inset-0 z-0 overflow-hidden">
-      {/* Sky gradient - renders instantly */}
+      {/* Sky gradient - renders instantly as base */}
       <div className="y2k-sky" />
-      {/* SVG mountain silhouettes - renders instantly */}
-      <svg className="absolute bottom-0 left-0 right-0" viewBox="0 0 1440 500" preserveAspectRatio="none" style={{ height: '60vh', width: '100%' }}>
-        <polygon points="0,500 0,300 80,240 160,270 260,200 360,250 460,180 540,210 640,150 720,190 820,130 900,170 1000,120 1080,160 1180,100 1260,150 1360,90 1440,140 1440,500" fill="var(--mountain2)" opacity="0.9"/>
-        <polygon points="820,130 800,170 840,170" fill="var(--snow)" opacity="0.4"/>
-        <polygon points="1180,100 1160,140 1200,140" fill="var(--snow)" opacity="0.35"/>
-        <polygon points="460,180 440,215 480,215" fill="var(--snow)" opacity="0.35"/>
-        <polygon points="0,500 0,350 60,320 140,340 220,290 320,310 420,260 500,280 600,230 700,255 780,210 860,240 960,195 1040,220 1140,185 1220,205 1320,170 1440,195 1440,500" fill="var(--mountain1)" opacity="0.95"/>
-        <polygon points="600,230 582,260 618,260" fill="var(--snow)" opacity="0.5"/>
-        <polygon points="960,195 942,225 978,225" fill="var(--snow)" opacity="0.45"/>
-        <polygon points="0,500 0,400 100,380 200,395 300,360 400,380 520,345 640,370 760,335 880,360 1000,325 1120,350 1240,320 1360,345 1440,325 1440,500" fill="var(--mountain3)" opacity="0.8"/>
-        <rect x="0" y="470" width="1440" height="30" fill="var(--bg2)" opacity="0.9"/>
-      </svg>
-      {/* Unsplash photo - fades in when loaded */}
-      {imgLoaded && (
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000"
-          style={{
-            backgroundImage: 'url(https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&q=80)',
-            filter: isDark ? 'brightness(0.4) saturate(0.8)' : 'brightness(1.1) saturate(0.9)',
-            opacity: 0.6,
-          }}
-        />
-      )}
+      {/* Unsplash mountain photo - always rendered, browser handles loading */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: 'url(https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&q=80)',
+          filter: isDark ? 'brightness(0.4) saturate(0.8)' : 'brightness(1.1) saturate(0.9)',
+          opacity: 0.6,
+        }}
+      />
       {/* Aurora/glow effect */}
       <div className="y2k-aurora" />
-      {/* Stars canvas (dark mode only) */}
-      <canvas ref={canvasRef} className="absolute inset-0" style={{ opacity: isDark ? 1 : 0 }} />
       {/* Bottom fade to content */}
       <div
         className="absolute bottom-0 left-0 right-0 h-32"
         style={{
-          background: `linear-gradient(to top, var(--bg) 0%, transparent 100%)`,
+          background: 'linear-gradient(to top, var(--bg) 0%, transparent 100%)',
         }}
       />
     </div>
@@ -1041,6 +964,180 @@ const MobileModal = ({ title, children, onClose }) => (
   </div>
 );
 
+// ===== STANDALONE PAGE COMPONENTS (must be outside main component to avoid remounting) =====
+
+// Projects Page
+const ProjectsPage = () => {
+  const [formData, setFormData] = useState({ name: '', email: '', company: '', message: '' });
+  const [formSubmitted, setFormSubmitted] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const subject = `Alt-Tab Inquiry from ${formData.name}`;
+    const body = `Name: ${formData.name}\nEmail: ${formData.email}\nCompany: ${formData.company || 'Not provided'}\n\nMessage:\n${formData.message}`;
+    window.location.href = `mailto:ty@alt-tab.xyz?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    setFormSubmitted(true);
+    setTimeout(() => {
+      setFormSubmitted(false);
+      setFormData({ name: '', email: '', company: '', message: '' });
+    }, 3000);
+  };
+
+  const projects = [
+    { name: 'Virginia Tech', logo: '/images/virginia-tech-logo.svg', description: 'University partnership and research', link: 'https://www.vt.edu/' },
+    { name: 'Live Breathe Futbol', logo: '/images/lbf-logo.svg', description: 'Football apparel brand', link: 'https://www.livebreathefutbol.com/' },
+    { name: 'USM Furniture', logoText: 'USM', description: 'Modular furniture system design', link: 'https://us.usm.com/' },
+    { name: 'Wonder Universe', logoText: 'WU', description: "Children's museum experience", link: 'https://wonderuniverse.org/' },
+    { name: 'BKYSC', logoText: 'BKYSC', description: 'Brooklyn Youth Sports Club', link: 'https://www.brooklynyouthsportsclub.org/' },
+    { name: 'Nike NYC', logoText: 'NIKE', description: 'Retail experience design' },
+    { name: 'MLB Streaming', logoText: 'MLB', description: 'Digital streaming platform' },
+    { name: 'Akash Network', logoText: 'AKASH', description: 'Decentralized cloud computing', link: 'https://akash.network/' },
+  ];
+
+  return (
+    <div className="space-y-8 pb-16">
+      <div className="text-center space-y-4 p-6 md:p-8" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+        <h2 className="text-4xl md:text-5xl font-mono-vt" style={{ color: 'var(--accent)', textShadow: '0 0 20px var(--accent)' }}>PROJECTS</h2>
+        <p className="font-mono-courier" style={{ color: 'var(--text-dim)' }}>
+          "Sometimes we do work for us; sometimes we do work with you."
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {projects.map((project, i) => {
+          const CardWrapper = project.link ? 'a' : 'div';
+          const linkProps = project.link ? { href: project.link, target: '_blank', rel: 'noopener noreferrer' } : {};
+          return (
+            <CardWrapper
+              key={i}
+              {...linkProps}
+              className="group p-4 hover:scale-105 transition-all duration-300 cursor-pointer block"
+              style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+            >
+              <div className="h-12 flex items-center justify-center mb-2">
+                {project.logoText ? (
+                  <span className="text-xl font-mono-vt" style={{ color: 'var(--accent)' }}>{project.logoText}</span>
+                ) : (
+                  <img src={project.logo} alt={project.name} loading="lazy" className="max-h-full max-w-full object-contain" style={{ filter: 'brightness(0) invert(1)' }} />
+                )}
+              </div>
+              <h3 className="font-mono-vt text-sm text-center" style={{ color: 'var(--text)' }}>{project.name}</h3>
+              <p className="font-mono-share text-xs text-center mt-1" style={{ color: 'var(--text-dim)' }}>{project.description}</p>
+            </CardWrapper>
+          );
+        })}
+      </div>
+
+      <div className="max-w-2xl mx-auto p-6 md:p-8" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+        <h3 className="text-2xl font-mono-vt text-center mb-6" style={{ color: 'var(--accent)' }}>WORK WITH US</h3>
+        {formSubmitted ? (
+          <div className="text-center py-8">
+            <Sparkles size={40} className="mx-auto mb-4" style={{ color: 'var(--accent)' }} />
+            <p className="font-mono-vt" style={{ color: 'var(--accent)' }}>MESSAGE SENT!</p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-4">
+              <input type="text" required placeholder="Name *" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full px-3 py-2 font-mono-courier text-sm" style={{ background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)' }} />
+              <input type="email" required placeholder="Email *" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full px-3 py-2 font-mono-courier text-sm" style={{ background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)' }} />
+            </div>
+            <input type="text" placeholder="Company" value={formData.company} onChange={(e) => setFormData({...formData, company: e.target.value})} className="w-full px-3 py-2 font-mono-courier text-sm" style={{ background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)' }} />
+            <textarea required placeholder="Tell us about your project *" rows={4} value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} className="w-full px-3 py-2 font-mono-courier text-sm resize-none" style={{ background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)' }} />
+            <button type="submit" className="w-full py-2 font-mono-vt" style={{ background: 'var(--accent)', color: 'var(--bg)', border: 'none', cursor: 'pointer' }}>[ SEND ]</button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Moodboards Page
+const MoodboardsPage = () => {
+  const [activeVideo, setActiveVideo] = useState(null);
+  const videos = useMemo(() => [
+    '7IdoDJCssNk', 'M_0do0LP2tk', 'XTomk3L1R5I', 'cFwytlpCJ9U', 'l126-q8Ne5I',
+    '0JpVNPH6cl8', 'P_QJKaKD-i8', 'mBjo4Dmsmok', 'sKE1nLc5P_c', '0zIVTDbve7k',
+    'ZYAzo5OdqHM', 'tnFPQ57l0Dg', 'RqQGUJK7Na4', 'pYdkiWIPp-s', 'vtBoQuAtX3I',
+  ], []);
+
+  const [displayVideos, setDisplayVideos] = useState(() => {
+    const getRandomSize = () => {
+      const rand = Math.random();
+      if (rand < 0.35) return 'small';
+      if (rand < 0.7) return 'medium';
+      return 'large';
+    };
+    return [...videos].sort(() => Math.random() - 0.5).map(id => ({ id, size: getRandomSize() }));
+  });
+
+  const handleShuffle = useCallback(() => {
+    const getRandomSize = () => {
+      const rand = Math.random();
+      if (rand < 0.35) return 'small';
+      if (rand < 0.7) return 'medium';
+      return 'large';
+    };
+    setDisplayVideos([...videos].sort(() => Math.random() - 0.5).map(id => ({ id, size: getRandomSize() })));
+  }, [videos]);
+
+  const getThumbnail = (videoId) => `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+
+  const getSizeClasses = (size) => {
+    switch (size) {
+      case 'large': return 'col-span-2 row-span-2';
+      case 'medium': return 'col-span-2 md:col-span-1 row-span-1';
+      default: return 'col-span-1 row-span-1';
+    }
+  };
+
+  return (
+    <div className="space-y-6 pb-16">
+      <div className="text-center space-y-4">
+        <h2 className="text-4xl md:text-5xl font-mono-vt" style={{ color: 'var(--accent)', textShadow: '0 0 20px var(--accent)' }}>MOODBOARDS</h2>
+        <p className="font-mono-courier" style={{ color: 'var(--text-dim)' }}>Video inspiration from skate culture</p>
+        <button onClick={handleShuffle} className="px-4 py-2 font-mono-vt" style={{ background: 'var(--accent)', color: 'var(--bg)', border: 'none', cursor: 'pointer' }}>
+          <RefreshCw size={14} className="inline mr-2" />[ SHUFFLE ]
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 auto-rows-[100px] md:auto-rows-[120px]">
+        {displayVideos.map(({ id, size }, idx) => (
+          <button
+            key={`${id}-${idx}`}
+            onClick={() => setActiveVideo(id)}
+            className={`group relative overflow-hidden transition-all duration-300 hover:scale-[1.02] ${getSizeClasses(size)}`}
+            style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+          >
+            <img src={getThumbnail(id)} alt="" loading="lazy" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="w-12 h-12 flex items-center justify-center" style={{ background: 'var(--accent)', borderRadius: '50%' }}>
+                <svg className="w-5 h-5 ml-1" fill="var(--bg)" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+              </div>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      <div className="text-center">
+        <a href="https://www.youtube.com/@quartersnacksdotcom" target="_blank" rel="noopener noreferrer" className="inline-block px-4 py-2 font-mono-vt" style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--accent)' }}>
+          QUARTERSNACKS →
+        </a>
+      </div>
+
+      {activeVideo && (
+        <div className="fixed inset-0 z-[600] flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.95)' }} onClick={() => setActiveVideo(null)}>
+          <div className="relative w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setActiveVideo(null)} className="absolute -top-10 right-0 font-mono-vt" style={{ color: 'var(--text-dim)' }}>[ CLOSE ]</button>
+            <div className="aspect-video" style={{ background: 'var(--bg)' }}>
+              <iframe src={`https://www.youtube.com/embed/${activeVideo}?autoplay=1&rel=0`} title="Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full" />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ===== MAIN APP COMPONENT =====
 
 const AltTabWebsite = () => {
@@ -1334,7 +1431,7 @@ const AltTabWebsite = () => {
           onMinimize={() => toggleWindow('services')}
           onFocus={() => focusWindow('services')}
         >
-          <ServicesContent />
+          {ServicesContent()}
         </Y2KWindow>
       )}
 
@@ -1350,7 +1447,7 @@ const AltTabWebsite = () => {
           onMinimize={() => toggleWindow('news')}
           onFocus={() => focusWindow('news')}
         >
-          <NewsContent />
+          {NewsContent()}
         </Y2KWindow>
       )}
 
@@ -1366,7 +1463,7 @@ const AltTabWebsite = () => {
           onMinimize={() => toggleWindow('trivia')}
           onFocus={() => focusWindow('trivia')}
         >
-          <TriviaContent />
+          {TriviaContent()}
         </Y2KWindow>
       )}
 
@@ -1414,7 +1511,7 @@ const AltTabWebsite = () => {
           onMinimize={() => toggleWindow('about')}
           onFocus={() => focusWindow('about')}
         >
-          <AboutContent />
+          {AboutContent()}
         </Y2KWindow>
       )}
 
@@ -1498,17 +1595,17 @@ const AltTabWebsite = () => {
       )}
       {mobileModal === 'services' && (
         <MobileModal title="SERVICES" onClose={() => setMobileModal(null)}>
-          <ServicesContent />
+          {ServicesContent()}
         </MobileModal>
       )}
       {mobileModal === 'news' && (
         <MobileModal title="HEADLINES" onClose={() => setMobileModal(null)}>
-          <NewsContent />
+          {NewsContent()}
         </MobileModal>
       )}
       {mobileModal === 'trivia' && (
         <MobileModal title="TRIVIA" onClose={() => setMobileModal(null)}>
-          <TriviaContent />
+          {TriviaContent()}
         </MobileModal>
       )}
       {mobileModal === 'snake' && (
@@ -1523,7 +1620,7 @@ const AltTabWebsite = () => {
       )}
       {mobileModal === 'about' && (
         <MobileModal title="ABOUT" onClose={() => setMobileModal(null)}>
-          <AboutContent />
+          {AboutContent()}
         </MobileModal>
       )}
       {mobileModal === 'sports' && (
@@ -1533,178 +1630,6 @@ const AltTabWebsite = () => {
       )}
     </div>
   );
-
-  // Projects Page (Y2K styled but full page)
-  const ProjectsPage = () => {
-    const [formData, setFormData] = useState({ name: '', email: '', company: '', message: '' });
-    const [formSubmitted, setFormSubmitted] = useState(false);
-
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      const subject = `Alt-Tab Inquiry from ${formData.name}`;
-      const body = `Name: ${formData.name}\nEmail: ${formData.email}\nCompany: ${formData.company || 'Not provided'}\n\nMessage:\n${formData.message}`;
-      window.location.href = `mailto:ty@alt-tab.xyz?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      setFormSubmitted(true);
-      setTimeout(() => {
-        setFormSubmitted(false);
-        setFormData({ name: '', email: '', company: '', message: '' });
-      }, 3000);
-    };
-
-    const projects = [
-      { name: 'Virginia Tech', logo: '/images/virginia-tech-logo.svg', description: 'University partnership and research', link: 'https://www.vt.edu/' },
-      { name: 'Live Breathe Futbol', logo: '/images/lbf-logo.svg', description: 'Football apparel brand', link: 'https://www.livebreathefutbol.com/' },
-      { name: 'USM Furniture', logoText: 'USM', description: 'Modular furniture system design', link: 'https://us.usm.com/' },
-      { name: 'Wonder Universe', logoText: 'WU', description: "Children's museum experience", link: 'https://wonderuniverse.org/' },
-      { name: 'BKYSC', logoText: 'BKYSC', description: 'Brooklyn Youth Sports Club', link: 'https://www.brooklynyouthsportsclub.org/' },
-      { name: 'Nike NYC', logoText: 'NIKE', description: 'Retail experience design' },
-      { name: 'MLB Streaming', logoText: 'MLB', description: 'Digital streaming platform' },
-      { name: 'Akash Network', logoText: 'AKASH', description: 'Decentralized cloud computing', link: 'https://akash.network/' },
-    ];
-
-    return (
-      <div className="space-y-8 pb-16">
-        <div className="text-center space-y-4 p-6 md:p-8" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-          <h2 className="text-4xl md:text-5xl font-mono-vt" style={{ color: 'var(--accent)', textShadow: '0 0 20px var(--accent)' }}>PARTNERS</h2>
-          <p className="font-mono-courier" style={{ color: 'var(--text-dim)' }}>
-            "Sometimes we do work for us; sometimes we do work with you."
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {projects.map((project, i) => {
-            const CardWrapper = project.link ? 'a' : 'div';
-            const linkProps = project.link ? { href: project.link, target: '_blank', rel: 'noopener noreferrer' } : {};
-            return (
-              <CardWrapper
-                key={i}
-                {...linkProps}
-                className="group p-4 hover:scale-105 transition-all duration-300 cursor-pointer block"
-                style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
-              >
-                <div className="h-12 flex items-center justify-center mb-2">
-                  {project.logoText ? (
-                    <span className="text-xl font-mono-vt" style={{ color: 'var(--accent)' }}>{project.logoText}</span>
-                  ) : (
-                    <img src={project.logo} alt={project.name} loading="lazy" className="max-h-full max-w-full object-contain" style={{ filter: 'brightness(0) invert(1)' }} />
-                  )}
-                </div>
-                <h3 className="font-mono-vt text-sm text-center" style={{ color: 'var(--text)' }}>{project.name}</h3>
-                <p className="font-mono-share text-xs text-center mt-1" style={{ color: 'var(--text-dim)' }}>{project.description}</p>
-              </CardWrapper>
-            );
-          })}
-        </div>
-
-        <div className="max-w-2xl mx-auto p-6 md:p-8" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-          <h3 className="text-2xl font-mono-vt text-center mb-6" style={{ color: 'var(--accent)' }}>WORK WITH US</h3>
-          {formSubmitted ? (
-            <div className="text-center py-8">
-              <Sparkles size={40} className="mx-auto mb-4" style={{ color: 'var(--accent)' }} />
-              <p className="font-mono-vt" style={{ color: 'var(--accent)' }}>MESSAGE SENT!</p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <input type="text" required placeholder="Name *" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full px-3 py-2 font-mono-courier text-sm" style={{ background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)' }} />
-                <input type="email" required placeholder="Email *" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full px-3 py-2 font-mono-courier text-sm" style={{ background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)' }} />
-              </div>
-              <input type="text" placeholder="Company" value={formData.company} onChange={(e) => setFormData({...formData, company: e.target.value})} className="w-full px-3 py-2 font-mono-courier text-sm" style={{ background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)' }} />
-              <textarea required placeholder="Tell us about your project *" rows={4} value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} className="w-full px-3 py-2 font-mono-courier text-sm resize-none" style={{ background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)' }} />
-              <button type="submit" className="w-full py-2 font-mono-vt" style={{ background: 'var(--accent)', color: 'var(--bg)', border: 'none', cursor: 'pointer' }}>[ SEND ]</button>
-            </form>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  // Moodboards Page (Y2K styled but full page)
-  const MoodboardsPage = () => {
-    const [activeVideo, setActiveVideo] = useState(null);
-    const videos = useMemo(() => [
-      '7IdoDJCssNk', 'M_0do0LP2tk', 'XTomk3L1R5I', 'cFwytlpCJ9U', 'l126-q8Ne5I',
-      '0JpVNPH6cl8', 'P_QJKaKD-i8', 'mBjo4Dmsmok', 'sKE1nLc5P_c', '0zIVTDbve7k',
-      'ZYAzo5OdqHM', 'tnFPQ57l0Dg', 'RqQGUJK7Na4', 'pYdkiWIPp-s', 'vtBoQuAtX3I',
-    ], []);
-
-    const [displayVideos, setDisplayVideos] = useState(() => {
-      const getRandomSize = () => {
-        const rand = Math.random();
-        if (rand < 0.35) return 'small';
-        if (rand < 0.7) return 'medium';
-        return 'large';
-      };
-      return [...videos].sort(() => Math.random() - 0.5).map(id => ({ id, size: getRandomSize() }));
-    });
-
-    const handleShuffle = useCallback(() => {
-      const getRandomSize = () => {
-        const rand = Math.random();
-        if (rand < 0.35) return 'small';
-        if (rand < 0.7) return 'medium';
-        return 'large';
-      };
-      setDisplayVideos([...videos].sort(() => Math.random() - 0.5).map(id => ({ id, size: getRandomSize() })));
-    }, [videos]);
-
-    const getThumbnail = (videoId) => `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-
-    const getSizeClasses = (size) => {
-      switch (size) {
-        case 'large': return 'col-span-2 row-span-2';
-        case 'medium': return 'col-span-2 md:col-span-1 row-span-1';
-        default: return 'col-span-1 row-span-1';
-      }
-    };
-
-    return (
-      <div className="space-y-6 pb-16">
-        <div className="text-center space-y-4">
-          <h2 className="text-4xl md:text-5xl font-mono-vt" style={{ color: 'var(--accent)', textShadow: '0 0 20px var(--accent)' }}>MOODBOARDS</h2>
-          <p className="font-mono-courier" style={{ color: 'var(--text-dim)' }}>Video inspiration from skate culture</p>
-          <button onClick={handleShuffle} className="px-4 py-2 font-mono-vt" style={{ background: 'var(--accent)', color: 'var(--bg)', border: 'none', cursor: 'pointer' }}>
-            <RefreshCw size={14} className="inline mr-2" />[ SHUFFLE ]
-          </button>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 auto-rows-[100px] md:auto-rows-[120px]">
-          {displayVideos.map(({ id, size }, idx) => (
-            <button
-              key={`${id}-${idx}`}
-              onClick={() => setActiveVideo(id)}
-              className={`group relative overflow-hidden transition-all duration-300 hover:scale-[1.02] ${getSizeClasses(size)}`}
-              style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
-            >
-              <img src={getThumbnail(id)} alt="" loading="lazy" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="w-12 h-12 flex items-center justify-center" style={{ background: 'var(--accent)', borderRadius: '50%' }}>
-                  <svg className="w-5 h-5 ml-1" fill="var(--bg)" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-
-        <div className="text-center">
-          <a href="https://www.youtube.com/@quartersnacksdotcom" target="_blank" rel="noopener noreferrer" className="inline-block px-4 py-2 font-mono-vt" style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--accent)' }}>
-            QUARTERSNACKS →
-          </a>
-        </div>
-
-        {activeVideo && (
-          <div className="fixed inset-0 z-[600] flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.95)' }} onClick={() => setActiveVideo(null)}>
-            <div className="relative w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
-              <button onClick={() => setActiveVideo(null)} className="absolute -top-10 right-0 font-mono-vt" style={{ color: 'var(--text-dim)' }}>[ CLOSE ]</button>
-              <div className="aspect-video" style={{ background: 'var(--bg)' }}>
-                <iframe src={`https://www.youtube.com/embed/${activeVideo}?autoplay=1&rel=0`} title="Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full" />
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
 
   // About Page (Y2K styled with windowed layout)
   const AboutPage = () => (
@@ -1841,11 +1766,11 @@ const AltTabWebsite = () => {
           </div>
         }>
           <Routes>
-            <Route path="/" element={isMobile ? <MobileHomePage /> : <DesktopHomePage />} />
+            <Route path="/" element={isMobile ? MobileHomePage() : DesktopHomePage()} />
             <Route path="/projects" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><ProjectsPage /></div>} />
             <Route path="/moodboards" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><MoodboardsPage /></div>} />
-            <Route path="/about" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><AboutPage /></div>} />
-            <Route path="/shop" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><ShopPage /></div>} />
+            <Route path="/about" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8">{AboutPage()}</div>} />
+            <Route path="/shop" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8">{ShopPage()}</div>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </SafeSection>
