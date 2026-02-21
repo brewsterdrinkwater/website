@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route, Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Sparkles, RefreshCw, Construction, Instagram } from 'lucide-react';
 
 // ===== DATA =====
@@ -127,58 +127,6 @@ const MARQUEE_ITEMS = [
 ];
 
 // ===== STANDALONE COMPONENTS (outside main component to prevent remounting) =====
-
-// Scroll-reveal hook using IntersectionObserver
-const useScrollReveal = () => {
-  const ref = useRef(null);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(node);
-        }
-      },
-      { threshold: 0.15 }
-    );
-
-    observer.observe(node);
-    return () => observer.unobserve(node);
-  }, []);
-
-  return [ref, isVisible];
-};
-
-// ScrollReveal wrapper component
-const Reveal = ({ children, direction = 'up', delay = 0 }) => {
-  const [ref, isVisible] = useScrollReveal();
-
-  const transforms = {
-    up: 'translateY(40px)',
-    down: 'translateY(-40px)',
-    left: 'translateX(40px)',
-    right: 'translateX(-40px)',
-    scale: 'scale(0.9)',
-  };
-
-  return (
-    <div
-      ref={ref}
-      style={{
-        opacity: isVisible ? 1 : 0,
-        transform: isVisible ? 'none' : transforms[direction],
-        transition: `opacity 0.6s ease ${delay}s, transform 0.6s ease ${delay}s`,
-      }}
-    >
-      {children}
-    </div>
-  );
-};
 
 // Snake Game
 const SnakeGame = ({ isMobile }) => {
@@ -415,7 +363,7 @@ const GolfBallCursor = () => {
 
   return (
     <div
-      className="fixed w-6 h-6 rounded-full pointer-events-none z-[100] shadow-lg hidden md:block"
+      className="fixed w-6 h-6 rounded-full pointer-events-none z-[100] shadow-lg hidden lg:block"
       style={{
         left: position.x - 12,
         top: position.y - 12,
@@ -444,7 +392,7 @@ const DraggableHeroLetters = () => {
   const lastTapRef = useRef(0);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.matchMedia('(max-width: 768px)').matches);
+    const checkMobile = () => setIsMobile(window.matchMedia('(max-width: 1023px)').matches);
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -889,8 +837,14 @@ const SportsTracker = () => {
       return { last5: completed.slice(-5), next5: upcoming.slice(0, 5) };
     };
 
+    const timedFetch = (url) => {
+      const ctrl = new AbortController();
+      setTimeout(() => ctrl.abort(), 5000);
+      return fetch(url, { signal: ctrl.signal });
+    };
+
     // Arsenal schedule
-    fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/teams/359/schedule')
+    timedFetch('https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/teams/359/schedule')
       .then(r => r.json())
       .then(data => {
         const { last5, next5 } = parseGames(data.events, 359);
@@ -898,7 +852,7 @@ const SportsTracker = () => {
       }).catch(() => setArsenal(prev => ({ ...prev, loading: false })));
 
     // Arsenal standings
-    fetch('https://site.api.espn.com/apis/v2/sports/soccer/eng.1/standings')
+    timedFetch('https://site.api.espn.com/apis/v2/sports/soccer/eng.1/standings')
       .then(r => r.json())
       .then(data => {
         const entries = data.children?.[0]?.standings?.entries || [];
@@ -910,7 +864,7 @@ const SportsTracker = () => {
       }).catch(() => {});
 
     // Mets schedule
-    fetch('https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/21/schedule')
+    timedFetch('https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/21/schedule')
       .then(r => r.json())
       .then(data => {
         const { last5, next5 } = parseGames(data.events, 21);
@@ -918,7 +872,7 @@ const SportsTracker = () => {
       }).catch(() => setMets(prev => ({ ...prev, loading: false })));
 
     // Mets standings
-    fetch('https://site.api.espn.com/apis/v2/sports/baseball/mlb/standings')
+    timedFetch('https://site.api.espn.com/apis/v2/sports/baseball/mlb/standings')
       .then(r => r.json())
       .then(data => {
         const groups = data.children || [];
@@ -1103,9 +1057,9 @@ const AltTabWebsite = () => {
     return SPORTS_TRIVIA[dayOfYear % SPORTS_TRIVIA.length];
   }, []);
 
-  // Detect mobile
+  // Detect mobile/tablet — use app-grid layout for anything under 1024px
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.matchMedia('(max-width: 768px)').matches);
+    const checkMobile = () => setIsMobile(window.matchMedia('(max-width: 1023px)').matches);
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -1715,7 +1669,7 @@ const AltTabWebsite = () => {
         </div>
 
         {activeVideo && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.95)' }} onClick={() => setActiveVideo(null)}>
+          <div className="fixed inset-0 z-[600] flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.95)' }} onClick={() => setActiveVideo(null)}>
             <div className="relative w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
               <button onClick={() => setActiveVideo(null)} className="absolute -top-10 right-0 font-mono-vt" style={{ color: 'var(--text-dim)' }}>[ CLOSE ]</button>
               <div className="aspect-video" style={{ background: 'var(--bg)' }}>
@@ -1822,16 +1776,16 @@ const AltTabWebsite = () => {
       {/* Topbar */}
       <div className="y2k-topbar fixed top-0 left-0 right-0 z-[300]">
         <Link to="/" className="y2k-logo" onClick={() => window.scrollTo(0, 0)}>ALT-TAB</Link>
-        <div className="y2k-nav-links hidden md:flex">
+        <div className="y2k-nav-links hidden lg:flex">
           <Link to="/about" onClick={() => window.scrollTo(0, 0)}>about</Link>
           <Link to="/moodboards" onClick={() => window.scrollTo(0, 0)}>moodboards</Link>
           <Link to="/projects" onClick={() => window.scrollTo(0, 0)}>projects</Link>
         </div>
         <div className="flex items-center gap-2">
           <button className="y2k-theme-toggle" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
-            [ {theme === 'dark' ? '☀' : '☾'} ]
+            {theme === 'dark' ? '☀' : '☾'}
           </button>
-          <button className="md:hidden p-2" style={{ color: 'var(--text)' }} onClick={() => setMenuOpen(!menuOpen)}>
+          <button className="lg:hidden p-2" style={{ color: 'var(--text)' }} onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
@@ -1839,7 +1793,7 @@ const AltTabWebsite = () => {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="fixed top-12 left-0 right-0 z-[299] p-4 space-y-2 md:hidden" style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
+        <div className="fixed top-12 left-0 right-0 z-[299] p-4 space-y-2 lg:hidden" style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
           <Link to="/" onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }} className="block py-2 font-mono-vt" style={{ color: 'var(--accent)' }}>HOME</Link>
           <Link to="/about" onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }} className="block py-2 font-mono-vt" style={{ color: 'var(--text)' }}>ABOUT</Link>
           <Link to="/moodboards" onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }} className="block py-2 font-mono-vt" style={{ color: 'var(--text)' }}>MOODBOARDS</Link>
@@ -1855,6 +1809,7 @@ const AltTabWebsite = () => {
           <Route path="/moodboards" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><MoodboardsPage /></div>} />
           <Route path="/about" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><AboutPage /></div>} />
           <Route path="/shop" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><ShopPage /></div>} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
 
