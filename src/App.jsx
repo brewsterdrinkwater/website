@@ -1146,7 +1146,7 @@ const AltTabWebsite = () => {
   const currentPage = location.pathname === '/' ? 'home' : location.pathname.slice(1);
 
   const [menuOpen, setMenuOpen] = useState(false);
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState('light');
   const [isMobile, setIsMobile] = useState(false);
   const [toast, setToast] = useState({ message: '', show: false });
 
@@ -1735,7 +1735,7 @@ const AltTabWebsite = () => {
           <Link to="/projects" onClick={() => window.scrollTo(0, 0)}>projects</Link>
         </div>
         <div className="flex items-center gap-2">
-          <button className="y2k-theme-toggle" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+          <button className="y2k-theme-toggle hidden lg:block" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
             {theme === 'dark' ? '☀' : '☾'}
           </button>
           <button className="lg:hidden p-2" style={{ color: 'var(--text)' }} onClick={() => setMenuOpen(!menuOpen)}>
@@ -1747,10 +1747,12 @@ const AltTabWebsite = () => {
       {/* Mobile menu */}
       {menuOpen && (
         <div className="fixed top-12 left-0 right-0 z-[299] p-4 space-y-2 lg:hidden" style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
-          <Link to="/" onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }} className="block py-2 font-mono-vt" style={{ color: 'var(--accent)' }}>HOME</Link>
           <Link to="/about" onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }} className="block py-2 font-mono-vt" style={{ color: 'var(--text)' }}>ABOUT</Link>
           <Link to="/moodboards" onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }} className="block py-2 font-mono-vt" style={{ color: 'var(--text)' }}>MOODBOARDS</Link>
           <Link to="/projects" onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }} className="block py-2 font-mono-vt" style={{ color: 'var(--text)' }}>PROJECTS</Link>
+          <button onClick={() => { setTheme(theme === 'dark' ? 'light' : 'dark'); setMenuOpen(false); }} className="block w-full text-left py-2 font-mono-vt" style={{ color: 'var(--text-dim)', background: 'none', border: 'none', cursor: 'pointer' }}>
+            {theme === 'dark' ? '☀ LIGHT MODE' : '☾ DARK MODE'}
+          </button>
         </div>
       )}
 
