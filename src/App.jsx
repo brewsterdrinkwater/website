@@ -6,17 +6,19 @@ import { Menu, X, Sparkles, RefreshCw, Construction, Instagram } from 'lucide-re
 class SafeSection extends Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, error: null };
   }
-  static getDerivedStateFromError() {
-    return { hasError: true };
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
   }
   componentDidCatch(error, info) {
     console.error(`[SafeSection:${this.props.name || 'unknown'}]`, error, info);
   }
   render() {
     if (this.state.hasError) {
-      return this.props.fallback || null;
+      if (this.props.fallback) return this.props.fallback;
+      // For sections without a custom fallback, render nothing but log
+      return null;
     }
     return this.props.children;
   }
@@ -951,10 +953,13 @@ const DesktopIcon = ({ icon, label, onClick }) => (
   </div>
 );
 
-// Mobile Modal
+// Mobile Modal — with prominent back button for easy return to home grid
 const MobileModal = ({ title, children, onClose }) => (
   <div className="y2k-mobile-modal">
     <div className="y2k-modal-header">
+      <button className="y2k-modal-back" onClick={onClose} aria-label="Back to home">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+      </button>
       <span className="y2k-modal-title">{title}</span>
       <button className="y2k-modal-close" onClick={onClose}>[ X ]</button>
     </div>
@@ -1146,7 +1151,7 @@ const AltTabWebsite = () => {
   const currentPage = location.pathname === '/' ? 'home' : location.pathname.slice(1);
 
   const [menuOpen, setMenuOpen] = useState(false);
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState(() => document.documentElement.getAttribute('data-theme') || 'dark');
   const [isMobile, setIsMobile] = useState(false);
   const [toast, setToast] = useState({ message: '', show: false });
 
@@ -1362,8 +1367,8 @@ const AltTabWebsite = () => {
     </div>
   );
 
-  // Desktop Homepage
-  const DesktopHomePage = () => (
+  // Desktop Homepage — each window wrapped in SafeSection so one crash can't take down the page
+  const desktopHomeContent = (
     <div className="relative min-h-screen pb-8">
       {/* Hero section on the desktop background */}
       <div className="flex items-center justify-center pt-20 pb-16">
@@ -1402,139 +1407,155 @@ const AltTabWebsite = () => {
         ))}
       </div>
 
-      {/* Windows */}
-      {windows.clocks.visible && (
-        <Y2KWindow
-          id="clocks"
-          title="world_clocks.exe"
-          defaultPosition={windowPositions.clocks}
-          defaultSize={{ width: 280, height: 'auto' }}
-          isMinimized={windows.clocks.minimized}
-          isActive={activeWindow === 'clocks'}
-          onClose={() => closeWindow('clocks')}
-          onMinimize={() => toggleWindow('clocks')}
-          onFocus={() => focusWindow('clocks')}
-        >
-          <WorldClocks />
-        </Y2KWindow>
-      )}
+      {/* Windows — each isolated so a single failure doesn't break the page */}
+      <SafeSection name="window-clocks">
+        {windows.clocks.visible && (
+          <Y2KWindow
+            id="clocks"
+            title="world_clocks.exe"
+            defaultPosition={windowPositions.clocks}
+            defaultSize={{ width: 280, height: 'auto' }}
+            isMinimized={windows.clocks.minimized}
+            isActive={activeWindow === 'clocks'}
+            onClose={() => closeWindow('clocks')}
+            onMinimize={() => toggleWindow('clocks')}
+            onFocus={() => focusWindow('clocks')}
+          >
+            <WorldClocks />
+          </Y2KWindow>
+        )}
+      </SafeSection>
 
-      {windows.services.visible && (
-        <Y2KWindow
-          id="services"
-          title="services.exe"
-          defaultPosition={windowPositions.services}
-          defaultSize={{ width: 300, height: 'auto' }}
-          isMinimized={windows.services.minimized}
-          isActive={activeWindow === 'services'}
-          onClose={() => closeWindow('services')}
-          onMinimize={() => toggleWindow('services')}
-          onFocus={() => focusWindow('services')}
-        >
-          {ServicesContent()}
-        </Y2KWindow>
-      )}
+      <SafeSection name="window-services">
+        {windows.services.visible && (
+          <Y2KWindow
+            id="services"
+            title="services.exe"
+            defaultPosition={windowPositions.services}
+            defaultSize={{ width: 300, height: 'auto' }}
+            isMinimized={windows.services.minimized}
+            isActive={activeWindow === 'services'}
+            onClose={() => closeWindow('services')}
+            onMinimize={() => toggleWindow('services')}
+            onFocus={() => focusWindow('services')}
+          >
+            {ServicesContent()}
+          </Y2KWindow>
+        )}
+      </SafeSection>
 
-      {windows.news.visible && (
-        <Y2KWindow
-          id="news"
-          title="headlines.exe"
-          defaultPosition={windowPositions.news}
-          defaultSize={{ width: 300, height: 300 }}
-          isMinimized={windows.news.minimized}
-          isActive={activeWindow === 'news'}
-          onClose={() => closeWindow('news')}
-          onMinimize={() => toggleWindow('news')}
-          onFocus={() => focusWindow('news')}
-        >
-          {NewsContent()}
-        </Y2KWindow>
-      )}
+      <SafeSection name="window-news">
+        {windows.news.visible && (
+          <Y2KWindow
+            id="news"
+            title="headlines.exe"
+            defaultPosition={windowPositions.news}
+            defaultSize={{ width: 300, height: 300 }}
+            isMinimized={windows.news.minimized}
+            isActive={activeWindow === 'news'}
+            onClose={() => closeWindow('news')}
+            onMinimize={() => toggleWindow('news')}
+            onFocus={() => focusWindow('news')}
+          >
+            {NewsContent()}
+          </Y2KWindow>
+        )}
+      </SafeSection>
 
-      {windows.trivia.visible && (
-        <Y2KWindow
-          id="trivia"
-          title="trivia.exe"
-          defaultPosition={windowPositions.trivia}
-          defaultSize={{ width: 320, height: 'auto' }}
-          isMinimized={windows.trivia.minimized}
-          isActive={activeWindow === 'trivia'}
-          onClose={() => closeWindow('trivia')}
-          onMinimize={() => toggleWindow('trivia')}
-          onFocus={() => focusWindow('trivia')}
-        >
-          {TriviaContent()}
-        </Y2KWindow>
-      )}
+      <SafeSection name="window-trivia">
+        {windows.trivia.visible && (
+          <Y2KWindow
+            id="trivia"
+            title="trivia.exe"
+            defaultPosition={windowPositions.trivia}
+            defaultSize={{ width: 320, height: 'auto' }}
+            isMinimized={windows.trivia.minimized}
+            isActive={activeWindow === 'trivia'}
+            onClose={() => closeWindow('trivia')}
+            onMinimize={() => toggleWindow('trivia')}
+            onFocus={() => focusWindow('trivia')}
+          >
+            {TriviaContent()}
+          </Y2KWindow>
+        )}
+      </SafeSection>
 
-      {windows.snake.visible && (
-        <Y2KWindow
-          id="snake"
-          title="snake.exe"
-          defaultPosition={windowPositions.snake}
-          defaultSize={{ width: 320, height: 'auto' }}
-          isMinimized={windows.snake.minimized}
-          isActive={activeWindow === 'snake'}
-          onClose={() => closeWindow('snake')}
-          onMinimize={() => toggleWindow('snake')}
-          onFocus={() => focusWindow('snake')}
-        >
-          <SnakeGame isMobile={false} />
-        </Y2KWindow>
-      )}
+      <SafeSection name="window-snake">
+        {windows.snake.visible && (
+          <Y2KWindow
+            id="snake"
+            title="snake.exe"
+            defaultPosition={windowPositions.snake}
+            defaultSize={{ width: 320, height: 'auto' }}
+            isMinimized={windows.snake.minimized}
+            isActive={activeWindow === 'snake'}
+            onClose={() => closeWindow('snake')}
+            onMinimize={() => toggleWindow('snake')}
+            onFocus={() => focusWindow('snake')}
+          >
+            <SnakeGame isMobile={false} />
+          </Y2KWindow>
+        )}
+      </SafeSection>
 
-      {windows.reaction.visible && (
-        <Y2KWindow
-          id="reaction"
-          title="reaction.exe"
-          defaultPosition={windowPositions.reaction}
-          defaultSize={{ width: 280, height: 'auto' }}
-          isMinimized={windows.reaction.minimized}
-          isActive={activeWindow === 'reaction'}
-          onClose={() => closeWindow('reaction')}
-          onMinimize={() => toggleWindow('reaction')}
-          onFocus={() => focusWindow('reaction')}
-        >
-          <ReactionGame />
-        </Y2KWindow>
-      )}
+      <SafeSection name="window-reaction">
+        {windows.reaction.visible && (
+          <Y2KWindow
+            id="reaction"
+            title="reaction.exe"
+            defaultPosition={windowPositions.reaction}
+            defaultSize={{ width: 280, height: 'auto' }}
+            isMinimized={windows.reaction.minimized}
+            isActive={activeWindow === 'reaction'}
+            onClose={() => closeWindow('reaction')}
+            onMinimize={() => toggleWindow('reaction')}
+            onFocus={() => focusWindow('reaction')}
+          >
+            <ReactionGame />
+          </Y2KWindow>
+        )}
+      </SafeSection>
 
-      {windows.about.visible && (
-        <Y2KWindow
-          id="about"
-          title="about.txt"
-          defaultPosition={windowPositions.about}
-          defaultSize={{ width: 300, height: 'auto' }}
-          isMinimized={windows.about.minimized}
-          isActive={activeWindow === 'about'}
-          onClose={() => closeWindow('about')}
-          onMinimize={() => toggleWindow('about')}
-          onFocus={() => focusWindow('about')}
-        >
-          {AboutContent()}
-        </Y2KWindow>
-      )}
+      <SafeSection name="window-about">
+        {windows.about.visible && (
+          <Y2KWindow
+            id="about"
+            title="about.txt"
+            defaultPosition={windowPositions.about}
+            defaultSize={{ width: 300, height: 'auto' }}
+            isMinimized={windows.about.minimized}
+            isActive={activeWindow === 'about'}
+            onClose={() => closeWindow('about')}
+            onMinimize={() => toggleWindow('about')}
+            onFocus={() => focusWindow('about')}
+          >
+            {AboutContent()}
+          </Y2KWindow>
+        )}
+      </SafeSection>
 
-      {windows.sports.visible && (
-        <Y2KWindow
-          id="sports"
-          title="scores.exe"
-          defaultPosition={windowPositions.sports}
-          defaultSize={{ width: 380, height: 'auto' }}
-          isMinimized={windows.sports.minimized}
-          isActive={activeWindow === 'sports'}
-          onClose={() => closeWindow('sports')}
-          onMinimize={() => toggleWindow('sports')}
-          onFocus={() => focusWindow('sports')}
-        >
-          <SportsTracker />
-        </Y2KWindow>
-      )}
+      <SafeSection name="window-sports">
+        {windows.sports.visible && (
+          <Y2KWindow
+            id="sports"
+            title="scores.exe"
+            defaultPosition={windowPositions.sports}
+            defaultSize={{ width: 380, height: 'auto' }}
+            isMinimized={windows.sports.minimized}
+            isActive={activeWindow === 'sports'}
+            onClose={() => closeWindow('sports')}
+            onMinimize={() => toggleWindow('sports')}
+            onFocus={() => focusWindow('sports')}
+          >
+            <SportsTracker />
+          </Y2KWindow>
+        )}
+      </SafeSection>
     </div>
   );
 
-  // Mobile Homepage
-  const MobileHomePage = () => (
+  // Mobile Homepage — modals wrapped in SafeSection for crash isolation
+  const mobileHomeContent = (
     <div className="min-h-screen pb-16">
       {/* Hero */}
       <div className="pt-8 pb-12 px-4">
@@ -1587,45 +1608,61 @@ const AltTabWebsite = () => {
         </a>
       </div>
 
-      {/* Mobile Modals */}
+      {/* Mobile Modals — each wrapped in SafeSection */}
       {mobileModal === 'clocks' && (
         <MobileModal title="WORLD CLOCKS" onClose={() => setMobileModal(null)}>
-          <WorldClocks />
+          <SafeSection name="modal-clocks">
+            <WorldClocks />
+          </SafeSection>
         </MobileModal>
       )}
       {mobileModal === 'services' && (
         <MobileModal title="SERVICES" onClose={() => setMobileModal(null)}>
-          {ServicesContent()}
+          <SafeSection name="modal-services">
+            {ServicesContent()}
+          </SafeSection>
         </MobileModal>
       )}
       {mobileModal === 'news' && (
         <MobileModal title="HEADLINES" onClose={() => setMobileModal(null)}>
-          {NewsContent()}
+          <SafeSection name="modal-news">
+            {NewsContent()}
+          </SafeSection>
         </MobileModal>
       )}
       {mobileModal === 'trivia' && (
         <MobileModal title="TRIVIA" onClose={() => setMobileModal(null)}>
-          {TriviaContent()}
+          <SafeSection name="modal-trivia">
+            {TriviaContent()}
+          </SafeSection>
         </MobileModal>
       )}
       {mobileModal === 'snake' && (
         <MobileModal title="SNAKE" onClose={() => setMobileModal(null)}>
-          <SnakeGame isMobile={true} />
+          <SafeSection name="modal-snake">
+            <SnakeGame isMobile={true} />
+          </SafeSection>
         </MobileModal>
       )}
       {mobileModal === 'reaction' && (
         <MobileModal title="REACTION" onClose={() => setMobileModal(null)}>
-          <ReactionGame />
+          <SafeSection name="modal-reaction">
+            <ReactionGame />
+          </SafeSection>
         </MobileModal>
       )}
       {mobileModal === 'about' && (
         <MobileModal title="ABOUT" onClose={() => setMobileModal(null)}>
-          {AboutContent()}
+          <SafeSection name="modal-about">
+            {AboutContent()}
+          </SafeSection>
         </MobileModal>
       )}
       {mobileModal === 'sports' && (
         <MobileModal title="MY TEAMS" onClose={() => setMobileModal(null)}>
-          <SportsTracker />
+          <SafeSection name="modal-sports">
+            <SportsTracker />
+          </SafeSection>
         </MobileModal>
       )}
     </div>
@@ -1708,6 +1745,10 @@ const AltTabWebsite = () => {
     </div>
   );
 
+  // About and Shop page content (inline JSX, not function calls)
+  const aboutElement = <div className="max-w-5xl mx-auto px-4 md:px-6 py-8">{AboutPage()}</div>;
+  const shopElement = <div className="max-w-5xl mx-auto px-4 md:px-6 py-8">{ShopPage()}</div>;
+
   return (
     <div className="min-h-screen overflow-x-hidden">
       {/* Background */}
@@ -1760,19 +1801,24 @@ const AltTabWebsite = () => {
       <main className="relative z-10 pt-14">
         <SafeSection name="routes" fallback={
           <div className="flex items-center justify-center min-h-[60vh]">
-            <div className="text-center p-8" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+            <div className="text-center p-8" style={{ background: 'var(--surface)', border: '1px solid var(--border)', maxWidth: '400px' }}>
               <h2 className="text-2xl font-mono-vt mb-4" style={{ color: 'var(--accent)' }}>ALT-TAB</h2>
-              <p className="font-mono-courier mb-4" style={{ color: 'var(--text)' }}>Page failed to load.</p>
-              <button onClick={() => window.location.reload()} className="px-4 py-2 font-mono-vt" style={{ background: 'var(--accent)', color: 'var(--bg)', border: 'none', cursor: 'pointer' }}>[ RELOAD ]</button>
+              <p className="font-mono-courier mb-4" style={{ color: 'var(--text)' }}>Something went wrong loading this page.</p>
+              <div className="flex flex-col gap-2">
+                <button onClick={() => window.location.reload()} className="px-4 py-2 font-mono-vt" style={{ background: 'var(--accent)', color: 'var(--bg)', border: 'none', cursor: 'pointer' }}>[ RELOAD ]</button>
+                <a href="/about" className="px-4 py-2 font-mono-vt" style={{ border: '1px solid var(--border)', color: 'var(--text-dim)', textDecoration: 'none', display: 'block' }}>ABOUT</a>
+                <a href="/projects" className="px-4 py-2 font-mono-vt" style={{ border: '1px solid var(--border)', color: 'var(--text-dim)', textDecoration: 'none', display: 'block' }}>PROJECTS</a>
+                <a href="/moodboards" className="px-4 py-2 font-mono-vt" style={{ border: '1px solid var(--border)', color: 'var(--text-dim)', textDecoration: 'none', display: 'block' }}>MOODBOARDS</a>
+              </div>
             </div>
           </div>
         }>
           <Routes>
-            <Route path="/" element={isMobile ? MobileHomePage() : DesktopHomePage()} />
+            <Route path="/" element={isMobile ? mobileHomeContent : desktopHomeContent} />
             <Route path="/projects" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><ProjectsPage /></div>} />
             <Route path="/moodboards" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><MoodboardsPage /></div>} />
-            <Route path="/about" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8">{AboutPage()}</div>} />
-            <Route path="/shop" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8">{ShopPage()}</div>} />
+            <Route path="/about" element={aboutElement} />
+            <Route path="/shop" element={shopElement} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </SafeSection>
