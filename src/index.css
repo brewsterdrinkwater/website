@@ -290,8 +290,14 @@ body {
 }
 
 .y2k-nav-links {
-  display: flex;
+  display: none;
   gap: 20px;
+}
+
+@media (min-width: 1024px) {
+  .y2k-nav-links {
+    display: flex;
+  }
 }
 
 .y2k-nav-links a {
@@ -540,6 +546,20 @@ body {
   font-size: 20px;
   color: var(--accent);
   letter-spacing: 2px;
+}
+
+.y2k-modal-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
 .y2k-modal-close {
