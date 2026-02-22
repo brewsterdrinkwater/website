@@ -1704,7 +1704,7 @@ const AltTabWebsite = () => {
               </div>
             </div>
             <p className="text-sm font-mono-share" style={{ color: 'var(--text-dim)' }}>
-              &gt; Sometimes we make for us; "Style Matters"_<span className="y2k-blink">█</span>
+              &gt; "Style Matters"_<span className="y2k-blink">█</span>
             </p>
           </div>
         </div>
