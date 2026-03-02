@@ -973,22 +973,29 @@ const MobileModal = ({ title, children, onClose }) => (
 
 // Shared projects data
 const PROJECTS = [
-  { slug: 'lbf', name: 'Live Breathe Futbol', year: '2023', category: 'Brand', description: 'Football culture and apparel brand rooted in the global love of the beautiful game.' },
-  { slug: 'wonder-universe', name: 'Wonder Universe', year: '2024', category: 'Experience', description: "Children's museum experience designed to spark curiosity and imagination." },
-  { slug: 'usm-furniture', name: 'USM Furniture', year: '2023', category: 'Design', description: 'Modular furniture system — timeless Swiss design for modern spaces.' },
-  { slug: 'akash-network', name: 'Akash Network', year: '2024', category: 'Web3', description: 'Decentralized cloud computing — the open-source supercloud.' },
-  { slug: 'bkysc', name: 'BKYSC', year: '2023', category: 'Community', description: 'Brooklyn Youth Sports Club — building community through sport.' },
-  { slug: 'north-jersey-bulls', name: 'North Jersey Bulls', year: '2024', category: 'Sports', description: 'Semi-professional soccer club representing North Jersey.' },
-  { slug: 'nike-nyc', name: 'Nike NYC', year: '2023', category: 'Retail', description: 'Retail experience design for Nike in New York City.' },
-  { slug: 'shoe-kit', name: 'Shoe Kit', year: '2024', category: 'Product', description: 'Footwear toolkit — designing the future of kicks.' },
-  { slug: 'salt-tab', name: 'Salt-tab', year: '2024', category: 'Brand', description: 'A flavor-forward brand experience.' },
-  { slug: 'walt-tab', name: 'Walt-tab', year: '2024', category: 'Brand', description: 'Creative studio and content platform.' },
-  { slug: 'dj-fabb-earz', name: 'DJ Fabb + Earz to Da Streetz', year: '2024', category: 'Music', description: 'Music culture platform bridging the streets and the sound.' },
+  { slug: 'teerex-garck', name: 'Teerex / Garck', year: '2024', category: 'Brand', description: 'Teerex / Garck — creative brand partnership.', hasDetail: false },
+  { slug: 'bam', name: 'BAM', year: '2024', category: 'Brand', description: 'BAM — bold brand identity and creative direction.', hasDetail: false },
+  { slug: 'classified-1', name: 'Classified', year: '—', category: '—', classified: true },
+  { slug: 'bkysc', name: 'BKYSC', year: '2023', category: 'Community', description: 'Brooklyn Youth Sports Club — building community through sport.', hasDetail: false },
+  { slug: 'lbf', name: 'Live Breathe Futbol', year: '2023', category: 'Brand', description: 'Football culture and apparel brand rooted in the global love of the beautiful game.', hasDetail: false },
+  { slug: 'dj-fabb-earz', name: 'DJ Fabb + Earz 2 Da Streetz', year: '2024', category: 'Music', description: 'Music culture platform bridging the streets and the sound.', hasDetail: false },
+  { slug: 'nike-nyc', name: 'Nike NYC', year: '2023', category: 'Retail', description: 'Retail experience design for Nike in New York City.', hasDetail: false },
+  { slug: 'north-jersey-bulls', name: 'North Jersey Bulls', year: '2024', category: 'Sports', description: 'Semi-professional soccer club representing North Jersey.', hasDetail: false },
+  { slug: 'usm-furniture', name: 'USM Furniture', year: '2023', category: 'Design', description: 'Modular furniture system — timeless Swiss design for modern spaces.', hasDetail: false },
+  { slug: 'classified-2', name: 'Classified', year: '—', category: '—', classified: true },
+  { slug: 'classified-3', name: 'Classified', year: '—', category: '—', classified: true },
+  { slug: 'classified-4', name: 'Classified', year: '—', category: '—', classified: true },
+  { slug: 'shoe-kit', name: 'Shoe Kit', year: '2024', category: 'Product', description: 'Footwear toolkit — designing the future of kicks.', hasDetail: false },
+  { slug: 'akash-network', name: 'Akash Network', year: '2024', category: 'Web3', description: 'Decentralized cloud computing — the open-source supercloud.', hasDetail: false },
+  { slug: 'salt-tab', name: 'Salt-Tab', year: '2024', category: 'Brand', description: 'A flavor-forward brand experience.', hasDetail: false },
+  { slug: 'walt-tab', name: 'Walt-Tab', year: '2024', category: 'Brand', description: 'Creative studio and content platform.', hasDetail: false },
+  { slug: 'mystery-box', name: 'Mystery Box', year: '2025', category: '???', description: 'What\'s in the box? Only one way to find out.', hasDetail: true },
 ];
 
 // Projects Page — Bibliography / Index style (MSCHF-inspired)
 const ProjectsPage = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [classifiedTooltip, setClassifiedTooltip] = useState(null);
 
   return (
     <div className="pb-16">
@@ -1000,52 +1007,150 @@ const ProjectsPage = () => {
       </div>
 
       <div style={{ borderTop: '1px solid var(--border)' }}>
-        {PROJECTS.map((project, i) => (
-          <Link
-            key={project.slug}
-            to={`/projects/${project.slug}`}
-            className="group block no-underline"
-            style={{ borderBottom: '1px solid var(--border)', textDecoration: 'none' }}
-            onMouseEnter={() => setHoveredIndex(i)}
-            onMouseLeave={() => setHoveredIndex(null)}
-            onClick={() => window.scrollTo(0, 0)}
-          >
-            <div
-              className="flex items-center justify-between py-4 px-2 md:px-4 transition-all duration-200"
-              style={{
-                background: hoveredIndex === i ? 'var(--surface)' : 'transparent',
-              }}
-            >
-              <div className="flex items-baseline gap-3 md:gap-6 min-w-0">
-                <span className="font-mono-share text-xs shrink-0" style={{ color: 'var(--text-dim)', width: '24px' }}>
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <span
-                  className="font-mono-vt text-lg md:text-2xl truncate transition-colors duration-200"
-                  style={{ color: hoveredIndex === i ? 'var(--accent)' : 'var(--text)' }}
-                >
-                  {project.name}
-                </span>
-              </div>
-              <div className="flex items-center gap-3 md:gap-6 shrink-0">
-                <span className="font-mono-share text-xs hidden md:inline" style={{ color: 'var(--text-dim)' }}>
-                  {project.category}
-                </span>
-                <span className="font-mono-share text-xs hidden sm:inline" style={{ color: 'var(--text-dim)' }}>
-                  {project.year}
-                </span>
-                <ChevronRight
-                  size={18}
-                  className="transition-transform duration-200"
+        {PROJECTS.map((project, i) => {
+          const isClassified = project.classified;
+          const isLinkable = project.hasDetail;
+
+          // Classified row
+          if (isClassified) {
+            return (
+              <div
+                key={project.slug}
+                className="block relative"
+                style={{ borderBottom: '1px solid var(--border)', cursor: 'default' }}
+                onMouseEnter={() => { setHoveredIndex(i); setClassifiedTooltip(i); }}
+                onMouseLeave={() => { setHoveredIndex(null); setClassifiedTooltip(null); }}
+              >
+                <div
+                  className="flex items-center justify-between py-4 px-2 md:px-4 transition-all duration-200"
                   style={{
-                    color: hoveredIndex === i ? 'var(--accent)' : 'var(--text-dim)',
-                    transform: hoveredIndex === i ? 'translateX(4px)' : 'translateX(0)',
+                    background: hoveredIndex === i ? 'var(--surface)' : 'transparent',
                   }}
-                />
+                >
+                  <div className="flex items-baseline gap-3 md:gap-6 min-w-0">
+                    <span className="font-mono-share text-xs shrink-0" style={{ color: 'var(--text-dim)', width: '24px' }}>
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span
+                      className="font-mono-vt text-lg md:text-2xl truncate transition-colors duration-200"
+                      style={{ color: 'var(--text-dim)', letterSpacing: '2px' }}
+                    >
+                      ██ CLASSIFIED ██
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 md:gap-6 shrink-0">
+                    <span className="font-mono-share text-xs" style={{ color: 'var(--text-dim)' }}>
+                      ▓▓▓
+                    </span>
+                  </div>
+                </div>
+
+                {/* "Keep Scrolling" tooltip */}
+                {classifiedTooltip === i && (
+                  <div
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 px-4 py-2 font-mono-vt text-sm pointer-events-none"
+                    style={{
+                      background: 'var(--accent)',
+                      color: 'var(--bg)',
+                      animation: 'classifiedPulse 0.8s ease-in-out infinite',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    KEEP SCROLLING
+                  </div>
+                )}
+              </div>
+            );
+          }
+
+          // Linkable row (Mystery Box)
+          if (isLinkable) {
+            return (
+              <Link
+                key={project.slug}
+                to={`/projects/${project.slug}`}
+                className="group block no-underline"
+                style={{ borderBottom: '1px solid var(--border)', textDecoration: 'none' }}
+                onMouseEnter={() => setHoveredIndex(i)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                onClick={() => window.scrollTo(0, 0)}
+              >
+                <div
+                  className="flex items-center justify-between py-4 px-2 md:px-4 transition-all duration-200"
+                  style={{
+                    background: hoveredIndex === i ? 'var(--surface)' : 'transparent',
+                  }}
+                >
+                  <div className="flex items-baseline gap-3 md:gap-6 min-w-0">
+                    <span className="font-mono-share text-xs shrink-0" style={{ color: 'var(--text-dim)', width: '24px' }}>
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span
+                      className="font-mono-vt text-lg md:text-2xl truncate transition-colors duration-200"
+                      style={{ color: hoveredIndex === i ? 'var(--accent)' : 'var(--text)' }}
+                    >
+                      {project.name}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 md:gap-6 shrink-0">
+                    <span className="font-mono-share text-xs hidden md:inline" style={{ color: 'var(--text-dim)' }}>
+                      {project.category}
+                    </span>
+                    <span className="font-mono-share text-xs hidden sm:inline" style={{ color: 'var(--text-dim)' }}>
+                      {project.year}
+                    </span>
+                    <ChevronRight
+                      size={18}
+                      className="transition-transform duration-200"
+                      style={{
+                        color: hoveredIndex === i ? 'var(--accent)' : 'var(--text-dim)',
+                        transform: hoveredIndex === i ? 'translateX(4px)' : 'translateX(0)',
+                      }}
+                    />
+                  </div>
+                </div>
+              </Link>
+            );
+          }
+
+          // Non-linkable row (everything else)
+          return (
+            <div
+              key={project.slug}
+              className="block"
+              style={{ borderBottom: '1px solid var(--border)', cursor: 'default' }}
+              onMouseEnter={() => setHoveredIndex(i)}
+              onMouseLeave={() => setHoveredIndex(null)}
+            >
+              <div
+                className="flex items-center justify-between py-4 px-2 md:px-4 transition-all duration-200"
+                style={{
+                  background: hoveredIndex === i ? 'var(--surface)' : 'transparent',
+                }}
+              >
+                <div className="flex items-baseline gap-3 md:gap-6 min-w-0">
+                  <span className="font-mono-share text-xs shrink-0" style={{ color: 'var(--text-dim)', width: '24px' }}>
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span
+                    className="font-mono-vt text-lg md:text-2xl truncate transition-colors duration-200"
+                    style={{ color: hoveredIndex === i ? 'var(--accent)' : 'var(--text)' }}
+                  >
+                    {project.name}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 md:gap-6 shrink-0">
+                  <span className="font-mono-share text-xs hidden md:inline" style={{ color: 'var(--text-dim)' }}>
+                    {project.category}
+                  </span>
+                  <span className="font-mono-share text-xs hidden sm:inline" style={{ color: 'var(--text-dim)' }}>
+                    {project.year}
+                  </span>
+                </div>
               </div>
             </div>
-          </Link>
-        ))}
+          );
+        })}
       </div>
 
       <div className="mt-12 text-center">
