@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef, Component } from 'react';
-import { Routes, Route, Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Sparkles, RefreshCw, Construction, Instagram } from 'lucide-react';
+import { Routes, Route, Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Menu, X, Sparkles, RefreshCw, Construction, Instagram, ChevronRight, ArrowLeft } from 'lucide-react';
 
 // Per-section error boundary — isolates crashes so the rest of the page renders
 class SafeSection extends Component {
@@ -971,8 +971,172 @@ const MobileModal = ({ title, children, onClose }) => (
 
 // ===== STANDALONE PAGE COMPONENTS (must be outside main component to avoid remounting) =====
 
-// Projects Page
+// Shared projects data
+const PROJECTS = [
+  { slug: 'lbf', name: 'Live Breathe Futbol', year: '2023', category: 'Brand', description: 'Football culture and apparel brand rooted in the global love of the beautiful game.' },
+  { slug: 'wonder-universe', name: 'Wonder Universe', year: '2024', category: 'Experience', description: "Children's museum experience designed to spark curiosity and imagination." },
+  { slug: 'usm-furniture', name: 'USM Furniture', year: '2023', category: 'Design', description: 'Modular furniture system — timeless Swiss design for modern spaces.' },
+  { slug: 'akash-network', name: 'Akash Network', year: '2024', category: 'Web3', description: 'Decentralized cloud computing — the open-source supercloud.' },
+  { slug: 'bkysc', name: 'BKYSC', year: '2023', category: 'Community', description: 'Brooklyn Youth Sports Club — building community through sport.' },
+  { slug: 'north-jersey-bulls', name: 'North Jersey Bulls', year: '2024', category: 'Sports', description: 'Semi-professional soccer club representing North Jersey.' },
+  { slug: 'nike-nyc', name: 'Nike NYC', year: '2023', category: 'Retail', description: 'Retail experience design for Nike in New York City.' },
+  { slug: 'shoe-kit', name: 'Shoe Kit', year: '2024', category: 'Product', description: 'Footwear toolkit — designing the future of kicks.' },
+  { slug: 'salt-tab', name: 'Salt-tab', year: '2024', category: 'Brand', description: 'A flavor-forward brand experience.' },
+  { slug: 'walt-tab', name: 'Walt-tab', year: '2024', category: 'Brand', description: 'Creative studio and content platform.' },
+  { slug: 'dj-fabb-earz', name: 'DJ Fabb + Earz to Da Streetz', year: '2024', category: 'Music', description: 'Music culture platform bridging the streets and the sound.' },
+];
+
+// Projects Page — Bibliography / Index style (MSCHF-inspired)
 const ProjectsPage = () => {
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+
+  return (
+    <div className="pb-16">
+      <div className="mb-12 pt-4">
+        <h2 className="text-5xl md:text-7xl font-mono-vt leading-none" style={{ color: 'var(--accent)' }}>PROJECTS</h2>
+        <p className="font-mono-courier mt-3 text-sm" style={{ color: 'var(--text-dim)' }}>
+          Index of works
+        </p>
+      </div>
+
+      <div style={{ borderTop: '1px solid var(--border)' }}>
+        {PROJECTS.map((project, i) => (
+          <Link
+            key={project.slug}
+            to={`/projects/${project.slug}`}
+            className="group block no-underline"
+            style={{ borderBottom: '1px solid var(--border)', textDecoration: 'none' }}
+            onMouseEnter={() => setHoveredIndex(i)}
+            onMouseLeave={() => setHoveredIndex(null)}
+            onClick={() => window.scrollTo(0, 0)}
+          >
+            <div
+              className="flex items-center justify-between py-4 px-2 md:px-4 transition-all duration-200"
+              style={{
+                background: hoveredIndex === i ? 'var(--surface)' : 'transparent',
+              }}
+            >
+              <div className="flex items-baseline gap-3 md:gap-6 min-w-0">
+                <span className="font-mono-share text-xs shrink-0" style={{ color: 'var(--text-dim)', width: '24px' }}>
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span
+                  className="font-mono-vt text-lg md:text-2xl truncate transition-colors duration-200"
+                  style={{ color: hoveredIndex === i ? 'var(--accent)' : 'var(--text)' }}
+                >
+                  {project.name}
+                </span>
+              </div>
+              <div className="flex items-center gap-3 md:gap-6 shrink-0">
+                <span className="font-mono-share text-xs hidden md:inline" style={{ color: 'var(--text-dim)' }}>
+                  {project.category}
+                </span>
+                <span className="font-mono-share text-xs hidden sm:inline" style={{ color: 'var(--text-dim)' }}>
+                  {project.year}
+                </span>
+                <ChevronRight
+                  size={18}
+                  className="transition-transform duration-200"
+                  style={{
+                    color: hoveredIndex === i ? 'var(--accent)' : 'var(--text-dim)',
+                    transform: hoveredIndex === i ? 'translateX(4px)' : 'translateX(0)',
+                  }}
+                />
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      <div className="mt-12 text-center">
+        <Link
+          to="/contact"
+          className="inline-block px-8 py-3 font-mono-vt text-sm transition-all duration-200 no-underline"
+          style={{
+            border: '1px solid var(--accent)',
+            color: 'var(--accent)',
+            textDecoration: 'none',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--accent)'; e.currentTarget.style.color = 'var(--bg)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--accent)'; }}
+          onClick={() => window.scrollTo(0, 0)}
+        >
+          [ CONTACT US ]
+        </Link>
+      </div>
+    </div>
+  );
+};
+
+// Project Detail Page — subpage for each project
+const ProjectDetailPage = () => {
+  const { slug } = useParams();
+  const project = PROJECTS.find(p => p.slug === slug);
+
+  if (!project) {
+    return (
+      <div className="text-center py-20">
+        <h2 className="text-3xl font-mono-vt mb-4" style={{ color: 'var(--accent)' }}>PROJECT NOT FOUND</h2>
+        <Link to="/projects" className="font-mono-vt text-sm" style={{ color: 'var(--text-dim)', textDecoration: 'none' }}>
+          &larr; Back to projects
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="pb-16">
+      <Link
+        to="/projects"
+        className="inline-flex items-center gap-2 font-mono-share text-sm mb-8 no-underline transition-colors duration-200"
+        style={{ color: 'var(--text-dim)', textDecoration: 'none' }}
+        onClick={() => window.scrollTo(0, 0)}
+      >
+        <ArrowLeft size={14} />
+        Back to projects
+      </Link>
+
+      <div className="mb-10">
+        <div className="flex items-baseline gap-4 mb-2">
+          <span className="font-mono-share text-xs" style={{ color: 'var(--text-dim)' }}>{project.category}</span>
+          <span className="font-mono-share text-xs" style={{ color: 'var(--text-dim)' }}>{project.year}</span>
+        </div>
+        <h1 className="text-4xl md:text-6xl font-mono-vt leading-none mb-6" style={{ color: 'var(--accent)' }}>
+          {project.name}
+        </h1>
+        <p className="font-mono-courier text-base max-w-2xl" style={{ color: 'var(--text)' }}>
+          {project.description}
+        </p>
+      </div>
+
+      {/* Image gallery placeholder */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+        {[1, 2, 3, 4].map((n) => (
+          <div
+            key={n}
+            className="aspect-[4/3] flex items-center justify-center"
+            style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+          >
+            <span className="font-mono-share text-xs" style={{ color: 'var(--text-dim)' }}>
+              Image {n}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Project details text box */}
+      <div className="max-w-2xl p-6 md:p-8" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+        <h3 className="font-mono-vt text-lg mb-4" style={{ color: 'var(--accent)' }}>ABOUT THIS PROJECT</h3>
+        <p className="font-mono-courier text-sm leading-relaxed" style={{ color: 'var(--text)' }}>
+          {project.description} More details coming soon.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+// Contact Page
+const ContactPage = () => {
   const [formData, setFormData] = useState({ name: '', email: '', company: '', message: '' });
   const [formSubmitted, setFormSubmitted] = useState(false);
 
@@ -988,53 +1152,16 @@ const ProjectsPage = () => {
     }, 3000);
   };
 
-  const projects = [
-    { name: 'Virginia Tech', logo: '/images/virginia-tech-logo.svg', description: 'University partnership and research', link: 'https://www.vt.edu/' },
-    { name: 'Live Breathe Futbol', logo: '/images/lbf-logo.svg', description: 'Football apparel brand', link: 'https://www.livebreathefutbol.com/' },
-    { name: 'USM Furniture', logoText: 'USM', description: 'Modular furniture system design', link: 'https://us.usm.com/' },
-    { name: 'Wonder Universe', logoText: 'WU', description: "Children's museum experience", link: 'https://wonderuniverse.org/' },
-    { name: 'BKYSC', logoText: 'BKYSC', description: 'Brooklyn Youth Sports Club', link: 'https://www.brooklynyouthsportsclub.org/' },
-    { name: 'Nike NYC', logoText: 'NIKE', description: 'Retail experience design' },
-    { name: 'MLB Streaming', logoText: 'MLB', description: 'Digital streaming platform' },
-    { name: 'Akash Network', logoText: 'AKASH', description: 'Decentralized cloud computing', link: 'https://akash.network/' },
-  ];
-
   return (
-    <div className="space-y-8 pb-16">
-      <div className="text-center space-y-4 p-6 md:p-8" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-        <h2 className="text-4xl md:text-5xl font-mono-vt" style={{ color: 'var(--accent)', textShadow: '0 0 20px var(--accent)' }}>PROJECTS</h2>
-        <p className="font-mono-courier" style={{ color: 'var(--text-dim)' }}>
-          "Sometimes we do work for us; sometimes we do work with you."
+    <div className="pb-16">
+      <div className="mb-12 pt-4">
+        <h2 className="text-5xl md:text-7xl font-mono-vt leading-none" style={{ color: 'var(--accent)' }}>CONTACT</h2>
+        <p className="font-mono-courier mt-3 text-sm" style={{ color: 'var(--text-dim)' }}>
+          Work with us
         </p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {projects.map((project, i) => {
-          const CardWrapper = project.link ? 'a' : 'div';
-          const linkProps = project.link ? { href: project.link, target: '_blank', rel: 'noopener noreferrer' } : {};
-          return (
-            <CardWrapper
-              key={i}
-              {...linkProps}
-              className="group p-4 hover:scale-105 transition-all duration-300 cursor-pointer block"
-              style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
-            >
-              <div className="h-12 flex items-center justify-center mb-2">
-                {project.logoText ? (
-                  <span className="text-xl font-mono-vt" style={{ color: 'var(--accent)' }}>{project.logoText}</span>
-                ) : (
-                  <img src={project.logo} alt={project.name} loading="lazy" className="max-h-full max-w-full object-contain" style={{ filter: 'brightness(0) invert(1)' }} />
-                )}
-              </div>
-              <h3 className="font-mono-vt text-sm text-center" style={{ color: 'var(--text)' }}>{project.name}</h3>
-              <p className="font-mono-share text-xs text-center mt-1" style={{ color: 'var(--text-dim)' }}>{project.description}</p>
-            </CardWrapper>
-          );
-        })}
-      </div>
-
-      <div className="max-w-2xl mx-auto p-6 md:p-8" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-        <h3 className="text-2xl font-mono-vt text-center mb-6" style={{ color: 'var(--accent)' }}>WORK WITH US</h3>
+      <div className="max-w-2xl p-6 md:p-8" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
         {formSubmitted ? (
           <div className="text-center py-8">
             <Sparkles size={40} className="mx-auto mb-4" style={{ color: 'var(--accent)' }} />
@@ -1774,6 +1901,7 @@ const AltTabWebsite = () => {
           <Link to="/about" onClick={() => window.scrollTo(0, 0)}>about</Link>
           <Link to="/moodboards" onClick={() => window.scrollTo(0, 0)}>moodboards</Link>
           <Link to="/projects" onClick={() => window.scrollTo(0, 0)}>projects</Link>
+          <Link to="/contact" onClick={() => window.scrollTo(0, 0)}>contact</Link>
         </div>
         <div className="flex items-center gap-2">
           <button className="y2k-theme-toggle hidden lg:block" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
@@ -1791,6 +1919,7 @@ const AltTabWebsite = () => {
           <Link to="/about" onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }} className="block py-2 font-mono-vt" style={{ color: 'var(--text)' }}>ABOUT</Link>
           <Link to="/moodboards" onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }} className="block py-2 font-mono-vt" style={{ color: 'var(--text)' }}>MOODBOARDS</Link>
           <Link to="/projects" onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }} className="block py-2 font-mono-vt" style={{ color: 'var(--text)' }}>PROJECTS</Link>
+          <Link to="/contact" onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }} className="block py-2 font-mono-vt" style={{ color: 'var(--accent)' }}>CONTACT</Link>
           <button onClick={() => { setTheme(theme === 'dark' ? 'light' : 'dark'); setMenuOpen(false); }} className="block w-full text-left py-2 font-mono-vt" style={{ color: 'var(--text-dim)', background: 'none', border: 'none', cursor: 'pointer' }}>
             {theme === 'dark' ? '☀ LIGHT MODE' : '☾ DARK MODE'}
           </button>
@@ -1809,6 +1938,7 @@ const AltTabWebsite = () => {
                 <a href="/about" className="px-4 py-2 font-mono-vt" style={{ border: '1px solid var(--border)', color: 'var(--text-dim)', textDecoration: 'none', display: 'block' }}>ABOUT</a>
                 <a href="/projects" className="px-4 py-2 font-mono-vt" style={{ border: '1px solid var(--border)', color: 'var(--text-dim)', textDecoration: 'none', display: 'block' }}>PROJECTS</a>
                 <a href="/moodboards" className="px-4 py-2 font-mono-vt" style={{ border: '1px solid var(--border)', color: 'var(--text-dim)', textDecoration: 'none', display: 'block' }}>MOODBOARDS</a>
+                <a href="/contact" className="px-4 py-2 font-mono-vt" style={{ border: '1px solid var(--border)', color: 'var(--text-dim)', textDecoration: 'none', display: 'block' }}>CONTACT</a>
               </div>
             </div>
           </div>
@@ -1816,6 +1946,8 @@ const AltTabWebsite = () => {
           <Routes>
             <Route path="/" element={isMobile ? mobileHomeContent : desktopHomeContent} />
             <Route path="/projects" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><ProjectsPage /></div>} />
+            <Route path="/projects/:slug" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><ProjectDetailPage /></div>} />
+            <Route path="/contact" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><ContactPage /></div>} />
             <Route path="/moodboards" element={<div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><MoodboardsPage /></div>} />
             <Route path="/about" element={aboutElement} />
             <Route path="/shop" element={shopElement} />
@@ -1834,6 +1966,7 @@ const AltTabWebsite = () => {
         <footer className="relative z-10 py-6 text-center" style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)' }}>
           <div className="flex flex-wrap items-center justify-center gap-4 mb-4">
             <Link to="/about" className="font-mono-vt text-sm" style={{ color: 'var(--text-dim)' }}>About</Link>
+            <Link to="/contact" className="font-mono-vt text-sm" style={{ color: 'var(--text-dim)' }}>Contact</Link>
             <a href="https://www.instagram.com/alttab.xyz/#" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 font-mono-vt text-sm" style={{ color: 'var(--text-dim)' }}>
               <Instagram size={14} /> @alttab
             </a>
