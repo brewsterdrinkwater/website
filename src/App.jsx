@@ -1306,7 +1306,7 @@ const MoodboardsPage = () => {
     <div className="space-y-6 pb-16">
       <div className="text-center space-y-4">
         <h2 className="text-4xl md:text-5xl font-mono-vt" style={{ color: 'var(--accent)', textShadow: '0 0 20px var(--accent)' }}>MOODBOARDS</h2>
-        <p className="font-mono-courier" style={{ color: 'var(--text-dim)' }}>Video inspiration from skate culture</p>
+        <p className="font-mono-courier" style={{ color: 'var(--text-dim)' }}>Things that inspire us</p>
         <button onClick={handleShuffle} className="px-4 py-2 font-mono-vt" style={{ background: 'var(--accent)', color: 'var(--bg)', border: 'none', cursor: 'pointer' }}>
           <RefreshCw size={14} className="inline mr-2" />[ SHUFFLE ]
         </button>
