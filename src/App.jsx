@@ -1264,33 +1264,41 @@ const ContactPage = () => {
 };
 
 // Moodboards Page
+const moodboardImages = Object.entries(import.meta.glob('../assets/moodboard/*.{png,jpg,jpeg,gif,webp,svg}', { eager: true, import: 'default' }));
+
 const MoodboardsPage = () => {
   const [activeVideo, setActiveVideo] = useState(null);
+  const [activeImage, setActiveImage] = useState(null);
   const videos = useMemo(() => [
     '7IdoDJCssNk', 'M_0do0LP2tk', 'XTomk3L1R5I', 'cFwytlpCJ9U', 'l126-q8Ne5I',
     '0JpVNPH6cl8', 'P_QJKaKD-i8', 'mBjo4Dmsmok', 'sKE1nLc5P_c', '0zIVTDbve7k',
     'ZYAzo5OdqHM', 'tnFPQ57l0Dg', 'RqQGUJK7Na4', 'pYdkiWIPp-s', 'vtBoQuAtX3I',
+    'alizrRKF4zc', 'O9QSpCkzMUc', '8m0I94-r7vk', 'j-rAdTueGZ0',
   ], []);
 
-  const [displayVideos, setDisplayVideos] = useState(() => {
-    const getRandomSize = () => {
-      const rand = Math.random();
-      if (rand < 0.35) return 'small';
-      if (rand < 0.7) return 'medium';
-      return 'large';
-    };
-    return [...videos].sort(() => Math.random() - 0.5).map(id => ({ id, size: getRandomSize() }));
-  });
+  const images = useMemo(() => moodboardImages.map(([path, src]) => ({
+    src,
+    name: path.split('/').pop().replace(/\.[^.]+$/, ''),
+  })), []);
+
+  const getRandomSize = useCallback(() => {
+    const rand = Math.random();
+    if (rand < 0.35) return 'small';
+    if (rand < 0.7) return 'medium';
+    return 'large';
+  }, []);
+
+  const buildItems = useCallback(() => {
+    const videoItems = videos.map(id => ({ type: 'video', id, size: getRandomSize() }));
+    const imageItems = images.map(img => ({ type: 'image', ...img, size: getRandomSize() }));
+    return [...videoItems, ...imageItems].sort(() => Math.random() - 0.5);
+  }, [videos, images, getRandomSize]);
+
+  const [displayItems, setDisplayItems] = useState(buildItems);
 
   const handleShuffle = useCallback(() => {
-    const getRandomSize = () => {
-      const rand = Math.random();
-      if (rand < 0.35) return 'small';
-      if (rand < 0.7) return 'medium';
-      return 'large';
-    };
-    setDisplayVideos([...videos].sort(() => Math.random() - 0.5).map(id => ({ id, size: getRandomSize() })));
-  }, [videos]);
+    setDisplayItems(buildItems());
+  }, [buildItems]);
 
   const getThumbnail = (videoId) => `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
@@ -1306,34 +1314,37 @@ const MoodboardsPage = () => {
     <div className="space-y-6 pb-16">
       <div className="text-center space-y-4">
         <h2 className="text-4xl md:text-5xl font-mono-vt" style={{ color: 'var(--accent)', textShadow: '0 0 20px var(--accent)' }}>MOODBOARDS</h2>
-        <p className="font-mono-courier" style={{ color: 'var(--text-dim)' }}>Video inspiration from skate culture</p>
+        <p className="font-mono-courier" style={{ color: 'var(--text-dim)' }}>Things that inspire us</p>
         <button onClick={handleShuffle} className="px-4 py-2 font-mono-vt" style={{ background: 'var(--accent)', color: 'var(--bg)', border: 'none', cursor: 'pointer' }}>
           <RefreshCw size={14} className="inline mr-2" />[ SHUFFLE ]
         </button>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 auto-rows-[100px] md:auto-rows-[120px]">
-        {displayVideos.map(({ id, size }, idx) => (
+        {displayItems.map((item, idx) => item.type === 'video' ? (
           <button
-            key={`${id}-${idx}`}
-            onClick={() => setActiveVideo(id)}
-            className={`group relative overflow-hidden transition-all duration-300 hover:scale-[1.02] ${getSizeClasses(size)}`}
+            key={`video-${item.id}-${idx}`}
+            onClick={() => setActiveVideo(item.id)}
+            className={`group relative overflow-hidden transition-all duration-300 hover:scale-[1.02] ${getSizeClasses(item.size)}`}
             style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
           >
-            <img src={getThumbnail(id)} alt="" loading="lazy" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+            <img src={getThumbnail(item.id)} alt="" loading="lazy" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <div className="w-12 h-12 flex items-center justify-center" style={{ background: 'var(--accent)', borderRadius: '50%' }}>
                 <svg className="w-5 h-5 ml-1" fill="var(--bg)" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
               </div>
             </div>
           </button>
+        ) : (
+          <button
+            key={`image-${item.name}-${idx}`}
+            onClick={() => setActiveImage(item.src)}
+            className={`group relative overflow-hidden transition-all duration-300 hover:scale-[1.02] ${getSizeClasses(item.size)}`}
+            style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+          >
+            <img src={item.src} alt={item.name} loading="lazy" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+          </button>
         ))}
-      </div>
-
-      <div className="text-center">
-        <a href="https://www.youtube.com/@quartersnacksdotcom" target="_blank" rel="noopener noreferrer" className="inline-block px-4 py-2 font-mono-vt" style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--accent)' }}>
-          QUARTERSNACKS →
-        </a>
       </div>
 
       {activeVideo && (
@@ -1343,6 +1354,15 @@ const MoodboardsPage = () => {
             <div className="aspect-video" style={{ background: 'var(--bg)' }}>
               <iframe src={`https://www.youtube.com/embed/${activeVideo}?autoplay=1&rel=0`} title="Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full" />
             </div>
+          </div>
+        </div>
+      )}
+
+      {activeImage && (
+        <div className="fixed inset-0 z-[600] flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.95)' }} onClick={() => setActiveImage(null)}>
+          <div className="relative max-w-4xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setActiveImage(null)} className="absolute -top-10 right-0 font-mono-vt" style={{ color: 'var(--text-dim)' }}>[ CLOSE ]</button>
+            <img src={activeImage} alt="" className="max-w-full max-h-[85vh] object-contain" />
           </div>
         </div>
       )}
