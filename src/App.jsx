@@ -1331,11 +1331,6 @@ const MoodboardsPage = () => {
         ))}
       </div>
 
-      <div className="text-center">
-        <a href="https://www.youtube.com/@quartersnacksdotcom" target="_blank" rel="noopener noreferrer" className="inline-block px-4 py-2 font-mono-vt" style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--accent)' }}>
-          QUARTERSNACKS →
-        </a>
-      </div>
 
       {activeVideo && (
         <div className="fixed inset-0 z-[600] flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.95)' }} onClick={() => setActiveVideo(null)}>
