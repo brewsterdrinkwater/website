@@ -1270,6 +1270,7 @@ const MoodboardsPage = () => {
     '7IdoDJCssNk', 'M_0do0LP2tk', 'XTomk3L1R5I', 'cFwytlpCJ9U', 'l126-q8Ne5I',
     '0JpVNPH6cl8', 'P_QJKaKD-i8', 'mBjo4Dmsmok', 'sKE1nLc5P_c', '0zIVTDbve7k',
     'ZYAzo5OdqHM', 'tnFPQ57l0Dg', 'RqQGUJK7Na4', 'pYdkiWIPp-s', 'vtBoQuAtX3I',
+    'alizrRKF4zc',
   ], []);
 
   const [displayVideos, setDisplayVideos] = useState(() => {
