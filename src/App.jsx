@@ -143,7 +143,6 @@ const MARQUEE_ITEMS = [
   "Alt-Tab on conventional thinking",
   "Cross-pollinating ideas since day one",
   "Systems thinking for complex problems",
-  "Press alt-tab. See what opens.",
   "Connecting dots across disciplines",
   "Part studio. Part lab. Part consultancy.",
 ];
@@ -628,88 +627,91 @@ const MountainBackground = ({ theme }) => {
 // Scanlines overlay
 const Scanlines = () => <div className="y2k-scanlines" />;
 
-// Sports Ticker Hook - fetches live scores for Arsenal and Mets
+// Sports Ticker Hook - fetches live scores for Arsenal and Mets via ESPN API
 const useSportsScores = () => {
   const [scores, setScores] = useState([]);
 
   useEffect(() => {
+    const timedFetch = (url) => {
+      const ctrl = new AbortController();
+      setTimeout(() => ctrl.abort(), 5000);
+      return fetch(url, { signal: ctrl.signal });
+    };
+
     const fetchScores = async () => {
       const sportsData = [];
 
-      // Fetch NY Mets data from MLB Stats API (free, no auth)
+      // Fetch NY Mets data from ESPN API
       try {
-        const metsId = 121; // NY Mets team ID
-        const today = new Date().toISOString().split('T')[0];
-        const endDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-        const metsCtrl = new AbortController();
-        setTimeout(() => metsCtrl.abort(), 5000);
-        const metsRes = await fetch(
-          `https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId=${metsId}&startDate=${today}&endDate=${endDate}`,
-          { signal: metsCtrl.signal }
-        );
+        const metsRes = await timedFetch('https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/21/schedule');
         if (metsRes.ok) {
-          const metsData = await metsRes.json();
-          const games = metsData.dates?.flatMap(d => d.games) || [];
-          if (games.length > 0) {
-            const game = games[0];
-            const isHome = game.teams.home.team.id === metsId;
-            const opponent = isHome ? game.teams.away.team.name : game.teams.home.team.name;
-            const status = game.status.detailedState;
-            if (status === 'Final') {
-              const metsScore = isHome ? game.teams.home.score : game.teams.away.score;
-              const oppScore = isHome ? game.teams.away.score : game.teams.home.score;
-              const result = metsScore > oppScore ? 'W' : metsScore < oppScore ? 'L' : 'T';
-              sportsData.push(`NY METS ${result} ${metsScore}-${oppScore} vs ${opponent.replace('New York ', 'NY ').toUpperCase()}`);
-            } else if (status === 'In Progress') {
-              const metsScore = isHome ? game.teams.home.score : game.teams.away.score;
-              const oppScore = isHome ? game.teams.away.score : game.teams.home.score;
-              sportsData.push(`NY METS LIVE: ${metsScore}-${oppScore} vs ${opponent.replace('New York ', 'NY ').toUpperCase()}`);
-            } else {
-              const gameDate = new Date(game.gameDate);
-              const dateStr = gameDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-              sportsData.push(`NY METS: ${isHome ? 'vs' : '@'} ${opponent.replace('New York ', 'NY ').toUpperCase()} ${dateStr}`);
-            }
+          const data = await metsRes.json();
+          const events = data.events || [];
+          const now = new Date();
+          const completed = [];
+          const upcoming = [];
+          events.forEach(ev => {
+            const comp = ev.competitions?.[0];
+            if (!comp) return;
+            const done = comp.status?.type?.completed;
+            const team = comp.competitors?.find(c => String(c.team?.id) === '21');
+            const opp = comp.competitors?.find(c => String(c.team?.id) !== '21');
+            if (!team || !opp) return;
+            if (done) completed.push({ team, opp, ev });
+            else upcoming.push({ team, opp, ev });
+          });
+          // Show most recent completed game
+          if (completed.length > 0) {
+            const last = completed[completed.length - 1];
+            const result = last.team.winner === true ? 'W' : last.team.winner === false ? 'L' : 'T';
+            const oppName = (last.opp.team?.abbreviation || last.opp.team?.shortDisplayName || '?').toUpperCase();
+            sportsData.push(`NY METS ${result} ${last.team.score}-${last.opp.score} vs ${oppName}`);
+          }
+          // Show next upcoming game
+          if (upcoming.length > 0) {
+            const next = upcoming[0];
+            const oppName = (next.opp.team?.abbreviation || next.opp.team?.shortDisplayName || '?').toUpperCase();
+            const homeAway = next.team.homeAway === 'home' ? 'vs' : '@';
+            const dateStr = new Date(next.ev.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+            sportsData.push(`NY METS NEXT: ${homeAway} ${oppName} ${dateStr}`);
           }
         }
       } catch (e) {
         sportsData.push('NY METS: Check schedule at mlb.com/mets');
       }
 
-      // Fetch Arsenal data from free API
+      // Fetch Arsenal data from ESPN API
       try {
-        const arsenalCtrl = new AbortController();
-        setTimeout(() => arsenalCtrl.abort(), 5000);
-        const arsenalRes = await fetch('https://www.thesportsdb.com/api/v1/json/3/eventslast.php?id=133604', { signal: arsenalCtrl.signal });
+        const arsenalRes = await timedFetch('https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/teams/359/schedule');
         if (arsenalRes.ok) {
-          const arsenalData = await arsenalRes.json();
-          const lastGame = arsenalData.results?.[0];
-          if (lastGame) {
-            const isHome = lastGame.idHomeTeam === '133604';
-            const arsenalScore = isHome ? lastGame.intHomeScore : lastGame.intAwayScore;
-            const oppScore = isHome ? lastGame.intAwayScore : lastGame.intHomeScore;
-            const opponent = isHome ? lastGame.strAwayTeam : lastGame.strHomeTeam;
-            const result = parseInt(arsenalScore) > parseInt(oppScore) ? 'W' : parseInt(arsenalScore) < parseInt(oppScore) ? 'L' : 'D';
-            sportsData.push(`ARSENAL ${result} ${arsenalScore}-${oppScore} vs ${opponent.toUpperCase()}`);
+          const data = await arsenalRes.json();
+          const events = data.events || [];
+          const completed = [];
+          const upcoming = [];
+          events.forEach(ev => {
+            const comp = ev.competitions?.[0];
+            if (!comp) return;
+            const done = comp.status?.type?.completed;
+            const team = comp.competitors?.find(c => String(c.team?.id) === '359');
+            const opp = comp.competitors?.find(c => String(c.team?.id) !== '359');
+            if (!team || !opp) return;
+            if (done) completed.push({ team, opp, ev });
+            else upcoming.push({ team, opp, ev });
+          });
+          // Show most recent completed game
+          if (completed.length > 0) {
+            const last = completed[completed.length - 1];
+            const result = last.team.winner === true ? 'W' : last.team.winner === false ? 'L' : 'D';
+            const oppName = (last.opp.team?.abbreviation || last.opp.team?.shortDisplayName || '?').toUpperCase();
+            sportsData.push(`ARSENAL ${result} ${last.team.score}-${last.opp.score} vs ${oppName}`);
           }
-        }
-      } catch (e) {
-        // Fallback
-      }
-
-      // Try to get next Arsenal fixture
-      try {
-        const nextCtrl = new AbortController();
-        setTimeout(() => nextCtrl.abort(), 5000);
-        const nextRes = await fetch('https://www.thesportsdb.com/api/v1/json/3/eventsnext.php?id=133604', { signal: nextCtrl.signal });
-        if (nextRes.ok) {
-          const nextData = await nextRes.json();
-          const nextGame = nextData.events?.[0];
-          if (nextGame) {
-            const isHome = nextGame.idHomeTeam === '133604';
-            const opponent = isHome ? nextGame.strAwayTeam : nextGame.strHomeTeam;
-            const gameDate = new Date(nextGame.dateEvent);
-            const dateStr = gameDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-            sportsData.push(`ARSENAL NEXT: ${isHome ? 'vs' : '@'} ${opponent.toUpperCase()} ${dateStr}`);
+          // Show next upcoming game
+          if (upcoming.length > 0) {
+            const next = upcoming[0];
+            const oppName = (next.opp.team?.abbreviation || next.opp.team?.shortDisplayName || '?').toUpperCase();
+            const homeAway = next.team.homeAway === 'home' ? 'vs' : '@';
+            const dateStr = new Date(next.ev.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+            sportsData.push(`ARSENAL NEXT: ${homeAway} ${oppName} ${dateStr}`);
           }
         }
       } catch (e) {
