@@ -1264,8 +1264,6 @@ const ContactPage = () => {
 };
 
 // Moodboards Page
-const moodboardImages = Object.entries(import.meta.glob('../assets/moodboard/*.{png,jpg,jpeg,gif,webp,svg}', { eager: true, import: 'default' }));
-
 const MoodboardsPage = () => {
   const [activeVideo, setActiveVideo] = useState(null);
   const [activeImage, setActiveImage] = useState(null);
@@ -1276,9 +1274,15 @@ const MoodboardsPage = () => {
     'alizrRKF4zc', 'O9QSpCkzMUc', '8m0I94-r7vk', 'j-rAdTueGZ0',
   ], []);
 
-  const images = useMemo(() => moodboardImages.map(([path, src]) => ({
-    src,
-    name: path.split('/').pop().replace(/\.[^.]+$/, ''),
+  const images = useMemo(() => [
+    'DSM1.webp', 'download.jpg', 'download-1.jpg', 'download-2.jpg',
+    'download-3.jpg', 'download-4.jpg', 'download-7.jpg', 'download-8.jpg',
+    'download-9.jpg', 'i.shgcdn.webp', 'images.jpg',
+    'research_interior_2014_09_18_sasb_rarebooks_I45A8003.webp',
+    'tumblr_nzfoe2Rw8s1uqc5ego1_1280.jpg',
+  ].map(file => ({
+    src: `/images/moodboard/${file}`,
+    name: file.replace(/\.[^.]+$/, ''),
   })), []);
 
   const getRandomSize = useCallback(() => {
@@ -1320,7 +1324,7 @@ const MoodboardsPage = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 auto-rows-[100px] md:auto-rows-[120px]">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 auto-rows-[100px] md:auto-rows-[160px]">
         {displayItems.map((item, idx) => item.type === 'video' ? (
           <button
             key={`video-${item.id}-${idx}`}
