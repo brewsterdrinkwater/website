@@ -627,126 +627,15 @@ const MountainBackground = ({ theme }) => {
 // Scanlines overlay
 const Scanlines = () => <div className="y2k-scanlines" />;
 
-// Sports Ticker Hook - fetches live scores for Arsenal and Mets via ESPN API
-const useSportsScores = () => {
-  const [scores, setScores] = useState([]);
-
-  useEffect(() => {
-    const timedFetch = (url) => {
-      const ctrl = new AbortController();
-      setTimeout(() => ctrl.abort(), 5000);
-      return fetch(url, { signal: ctrl.signal });
-    };
-
-    const fetchScores = async () => {
-      const sportsData = [];
-
-      // Fetch NY Mets data from ESPN API
-      try {
-        const metsRes = await timedFetch('https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/21/schedule');
-        if (metsRes.ok) {
-          const data = await metsRes.json();
-          const events = data.events || [];
-          const now = new Date();
-          const completed = [];
-          const upcoming = [];
-          events.forEach(ev => {
-            const comp = ev.competitions?.[0];
-            if (!comp) return;
-            const done = comp.status?.type?.completed;
-            const team = comp.competitors?.find(c => String(c.team?.id) === '21');
-            const opp = comp.competitors?.find(c => String(c.team?.id) !== '21');
-            if (!team || !opp) return;
-            if (done) completed.push({ team, opp, ev });
-            else upcoming.push({ team, opp, ev });
-          });
-          // Show most recent completed game
-          if (completed.length > 0) {
-            const last = completed[completed.length - 1];
-            const result = last.team.winner === true ? 'W' : last.team.winner === false ? 'L' : 'T';
-            const oppName = (last.opp.team?.abbreviation || last.opp.team?.shortDisplayName || '?').toUpperCase();
-            sportsData.push(`NY METS ${result} ${last.team.score}-${last.opp.score} vs ${oppName}`);
-          }
-          // Show next upcoming game
-          if (upcoming.length > 0) {
-            const next = upcoming[0];
-            const oppName = (next.opp.team?.abbreviation || next.opp.team?.shortDisplayName || '?').toUpperCase();
-            const homeAway = next.team.homeAway === 'home' ? 'vs' : '@';
-            const dateStr = new Date(next.ev.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-            sportsData.push(`NY METS NEXT: ${homeAway} ${oppName} ${dateStr}`);
-          }
-        }
-      } catch (e) {
-        sportsData.push('NY METS: Check schedule at mlb.com/mets');
-      }
-
-      // Fetch Arsenal data from ESPN API
-      try {
-        const arsenalRes = await timedFetch('https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/teams/359/schedule');
-        if (arsenalRes.ok) {
-          const data = await arsenalRes.json();
-          const events = data.events || [];
-          const completed = [];
-          const upcoming = [];
-          events.forEach(ev => {
-            const comp = ev.competitions?.[0];
-            if (!comp) return;
-            const done = comp.status?.type?.completed;
-            const team = comp.competitors?.find(c => String(c.team?.id) === '359');
-            const opp = comp.competitors?.find(c => String(c.team?.id) !== '359');
-            if (!team || !opp) return;
-            if (done) completed.push({ team, opp, ev });
-            else upcoming.push({ team, opp, ev });
-          });
-          // Show most recent completed game
-          if (completed.length > 0) {
-            const last = completed[completed.length - 1];
-            const result = last.team.winner === true ? 'W' : last.team.winner === false ? 'L' : 'D';
-            const oppName = (last.opp.team?.abbreviation || last.opp.team?.shortDisplayName || '?').toUpperCase();
-            sportsData.push(`ARSENAL ${result} ${last.team.score}-${last.opp.score} vs ${oppName}`);
-          }
-          // Show next upcoming game
-          if (upcoming.length > 0) {
-            const next = upcoming[0];
-            const oppName = (next.opp.team?.abbreviation || next.opp.team?.shortDisplayName || '?').toUpperCase();
-            const homeAway = next.team.homeAway === 'home' ? 'vs' : '@';
-            const dateStr = new Date(next.ev.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-            sportsData.push(`ARSENAL NEXT: ${homeAway} ${oppName} ${dateStr}`);
-          }
-        }
-      } catch (e) {
-        // Fallback
-      }
-
-      if (sportsData.length === 0) {
-        sportsData.push('ARSENAL: Live scores at arsenal.com');
-        sportsData.push('NY METS: Live scores at mlb.com/mets');
-      }
-
-      setScores(sportsData);
-    };
-
-    fetchScores();
-    // Refresh every 5 minutes
-    const interval = setInterval(fetchScores, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return scores;
-};
-
-// Marquee Bar with sports scores
+// Marquee Bar
 const MarqueeBar = () => {
-  const sportsScores = useSportsScores();
-  const allItems = [...MARQUEE_ITEMS, ...sportsScores];
-
   return (
     <div className="y2k-marquee-bar">
       <div className="y2k-marquee-label">ALT-TAB</div>
       <div style={{ overflow: 'hidden', flex: 1, height: '100%', display: 'flex', alignItems: 'center' }}>
         <div className="y2k-marquee-track">
-          {[...allItems, ...allItems].map((item, i) => (
-            <span key={i} style={sportsScores.includes(item) ? { color: 'var(--accent3)' } : {}}>{item}</span>
+          {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
+            <span key={i}>{item}</span>
           ))}
         </div>
       </div>
@@ -2059,9 +1948,11 @@ const AltTabWebsite = () => {
       {currentPage !== 'home' && (
         <footer className="relative z-10 py-6 text-center" style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)' }}>
           <div className="flex flex-wrap items-center justify-center gap-4 mb-4">
-            <Link to="/about" className="font-mono-vt text-sm" style={{ color: 'var(--text-dim)' }}>About</Link>
-            <Link to="/contact" className="font-mono-vt text-sm" style={{ color: 'var(--text-dim)' }}>Contact</Link>
-            <a href="https://www.instagram.com/alttab.xyz/#" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 font-mono-vt text-sm" style={{ color: 'var(--text-dim)' }}>
+            <Link to="/about" onClick={() => window.scrollTo(0, 0)} className="font-mono-vt text-sm" style={{ color: 'var(--text-dim)' }}>About</Link>
+            <Link to="/moodboards" onClick={() => window.scrollTo(0, 0)} className="font-mono-vt text-sm" style={{ color: 'var(--text-dim)' }}>Moodboards</Link>
+            <Link to="/projects" onClick={() => window.scrollTo(0, 0)} className="font-mono-vt text-sm" style={{ color: 'var(--text-dim)' }}>Projects</Link>
+            <Link to="/contact" onClick={() => window.scrollTo(0, 0)} className="font-mono-vt text-sm" style={{ color: 'var(--text-dim)' }}>Contact</Link>
+            <a href="https://www.instagram.com/alttab.xyz/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 font-mono-vt text-sm" style={{ color: 'var(--text-dim)' }}>
               <Instagram size={14} /> @alttab
             </a>
             <a href="https://www.walt-tab.com/" target="_blank" rel="noopener noreferrer" className="font-mono-vt text-sm" style={{ color: 'var(--accent)' }}>Walt-tab</a>
