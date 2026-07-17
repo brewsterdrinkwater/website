@@ -138,13 +138,7 @@ const NEWS_LINKS = [
 
 // Marquee messages
 const MARQUEE_ITEMS = [
-  "Multi-Disciplinary Think Tank",
-  "Design × Strategy × Technology",
-  "Alt-Tab on conventional thinking",
-  "Cross-pollinating ideas since day one",
-  "Systems thinking for complex problems",
-  "Connecting dots across disciplines",
-  "Part studio. Part lab. Part consultancy.",
+  "style matters",
 ];
 
 // ===== STANDALONE COMPONENTS (outside main component to prevent remounting) =====
@@ -627,15 +621,48 @@ const MountainBackground = ({ theme }) => {
 // Scanlines overlay
 const Scanlines = () => <div className="y2k-scanlines" />;
 
+// Fetches the Mets' upcoming games from our own /api/mets serverless function.
+// The fetch is same-origin and the function is edge-cached, so this is far more
+// reliable than hitting a sports API directly from the browser. Any failure
+// just leaves the list empty and the ticker shows its default text.
+const useMetsSchedule = () => {
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    const ctrl = new AbortController();
+    const timeout = setTimeout(() => ctrl.abort(), 6000);
+
+    fetch('/api/mets', { signal: ctrl.signal })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active && data && Array.isArray(data.items)) setItems(data.items);
+      })
+      .catch(() => {})
+      .finally(() => clearTimeout(timeout));
+
+    return () => {
+      active = false;
+      clearTimeout(timeout);
+      ctrl.abort();
+    };
+  }, []);
+
+  return items;
+};
+
 // Marquee Bar
 const MarqueeBar = () => {
+  const metsItems = useMetsSchedule();
+  const allItems = [...MARQUEE_ITEMS, ...metsItems];
+
   return (
     <div className="y2k-marquee-bar">
       <div className="y2k-marquee-label">ALT-TAB</div>
       <div style={{ overflow: 'hidden', flex: 1, height: '100%', display: 'flex', alignItems: 'center' }}>
         <div className="y2k-marquee-track">
-          {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
-            <span key={i}>{item}</span>
+          {[...allItems, ...allItems].map((item, i) => (
+            <span key={i} style={metsItems.includes(item) ? { color: 'var(--accent3)' } : {}}>{item}</span>
           ))}
         </div>
       </div>
