@@ -138,13 +138,7 @@ const NEWS_LINKS = [
 
 // Marquee messages
 const MARQUEE_ITEMS = [
-  "Multi-Disciplinary Think Tank",
-  "Design × Strategy × Technology",
-  "Alt-Tab on conventional thinking",
-  "Cross-pollinating ideas since day one",
-  "Systems thinking for complex problems",
-  "Connecting dots across disciplines",
-  "Part studio. Part lab. Part consultancy.",
+  "style matters",
 ];
 
 // ===== STANDALONE COMPONENTS (outside main component to prevent remounting) =====
